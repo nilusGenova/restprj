@@ -1,1 +1,3 @@
 This is a git repo
+to execute:
+java -jar target/restprj-1.0-SNAPSHOT.jar
