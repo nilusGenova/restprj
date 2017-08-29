@@ -1,3 +1,11 @@
 This is a git repo
+
+library to install:
+sudo apt-get install librxtx-java
+
 to execute:
 java -jar target/restprj-1.0-SNAPSHOT.jar
+
+to browse:
+http://localhost:8080/hal9000/test
+http://localhost:8080/hal9000/termometer
