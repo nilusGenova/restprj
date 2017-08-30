@@ -27,7 +27,7 @@ public class App {
         // Inizializza gestione porta seriale
     	try {
     		TwoWaysSerialComms serial = new TwoWaysSerialComms();
-  	      serial.connect( "/dev/ttyUSB0" , (str) -> System.out.println(str));
+  	      serial.connect( "/dev/ttyUSB0" , (str) -> System.out.println("*"+str+"*"));
   	      
 	        Thread.sleep(5000);
   	      serial.sendMsg("GCE");

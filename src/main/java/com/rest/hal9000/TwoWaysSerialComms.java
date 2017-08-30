@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 public class TwoWaysSerialComms {
 	
+	  private static final int RCV_BUFFER_SIZE = 500;
 	  SerialReader reader = null;
 	  SerialWriter writer = null;
       private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
@@ -68,12 +69,37 @@ public class TwoWaysSerialComms {
 	      this.rcvCallBack = rcvCallBack;
 	    }
 	    
+	    private int receivedNl(byte[] buffer, int first, int len) {
+	    	System.out.println("receivedNl f:"+first+" l:"+len);
+	    	for (int i=first; i<first+len ;i++) {
+	    		System.out.print(buffer[i]);
+	    		System.out.println("="+ (char)buffer[i]);
+	    		if (buffer[i]=='\n') {
+	    			return i;
+	    		}
+	    	}
+	    	return 0;
+	    }
+	    
 	    public void run() {
-	      byte[] buffer = new byte[ 1024 ];
+	      byte[] buffer = new byte[ RCV_BUFFER_SIZE ];
 	      int len = -1;
+	      int idx = 0;
 	      try {
-	        while( ( len = this.in.read( buffer ) ) > -1 ) {
-	        	rcvCallBack.accept(new String( buffer, 0, len ));
+	        while( ( len = this.in.read( buffer, idx, RCV_BUFFER_SIZE-idx ) ) > -1 ) {  	
+	        	//if (receivedNl(buffer, idx, len)>0) { 
+	        	if (buffer[idx+len-1]=='\n') {
+	        		String[] rcvLines = new String( buffer, 0, idx+len ).split("\n");
+	        		for (int i = 0; i < rcvLines.length; i++){
+	        			rcvCallBack.accept(rcvLines[i]);
+	        		}
+	        		idx = 0;
+	        	} else {
+	        		idx += len;
+	        		if (idx == RCV_BUFFER_SIZE-1 ) {
+	        		   idx = 0;
+	        		}
+	        	}
 	        }
 	      } catch( IOException e ) {
 	        e.printStackTrace();
