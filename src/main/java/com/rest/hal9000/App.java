@@ -7,6 +7,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 
 public class App {
+	
     public static void main(String[] args) throws Exception {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
@@ -26,7 +27,7 @@ public class App {
         // Inizializza gestione porta seriale
     	try {
     		TwoWaysSerialComms serial = new TwoWaysSerialComms();
-  	      serial.connect( "/dev/ttyUSB0" );
+  	      serial.connect( "/dev/ttyUSB0" , (str) -> System.out.println(str));
   	      
 	        Thread.sleep(5000);
   	      serial.sendMsg("GCE");

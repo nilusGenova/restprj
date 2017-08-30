@@ -8,6 +8,7 @@ import gnu.io.CommPort;
 import gnu.io.SerialPort;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
 public class TwoWaysSerialComms {
 	
@@ -15,7 +16,7 @@ public class TwoWaysSerialComms {
 	  SerialWriter writer = null;
       private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
 
-	void connect( String portName ) throws Exception {
+	void connect( String portName, Consumer<String> rcvCallBack ) throws Exception {
 	    CommPortIdentifier portIdentifier = CommPortIdentifier
 	        .getPortIdentifier( portName );
 	    if( portIdentifier.isCurrentlyOwned() ) {
@@ -37,7 +38,7 @@ public class TwoWaysSerialComms {
 	        InputStream in = serialPort.getInputStream();
 	        OutputStream out = serialPort.getOutputStream();
 	        
-	        reader = new SerialReader( in );
+	        reader = new SerialReader( in , rcvCallBack);
 	        writer = new SerialWriter( out );
 
 	        ( new Thread( reader ) ).start();
@@ -60,9 +61,11 @@ public class TwoWaysSerialComms {
 	  private static class SerialReader implements Runnable {
 
 	    InputStream in;
+	    Consumer<String> rcvCallBack;
 
-	    public SerialReader( InputStream in ) {
+	    public SerialReader( InputStream in , Consumer<String> rcvCallBack) {
 	      this.in = in;
+	      this.rcvCallBack = rcvCallBack;
 	    }
 	    
 	    public void run() {
@@ -70,7 +73,7 @@ public class TwoWaysSerialComms {
 	      int len = -1;
 	      try {
 	        while( ( len = this.in.read( buffer ) ) > -1 ) {
-	          System.out.println( new String( buffer, 0, len ) );
+	        	rcvCallBack.accept(new String( buffer, 0, len ));
 	        }
 	      } catch( IOException e ) {
 	        e.printStackTrace();
