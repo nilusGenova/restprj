@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 public class TwoWaysSerialComms {
 	
-	  private static final int RCV_BUFFER_SIZE = 500;
+	  private static final int RCV_BUFFER_SIZE = 100;
 	  SerialReader reader = null;
 	  SerialWriter writer = null;
       private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
@@ -86,18 +86,31 @@ public class TwoWaysSerialComms {
 	      int len = -1;
 	      int idx = 0;
 	      try {
-	        while( ( len = this.in.read( buffer, idx, RCV_BUFFER_SIZE-idx ) ) > -1 ) {  	
-	        	//if (receivedNl(buffer, idx, len)>0) { 
-	        	if (buffer[idx+len-1]=='\n') {
-	        		String[] rcvLines = new String( buffer, 0, idx+len ).split("\n");
-	        		for (int i = 0; i < rcvLines.length; i++){
+	        while( ( len = this.in.read( buffer, idx, RCV_BUFFER_SIZE-idx ) ) > -1 ) {
+	        	String rcvChars = new String( buffer, 0, idx+len );
+	        	if (rcvChars.contains("\n")) {
+	        		String[] rcvLines = rcvChars.split("\n");
+	        		int numOfCompletedStrings = rcvLines.length;
+	        		if (buffer[idx+len-1]!='\n') {
+	        			//latest string is incomplete so put back in buffer for latest processing
+	        			idx = rcvLines[numOfCompletedStrings-1].length();
+	        			for (int i = 0; i < idx; i++){
+		        			buffer[i] = (byte)rcvLines[numOfCompletedStrings-1].charAt(i);
+		        		}
+	        			numOfCompletedStrings--;
+	        		} else {
+	        			//reset buffer
+	        			idx = 0;
+	        		}
+	        		// callback for each completed string
+	        		for (int i = 0; i < numOfCompletedStrings; i++){
 	        			rcvCallBack.accept(rcvLines[i]);
 	        		}
-	        		idx = 0;
 	        	} else {
 	        		idx += len;
-	        		if (idx == RCV_BUFFER_SIZE-1 ) {
-	        		   idx = 0;
+	        		if (idx >= RCV_BUFFER_SIZE-1 ) {
+	        			// delete any received char
+	        		    idx = 0;
 	        		}
 	        	}
 	        }
