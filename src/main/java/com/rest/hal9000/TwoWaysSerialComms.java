@@ -69,18 +69,6 @@ public class TwoWaysSerialComms {
 	      this.rcvCallBack = rcvCallBack;
 	    }
 	    
-	    private int receivedNl(byte[] buffer, int first, int len) {
-	    	System.out.println("receivedNl f:"+first+" l:"+len);
-	    	for (int i=first; i<first+len ;i++) {
-	    		System.out.print(buffer[i]);
-	    		System.out.println("="+ (char)buffer[i]);
-	    		if (buffer[i]=='\n') {
-	    			return i;
-	    		}
-	    	}
-	    	return 0;
-	    }
-	    
 	    public void run() {
 	      byte[] buffer = new byte[ RCV_BUFFER_SIZE ];
 	      int len = -1;
