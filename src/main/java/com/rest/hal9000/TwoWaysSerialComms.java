@@ -17,7 +17,7 @@ public class TwoWaysSerialComms {
 	  SerialWriter writer = null;
       private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
 
-	void connect( String portName, Consumer<String> rcvCallBack ) throws Exception {
+	  public void connect( String portName, Consumer<String> rcvCallBack ) throws Exception {
 	    CommPortIdentifier portIdentifier = CommPortIdentifier
 	        .getPortIdentifier( portName );
 	    if( portIdentifier.isCurrentlyOwned() ) {
