@@ -29,6 +29,14 @@ import gnu.io.SerialPort;
 @PrepareForTest({TwoWaysSerialComms.class, CommPortIdentifier.class, SerialPort.class})
 public class TwoWaysSerialCommsTest {
 
+	// \n is the separator between messages to be considered as received
+	// \t is the separator between provided by the mocked read
+	static final String MESSAGES = "gCE174\n\tgC\tD01-01-20\t17\ngCE300\t\ngC\tT";
+	
+	static final String[] toReceive = MESSAGES.replaceAll("\t", "").split("\n");
+	static final String[] toUseInRead = MESSAGES.split("\t");
+	int readMsgIdx = 0;
+
 	@InjectMocks
     private final TwoWaysSerialComms objectUnderTest = new TwoWaysSerialComms();
 	
@@ -48,11 +56,15 @@ public class TwoWaysSerialCommsTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);	
 	}
-
-	private int simulateAnswer(String reply, InvocationOnMock invocation) {
+	
+	private int simulateRead(InvocationOnMock invocation) {
         Object[] args = invocation.getArguments();
         byte[] buffer = (byte[])args[0];
         int offs = (int)args[1];
+        if (readMsgIdx>=toUseInRead.length) {
+        	return -1;
+        }
+        String reply = toUseInRead[readMsgIdx++];
         int len = Math.min(reply.length(),(int)args[2]);
         for (int i = 0; i < len; i++){
 			buffer[i+offs] = (byte)reply.charAt(i);
@@ -60,9 +72,8 @@ public class TwoWaysSerialCommsTest {
         return len;
 	}
 	
-	
 	@Test
-	public void test() throws Exception {	
+	public void test() throws Exception {			
 		PowerMockito.mockStatic(CommPortIdentifier.class);
 		PowerMockito.when(CommPortIdentifier.getPortIdentifier(anyString())).thenReturn(portIdentifier);
 		when(portIdentifier.isCurrentlyOwned()).thenReturn(false);
@@ -70,35 +81,32 @@ public class TwoWaysSerialCommsTest {
 		doNothing().when(serialPort).setSerialPortParams(anyInt(), anyInt(), anyInt(), anyInt());
 		when(serialPort.getInputStream()).thenReturn(input);
 		when(serialPort.getOutputStream()).thenReturn(output);	
-		String[] toReply = {"gCE174", "gCD01-01-2017", "gCE300"};
-		ArrayList<String> replies = new ArrayList<>(); 
-				
-		Answer<Integer> answer1 = new Answer<Integer>() {
+		ArrayList<String> replies = new ArrayList<>();
+		readMsgIdx = 0;
+		
+		Answer<Integer> answer = new Answer<Integer>() {
 		    @Override
 		    public Integer answer(InvocationOnMock invocation) throws Throwable {
-		    	return simulateAnswer("gCE174\ngCD01-01-20", invocation);         
+		    	return simulateRead(invocation);         
 		    }
-		};
-		
-		Answer<Integer> answer2 = new Answer<Integer>() {
-		    @Override
-		    public Integer answer(InvocationOnMock invocation) throws Throwable {
-		    	return simulateAnswer("17\ngCE300\n", invocation);         
-		    }
-		};
-		
-		//when(input.read(anyObject(),anyInt(),anyInt())).thenReturn(-1);
-		when(input.read(anyObject(),anyInt(),anyInt())).thenAnswer(answer1).thenAnswer(answer2).thenReturn(-1);
+		};	
+		when(input.read(anyObject(),anyInt(),anyInt())).thenAnswer(answer);
 		
 		objectUnderTest.connect("device" , (str) -> replies.add(str));
-
-		Thread.sleep(5000);
+	
+		while (readMsgIdx<toUseInRead.length) ;
+		Thread.sleep(500);
+		
+		int msgToReceive = toReceive.length;
+		if (! MESSAGES.endsWith("\n")) {
+			msgToReceive--;
+		}
+		Assert.assertEquals("wrong number of received messages", msgToReceive, replies.size());
 		int i=0;
 		for (String reply: replies) {
 		    System.out.println(reply);
-		    Assert.assertEquals("Wrong answer:", reply, toReply[i++]);
+		    Assert.assertEquals("Wrong answer:", reply, toReceive[i++]);
 		}
-		//fail("Not yet implemented");
 	}
 
 }
