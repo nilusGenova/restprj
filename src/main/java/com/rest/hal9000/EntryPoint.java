@@ -1,8 +1,10 @@
 package com.rest.hal9000;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -11,7 +13,12 @@ import org.slf4j.LoggerFactory;
 @Path("/hal9000")
 public class EntryPoint {
 
-    private static Logger log = LoggerFactory.getLogger(EntryPoint.class);
+    private static final Logger log = LoggerFactory.getLogger(EntryPoint.class);
+
+    private void setLogLevel(String level) {
+	org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getRootLogger();
+	logger4j.setLevel(org.apache.log4j.Level.toLevel(level));
+    }
 
     @GET
     @Path("test")
@@ -28,4 +35,19 @@ public class EntryPoint {
 	log.info("termometer called");
 	return "15";
     }
+
+    @GET
+    @Path("debug")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String debugEnabler(@DefaultValue("true") @QueryParam("enable") boolean enable) {
+	if (enable) {
+	    setLogLevel("DEBUG");
+	    return "Debug enabled";
+	} else {
+	    log.debug("Debug disabled");
+	    setLogLevel("INFO");
+	    return "Debug disabled";
+	}
+    }
+
 }

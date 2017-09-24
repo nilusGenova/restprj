@@ -17,17 +17,17 @@ import gnu.io.SerialPort;
 public class TwoWaysSerialComms {
 
     private static final int RCV_BUFFER_SIZE = 100;
-    private static Logger log = LoggerFactory.getLogger(TwoWaysSerialComms.class);
+    private static final Logger log = LoggerFactory.getLogger(TwoWaysSerialComms.class);
 
     SerialReader reader = null;
     SerialWriter writer = null;
     private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
 
     public void connect(String portName, Consumer<String> rcvCallBack) throws Exception {
-	log.info("Connecting to:" + portName);
+	log.debug("Connecting to:" + portName);
 	CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 	if (portIdentifier.isCurrentlyOwned()) {
-	    log.error("Port is currently in use");
+	    log.error("Port {} is currently in use", portName);
 	} else {
 	    int timeout = 2000;
 	    CommPort commPort = portIdentifier.open(this.getClass().getName(), timeout);
@@ -38,7 +38,7 @@ public class TwoWaysSerialComms {
 			SerialPort.PARITY_NONE);
 
 		// This delay is required because Arduino restarts after connection
-		log.info("Delay to wait for Arduino restart");
+		log.debug("Delay to wait for Arduino restart");
 		Thread.sleep(2000);
 
 		InputStream in = serialPort.getInputStream();
@@ -82,13 +82,13 @@ public class TwoWaysSerialComms {
 	    try {
 		while ((len = this.in.read(buffer, idx, RCV_BUFFER_SIZE - idx)) > -1) {
 		    String rcvChars = new String(buffer, 0, idx + len);
-		    log.info("Reader: received <{}>", rcvChars);
+		    log.debug("Reader: received <{}>", rcvChars);
 		    if (rcvChars.contains("\n")) {
 			String[] rcvLines = rcvChars.split("\n");
 			int numOfCompletedStrings = rcvLines.length;
 			if (buffer[idx + len - 1] != '\n') {
 			    // latest string is incomplete so put back in buffer for latest processing
-			    log.info("Reader: put back in buffer for latest processing <{}>",
+			    log.debug("Reader: put back in buffer for latest processing <{}>",
 				    rcvLines[numOfCompletedStrings - 1]);
 			    idx = rcvLines[numOfCompletedStrings - 1].length();
 			    for (int i = 0; i < idx; i++) {
@@ -107,7 +107,7 @@ public class TwoWaysSerialComms {
 			idx += len;
 			if (idx >= RCV_BUFFER_SIZE - 1) {
 			    // delete any received char
-			    log.info("Reader: resetting any received char");
+			    log.debug("Reader: resetting any received char");
 			    idx = 0;
 			}
 		    }
@@ -132,7 +132,7 @@ public class TwoWaysSerialComms {
 		while (true) {
 		    // block until a msg to send arrives
 		    String msgToSend = outMsgQueue.take();
-		    log.info("Writer: sending <{}>", msgToSend);
+		    log.debug("Writer: sending <{}>", msgToSend);
 		    this.out.write(msgToSend.getBytes());
 		    this.out.write('\n');
 		    this.out.flush();
