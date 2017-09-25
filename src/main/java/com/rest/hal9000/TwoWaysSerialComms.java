@@ -24,7 +24,7 @@ public class TwoWaysSerialComms {
     private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
 
     public void connect(String portName, Consumer<String> rcvCallBack) throws Exception {
-	log.debug("Connecting to:" + portName);
+	log.debug("Connecting to: {}", portName);
 	CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 	if (portIdentifier.isCurrentlyOwned()) {
 	    log.error("Port {} is currently in use", portName);
