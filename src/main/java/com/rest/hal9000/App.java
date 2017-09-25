@@ -7,8 +7,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 public class App {
 
     private final static String usbDevice = "/dev/ttyUSB0";
+    private final static String DEBUG_FILE_NAME = "/tmp/hal900debug";
 
     public static void main(String[] args) throws Exception {
+	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
 	ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 	context.setContextPath("/");
 

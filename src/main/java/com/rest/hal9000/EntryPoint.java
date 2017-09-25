@@ -15,11 +15,6 @@ public class EntryPoint {
 
     private static final Logger log = LoggerFactory.getLogger(EntryPoint.class);
 
-    private void setLogLevel(String level) {
-	org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getRootLogger();
-	logger4j.setLevel(org.apache.log4j.Level.toLevel(level));
-    }
-
     @GET
     @Path("test")
     @Produces(MediaType.TEXT_PLAIN)
@@ -41,11 +36,12 @@ public class EntryPoint {
     @Produces(MediaType.TEXT_PLAIN)
     public String debugEnabler(@DefaultValue("true") @QueryParam("enable") boolean enable) {
 	if (enable) {
-	    setLogLevel("DEBUG");
+	    CommonUtils.setLogLevel("DEBUG");
+	    log.debug("Debug enabled");
 	    return "Debug enabled";
 	} else {
 	    log.debug("Debug disabled");
-	    setLogLevel("INFO");
+	    CommonUtils.setLogLevel("INFO");
 	    return "Debug disabled";
 	}
     }
