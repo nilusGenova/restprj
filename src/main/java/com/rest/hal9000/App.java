@@ -11,6 +11,9 @@ public class App {
 
     public static void main(String[] args) throws Exception {
 	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
+
+	final Parser parser = new Parser();
+
 	ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 	context.setContextPath("/");
 
@@ -26,7 +29,8 @@ public class App {
 	// Inizializza gestione porta seriale
 	try {
 	    TwoWaysSerialComms serial = new TwoWaysSerialComms();
-	    serial.connect(usbDevice, (str) -> System.out.println("*" + str + "*"));
+	    // serial.connect(usbDevice, (str) -> System.out.println("*" + str + "*"));
+	    serial.connect(usbDevice, (str) -> parser.msgToBeParsed(str));
 
 	    Thread.sleep(5000);
 	    serial.sendMsg("GCE");
