@@ -1,5 +1,6 @@
 package com.rest.test;
 
+import static org.mockito.Matchers.anyChar;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
@@ -36,82 +37,83 @@ public class ParserTest {
     @Before
     public void setUp() throws Exception {
 	MockitoAnnotations.initMocks(this);
-	
+
     }
 
     private void delay() {
-    	try {
-    		Thread.sleep(500);
-    	} catch (InterruptedException e) {
-    		e.printStackTrace();
-    	}
+	try {
+	    Thread.sleep(500);
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	}
     }
-    
+
     @Test
     public void checkIfMessagesAreRecognized() {
-    	when(objA.getId()).thenReturn('A');
-    	when(objB.getId()).thenReturn('B');
-    	doNothing().when(objA).parseGetAnswer(anyString());
-    	doNothing().when(objB).parseGetAnswer(anyString());
-    	doNothing().when(objA).parseEvent(anyString());
-    	doNothing().when(objB).parseEvent(anyString());
+	when(objA.getId()).thenReturn('A');
+	when(objB.getId()).thenReturn('B');
+	doNothing().when(objA).parseGetAnswer(anyChar(), anyString());
+	doNothing().when(objB).parseGetAnswer(anyChar(), anyString());
+	doNothing().when(objA).parseEvent(anyChar(), anyString());
+	doNothing().when(objB).parseEvent(anyChar(), anyString());
 
-    	parser.registerObj(objA);
-    	parser.registerObj(objB);
-    	parser.start();
-    	
+	parser.registerObj(objA);
+	parser.registerObj(objB);
+	parser.start();
+
 	Assert.assertEquals("Wrong number of registered objects:", parser.numOfRegisteredObj(), 2);
 
 	// Verify Wrong Messages
 	parser.msgToBeParsed("GA");
 	parser.msgToBeParsed("SB");
 	parser.msgToBeParsed("sB");
+	parser.msgToBeParsed("RB");
 	delay();
 
-	verify(objA, never()).parseGetAnswer(anyString());
-	verify(objB, never()).parseGetAnswer(anyString());
-	verify(objB, never()).parseEvent(anyString());
-	verify(objA, never()).parseEvent(anyString());
+	verify(objA, never()).parseGetAnswer(anyChar(), anyString());
+	verify(objB, never()).parseGetAnswer(anyChar(), anyString());
+	verify(objB, never()).parseEvent(anyChar(), anyString());
+	verify(objA, never()).parseEvent(anyChar(), anyString());
 
 	// Verify Wrong Object
 	parser.msgToBeParsed("gC");
 	parser.msgToBeParsed("EC");
 	delay();
 
-	verify(objA, never()).parseGetAnswer(anyString());
-	verify(objB, never()).parseGetAnswer(anyString());
-	verify(objB, never()).parseEvent(anyString());
-	verify(objA, never()).parseEvent(anyString());
+	verify(objA, never()).parseGetAnswer(anyChar(), anyString());
+	verify(objB, never()).parseGetAnswer(anyChar(), anyString());
+	verify(objB, never()).parseEvent(anyChar(), anyString());
+	verify(objA, never()).parseEvent(anyChar(), anyString());
 
 	// Verify Errors
 	parser.msgToBeParsed("!A");
 	parser.msgToBeParsed("!B");
 	delay();
 
-	verify(objA, never()).parseGetAnswer(anyString());
-	verify(objB, never()).parseGetAnswer(anyString());
-	verify(objB, never()).parseEvent(anyString());
-	verify(objA, never()).parseEvent(anyString());
+	verify(objA, never()).parseGetAnswer(anyChar(), anyString());
+	verify(objB, never()).parseGetAnswer(anyChar(), anyString());
+	verify(objB, never()).parseEvent(anyChar(), anyString());
+	verify(objA, never()).parseEvent(anyChar(), anyString());
 
 	// Verify Comments
 	parser.msgToBeParsed(";hello");
 	delay();
 
-	verify(objA, never()).parseGetAnswer(anyString());
-	verify(objB, never()).parseGetAnswer(anyString());
-	verify(objB, never()).parseEvent(anyString());
-	verify(objA, never()).parseEvent(anyString());
+	verify(objA, never()).parseGetAnswer(anyChar(), anyString());
+	verify(objB, never()).parseGetAnswer(anyChar(), anyString());
+	verify(objB, never()).parseEvent(anyChar(), anyString());
+	verify(objA, never()).parseEvent(anyChar(), anyString());
 
 	// Verify Correct messages
-	parser.msgToBeParsed("gA");
-	parser.msgToBeParsed("gB");
-	parser.msgToBeParsed("EB");
-	parser.msgToBeParsed("EA");
+	parser.msgToBeParsed("gA1parm");
+	parser.msgToBeParsed("gB2Z");
+	parser.msgToBeParsed("EB3Zza");
+	parser.msgToBeParsed("EA1Z");
 	delay();
-	
-	verify(objA).parseGetAnswer("gA");
-	verify(objB).parseGetAnswer("gB");
-	verify(objB).parseEvent("EB");
-	verify(objA).parseEvent("EA");
+
+	verify(objA).parseGetAnswer('1', "parm");
+	verify(objB).parseGetAnswer('2', "Z");
+	verify(objB).parseEvent('3', "Zza");
+	verify(objA).parseEvent('1', "Z");
     }
 }

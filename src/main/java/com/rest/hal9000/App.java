@@ -12,7 +12,12 @@ public class App {
     public static void main(String[] args) throws Exception {
 	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
 
+	TwoWaysSerialComms serial = new TwoWaysSerialComms();
 	final Parser parser = new Parser();
+	final ClockObjAgent clockAgent = new ClockObjAgent('C', (msg) -> serial.sendMsg(msg));
+	parser.registerObj(clockAgent);
+
+	parser.start();
 
 	ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 	context.setContextPath("/");
@@ -28,7 +33,6 @@ public class App {
 
 	// Inizializza gestione porta seriale
 	try {
-	    TwoWaysSerialComms serial = new TwoWaysSerialComms();
 	    // serial.connect(usbDevice, (str) -> System.out.println("*" + str + "*"));
 	    serial.connect(usbDevice, (str) -> parser.msgToBeParsed(str));
 
