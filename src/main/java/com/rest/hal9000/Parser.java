@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 public class Parser implements Runnable {
 
     private final static BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>(5);
-   // private final static ArrayList<HalObjAgent> listRegistered = new ArrayList<>();
     private final static List<HalObjAgent> listRegistered = Collections.synchronizedList(new ArrayList<HalObjAgent>());
 
     private static final Logger log = LoggerFactory.getLogger(Parser.class);

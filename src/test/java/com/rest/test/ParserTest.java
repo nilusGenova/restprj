@@ -113,6 +113,5 @@ public class ParserTest {
 	verify(objB).parseGetAnswer("gB");
 	verify(objB).parseEvent("EB");
 	verify(objA).parseEvent("EA");
-
     }
 }
