@@ -36,29 +36,38 @@ public class ParserTest {
     @Before
     public void setUp() throws Exception {
 	MockitoAnnotations.initMocks(this);
-	when(objA.getId()).thenReturn('A');
-	when(objB.getId()).thenReturn('B');
-	doNothing().when(objA).parseGetAnswer(anyString());
-	doNothing().when(objB).parseGetAnswer(anyString());
-	doNothing().when(objA).parseEvent(anyString());
-	doNothing().when(objB).parseEvent(anyString());
-
-	parser.registerObj(objA);
-	parser.registerObj(objB);
+	
     }
 
+    private void delay() {
+    	try {
+    		Thread.sleep(500);
+    	} catch (InterruptedException e) {
+    		e.printStackTrace();
+    	}
+    }
+    
     @Test
     public void checkIfMessagesAreRecognized() {
+    	when(objA.getId()).thenReturn('A');
+    	when(objB.getId()).thenReturn('B');
+    	doNothing().when(objA).parseGetAnswer(anyString());
+    	doNothing().when(objB).parseGetAnswer(anyString());
+    	doNothing().when(objA).parseEvent(anyString());
+    	doNothing().when(objB).parseEvent(anyString());
+
+    	parser.registerObj(objA);
+    	parser.registerObj(objB);
+    	parser.start();
+    	
 	Assert.assertEquals("Wrong number of registered objects:", parser.numOfRegisteredObj(), 2);
 
 	// Verify Wrong Messages
 	parser.msgToBeParsed("GA");
 	parser.msgToBeParsed("SB");
 	parser.msgToBeParsed("sB");
+	delay();
 
-	parser.parseMsg();
-	parser.parseMsg();
-	parser.parseMsg();
 	verify(objA, never()).parseGetAnswer(anyString());
 	verify(objB, never()).parseGetAnswer(anyString());
 	verify(objB, never()).parseEvent(anyString());
@@ -67,9 +76,8 @@ public class ParserTest {
 	// Verify Wrong Object
 	parser.msgToBeParsed("gC");
 	parser.msgToBeParsed("EC");
+	delay();
 
-	parser.parseMsg();
-	parser.parseMsg();
 	verify(objA, never()).parseGetAnswer(anyString());
 	verify(objB, never()).parseGetAnswer(anyString());
 	verify(objB, never()).parseEvent(anyString());
@@ -78,9 +86,8 @@ public class ParserTest {
 	// Verify Errors
 	parser.msgToBeParsed("!A");
 	parser.msgToBeParsed("!B");
+	delay();
 
-	parser.parseMsg();
-	parser.parseMsg();
 	verify(objA, never()).parseGetAnswer(anyString());
 	verify(objB, never()).parseGetAnswer(anyString());
 	verify(objB, never()).parseEvent(anyString());
@@ -88,8 +95,8 @@ public class ParserTest {
 
 	// Verify Comments
 	parser.msgToBeParsed(";hello");
+	delay();
 
-	parser.parseMsg();
 	verify(objA, never()).parseGetAnswer(anyString());
 	verify(objB, never()).parseGetAnswer(anyString());
 	verify(objB, never()).parseEvent(anyString());
@@ -100,14 +107,11 @@ public class ParserTest {
 	parser.msgToBeParsed("gB");
 	parser.msgToBeParsed("EB");
 	parser.msgToBeParsed("EA");
-
-	parser.parseMsg();
+	delay();
+	
 	verify(objA).parseGetAnswer("gA");
-	parser.parseMsg();
 	verify(objB).parseGetAnswer("gB");
-	parser.parseMsg();
 	verify(objB).parseEvent("EB");
-	parser.parseMsg();
 	verify(objA).parseEvent("EA");
 
     }

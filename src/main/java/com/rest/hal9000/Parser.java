@@ -3,14 +3,17 @@ package com.rest.hal9000;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.List;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Parser {
+public class Parser implements Runnable {
 
     private final static BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>(5);
-    private final static ArrayList<HalObjAgent> listRegistered = new ArrayList<>();
+   // private final static ArrayList<HalObjAgent> listRegistered = new ArrayList<>();
+    private final static List<HalObjAgent> listRegistered = Collections.synchronizedList(new ArrayList<HalObjAgent>());
 
     private static final Logger log = LoggerFactory.getLogger(Parser.class);
 
@@ -26,16 +29,20 @@ public class Parser {
     }
 
     private HalObjAgent getRegisteredObj(char objId) {
-	for (HalObjAgent obj : listRegistered) {
-	    if (obj.getId() == objId) {
-		return obj;
-	    }
-	}
-	return null;
+    	synchronized(listRegistered) {
+    		for (HalObjAgent obj : listRegistered) {
+    			if (obj.getId() == objId) {
+    				return obj;
+    			}
+	        }
+    	}
+	    return null;
     }
 
     public int numOfRegisteredObj() {
-	return listRegistered.size();
+    	synchronized(listRegistered) {
+    		return listRegistered.size();
+    	}
     }
 
     public void registerObj(HalObjAgent obj) {
@@ -44,12 +51,14 @@ public class Parser {
 	if (getRegisteredObj(id) != null) {
 	    log.error("Object {} already registered", id);
 	} else {
-	    listRegistered.add(obj);
+		synchronized(listRegistered) {
+			listRegistered.add(obj);
+		}
 	}
 	log.debug("Num of registered obj:{}", numOfRegisteredObj());
     }
 
-    public void parseMsg() {
+    private void parseMsg() {
 	try {
 	    // block until a msg to parse arrives
 	    String msgToParse = msgQueue.take();
@@ -90,11 +99,15 @@ public class Parser {
 	}
     }
 
-    public void parseLoop() {
-	log.info("Parser loop");
-	while (true) {
-	    parseMsg();
-	}
+    public void run() {
+    	log.info("Parser loop");
+    	while (true) {
+    		parseMsg();
+    	}
+    }
+    
+    public void start() {
+    	(new Thread(this)).start();
     }
 
 }
