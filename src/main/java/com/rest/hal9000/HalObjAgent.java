@@ -37,4 +37,6 @@ public abstract class HalObjAgent {
     public abstract void parseGetAnswer(char attribute, String msg);
 
     public abstract void parseEvent(char event, String msg);
+    
+    public abstract void alignAll();
 }

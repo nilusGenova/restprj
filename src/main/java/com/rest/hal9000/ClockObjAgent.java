@@ -108,11 +108,16 @@ public class ClockObjAgent extends HalObjAgent {
     public void parseEvent(char event, String msg) {
 	switch (event) {
 	case 'D':
-	    sendMsgToObj("GCE");
+	    alignAll();
 	    break;
 	default:
 	    wrongAttribute();
 	}
+    }
+    
+    @Override
+    public void alignAll() {
+	sendMsgToObj("GCE");
     }
 
 }
