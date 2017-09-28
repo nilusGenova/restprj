@@ -25,10 +25,10 @@ public class EntryPoint {
     }
 
     @GET
-    @Path("termometer")
+    @Path("clock")
     @Produces(MediaType.TEXT_PLAIN)
-    public String termometer() {
-	log.info("termometer called");
+    public String clock() {
+	log.info("clock called");
 	return "15";
     }
 

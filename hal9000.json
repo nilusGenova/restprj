@@ -1,0 +1,1 @@
+{"Hal9000DebugEnabled":{"method":"POST","url":"http://localhost:8080/hal9000/debug?enable=true","body":"","overrideMimeType":false,"headers":[]},"Hal9000DebugDisabled":{"method":"POST","url":"http://localhost:8080/hal9000/debug?enable=false","body":"","overrideMimeType":false,"headers":[]}}

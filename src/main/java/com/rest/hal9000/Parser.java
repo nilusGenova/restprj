@@ -1,10 +1,8 @@
 package com.rest.hal9000;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +10,12 @@ import org.slf4j.LoggerFactory;
 public class Parser implements Runnable {
 
     private final static BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>(5);
-    private final static List<HalObjAgent> listRegistered = Collections.synchronizedList(new ArrayList<HalObjAgent>());
+    private final Function<Character, HalObjAgent> getRegisteredObj;
 
     private static final Logger log = LoggerFactory.getLogger(Parser.class);
 
-    public Parser() {
+    public Parser(Function<Character, HalObjAgent> getRegisteredObj) {
+	this.getRegisteredObj = getRegisteredObj;
     }
 
     public void msgToBeParsed(String msg) {
@@ -25,36 +24,6 @@ public class Parser implements Runnable {
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
 	}
-    }
-
-    private HalObjAgent getRegisteredObj(char objId) {
-	synchronized (listRegistered) {
-	    for (HalObjAgent obj : listRegistered) {
-		if (obj.getId() == objId) {
-		    return obj;
-		}
-	    }
-	}
-	return null;
-    }
-
-    public int numOfRegisteredObj() {
-	synchronized (listRegistered) {
-	    return listRegistered.size();
-	}
-    }
-
-    public void registerObj(HalObjAgent obj) {
-	final char id = obj.getId();
-	log.info("Register obj {}", id);
-	if (getRegisteredObj(id) != null) {
-	    log.error("Object {} already registered", id);
-	} else {
-	    synchronized (listRegistered) {
-		listRegistered.add(obj);
-	    }
-	}
-	log.debug("Num of registered obj:{}", numOfRegisteredObj());
     }
 
     private void parseMsg() {
@@ -76,7 +45,7 @@ public class Parser implements Runnable {
 		// search for registered obj
 		log.debug("Correct msg, search registered obj to dispatch");
 		final char objId = msgToParse.charAt(1);
-		HalObjAgent obj = getRegisteredObj(objId);
+		HalObjAgent obj = getRegisteredObj.apply(objId);
 		if (obj != null) {
 		    if (invocation == 'g') {
 			log.debug("Invoking obj get parser");

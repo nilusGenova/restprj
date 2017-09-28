@@ -9,7 +9,7 @@ java -jar target/restprj-1.0-SNAPSHOT.jar
 to browse:
 GET:
 http://localhost:8080/hal9000/test
-http://localhost:8080/hal9000/termometer
+http://localhost:8080/hal9000/clock
 
 POST:
 http://localhost:8080/hal9000/debug?enable=true

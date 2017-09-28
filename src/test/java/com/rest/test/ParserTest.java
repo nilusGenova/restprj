@@ -1,13 +1,13 @@
 package com.rest.test;
 
 import static org.mockito.Matchers.anyChar;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,20 +19,24 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 
 import com.rest.hal9000.HalObjAgent;
 import com.rest.hal9000.Parser;
+import com.rest.hal9000.Registry;
 
 //@RunWith(PowerMockRunner.class)
 @RunWith(MockitoJUnitRunner.class)
-@PrepareForTest({ Parser.class, HalObjAgent.class })
+@PrepareForTest({ Parser.class, HalObjAgent.class, Registry.class })
 public class ParserTest {
 
-    @InjectMocks
-    private final Parser parser = new Parser();
+    @Mock
+    private Registry registry;
 
     @Mock
     private HalObjAgent objA;
 
     @Mock
     private HalObjAgent objB;
+
+    @InjectMocks
+    private final Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
 
     @Before
     public void setUp() throws Exception {
@@ -52,16 +56,16 @@ public class ParserTest {
     public void checkIfMessagesAreRecognized() {
 	when(objA.getId()).thenReturn('A');
 	when(objB.getId()).thenReturn('B');
+	when(registry.getRegisteredObj('A')).thenReturn(objA);
+	when(registry.getRegisteredObj('B')).thenReturn(objB);
+	when(registry.numOfRegisteredObj()).thenReturn(2);
 	doNothing().when(objA).parseGetAnswer(anyChar(), anyString());
 	doNothing().when(objB).parseGetAnswer(anyChar(), anyString());
 	doNothing().when(objA).parseEvent(anyChar(), anyString());
 	doNothing().when(objB).parseEvent(anyChar(), anyString());
+	doNothing().when(registry).registerObj(anyObject());
 
-	parser.registerObj(objA);
-	parser.registerObj(objB);
 	parser.start();
-
-	Assert.assertEquals("Wrong number of registered objects:", parser.numOfRegisteredObj(), 2);
 
 	// Verify Wrong Messages
 	parser.msgToBeParsed("GA");

@@ -13,9 +13,11 @@ public class App {
 	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
 
 	TwoWaysSerialComms serial = new TwoWaysSerialComms();
-	final Parser parser = new Parser();
+	final Registry registry = new Registry();
+	final Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
+
 	final ClockObjAgent clockAgent = new ClockObjAgent('C', (msg) -> serial.sendMsg(msg));
-	parser.registerObj(clockAgent);
+	registry.registerObj(clockAgent);
 
 	parser.start();
 
