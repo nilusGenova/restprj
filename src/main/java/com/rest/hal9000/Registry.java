@@ -1,33 +1,27 @@
 package com.rest.hal9000;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Registry {
     private static final Logger log = LoggerFactory.getLogger(Registry.class);
-    private final static List<HalObjAgent> listRegistered = Collections.synchronizedList(new ArrayList<HalObjAgent>());
+    private final static Map<Character, HalObjAgent> registeredMap = new HashMap();
 
     public Registry() {
     }
 
     public HalObjAgent getRegisteredObj(char objId) {
-	synchronized (listRegistered) {
-	    for (HalObjAgent obj : listRegistered) {
-		if (obj.getId() == objId) {
-		    return obj;
-		}
-	    }
+	synchronized (registeredMap) {
+	    return registeredMap.get(objId);
 	}
-	return null;
     }
 
     public int numOfRegisteredObj() {
-	synchronized (listRegistered) {
-	    return listRegistered.size();
+	synchronized (registeredMap) {
+	    return registeredMap.size();
 	}
     }
 
@@ -37,8 +31,8 @@ public class Registry {
 	if (getRegisteredObj(id) != null) {
 	    log.error("Object {} already registered", id);
 	} else {
-	    synchronized (listRegistered) {
-		listRegistered.add(obj);
+	    synchronized (registeredMap) {
+		registeredMap.put(id, obj);
 	    }
 	}
 	log.debug("Num of registered obj:{}", numOfRegisteredObj());
