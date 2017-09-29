@@ -23,11 +23,10 @@ import com.rest.hal9000.Registry;
 
 //@RunWith(PowerMockRunner.class)
 @RunWith(MockitoJUnitRunner.class)
-@PrepareForTest({ Parser.class, HalObjAgent.class, Registry.class })
+@PrepareForTest({ Parser.class, HalObjAgent.class })
 public class ParserTest {
 
-    @Mock
-    private Registry registry;
+    private Registry registry = new Registry();
 
     @Mock
     private HalObjAgent objA;
@@ -56,15 +55,13 @@ public class ParserTest {
     public void checkIfMessagesAreRecognized() {
 	when(objA.getId()).thenReturn('A');
 	when(objB.getId()).thenReturn('B');
-	when(registry.getRegisteredObj('A')).thenReturn(objA);
-	when(registry.getRegisteredObj('B')).thenReturn(objB);
-	when(registry.numOfRegisteredObj()).thenReturn(2);
 	doNothing().when(objA).parseGetAnswer(anyChar(), anyString());
 	doNothing().when(objB).parseGetAnswer(anyChar(), anyString());
 	doNothing().when(objA).parseEvent(anyChar(), anyString());
 	doNothing().when(objB).parseEvent(anyChar(), anyString());
-	doNothing().when(registry).registerObj(anyObject());
 
+	registry.registerObj(objA);
+	registry.registerObj(objB);
 	parser.start();
 
 	// Verify Wrong Messages
