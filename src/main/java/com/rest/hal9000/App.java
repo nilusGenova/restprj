@@ -4,17 +4,18 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-public class App {
+public final class App {
 
     private final static String usbDevice = "/dev/ttyUSB0";
     private final static String DEBUG_FILE_NAME = "/tmp/hal900debug";
+    public final static Registry registry = new Registry();
+    private final static Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
 
     public static void main(String[] args) throws Exception {
 	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
 
 	TwoWaysSerialComms serial = new TwoWaysSerialComms();
-	final Registry registry = new Registry();
-	final Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
+	
 
 	final ClockObjAgent clockAgent = new ClockObjAgent('C', (msg) -> serial.sendMsg(msg));
 	registry.registerObj(clockAgent);

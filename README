@@ -13,3 +13,4 @@ http://localhost:8080/hal9000/clock
 
 POST:
 http://localhost:8080/hal9000/debug?enable=true
+http://localhost:8080/hal9000/setclock

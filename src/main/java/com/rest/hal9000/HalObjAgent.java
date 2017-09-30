@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class HalObjAgent {
-
+    
     private static final Logger log = LoggerFactory.getLogger(HalObjAgent.class);
 
     private final char id;
@@ -39,4 +39,18 @@ public abstract class HalObjAgent {
     public abstract void parseEvent(char event, String msg);
     
     public abstract void alignAll();
+    
+    public abstract String exposeData();
+    
+    public boolean executeCmd(String cmd) {
+	return false;
+    }
+    
+    public boolean deleteData(String cmd) {
+	return false;
+    }
+    
+    public boolean createData(String cmd) {
+	return false;
+    }
 }

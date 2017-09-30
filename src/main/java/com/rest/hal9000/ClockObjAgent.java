@@ -18,7 +18,7 @@ public class ClockObjAgent extends HalObjAgent {
 	    weekDay = 0;
 	    epochtime = 0;
 	}
-
+	    
 	public void setEpocTime(int et) {
 
 	    epochtime = et;
@@ -119,5 +119,17 @@ public class ClockObjAgent extends HalObjAgent {
     public void alignAll() {
 	sendMsgToObj("GCE");
     }
+    
+    @Override
+    public String exposeData() {
+	return "error from clock";
+	//TODO:
+    }
+    
+    @Override
+    public boolean executeCmd(String cmd) {
+	setActualTime();
+  	return true;
+      }
 
 }

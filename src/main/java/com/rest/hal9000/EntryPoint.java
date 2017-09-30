@@ -29,7 +29,15 @@ public class EntryPoint {
     @Produces(MediaType.TEXT_PLAIN)
     public String clock() {
 	log.info("clock called");
-	return "15";
+	return App.registry.getRegisteredObj('C').exposeData();
+    }
+    
+    @POST
+    @Path("setclock")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String clockSet() {
+	log.info("Setting actual time");
+	return App.registry.getRegisteredObj('C').executeCmd("") ? "OK" : "ERROR";
     }
 
     @POST
