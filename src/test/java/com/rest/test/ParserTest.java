@@ -1,7 +1,6 @@
 package com.rest.test;
 
 import static org.mockito.Matchers.anyChar;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
@@ -40,7 +39,6 @@ public class ParserTest {
     @Before
     public void setUp() throws Exception {
 	MockitoAnnotations.initMocks(this);
-
     }
 
     private void delay() {

@@ -31,13 +31,13 @@ public class EntryPoint {
 	log.info("clock called");
 	return App.registry.getRegisteredObj('C').exposeData();
     }
-    
+
     @POST
     @Path("setclock")
     @Produces(MediaType.TEXT_PLAIN)
     public String clockSet() {
 	log.info("Setting actual time");
-	return App.registry.getRegisteredObj('C').executeCmd("") ? "OK" : "ERROR";
+	return App.registry.getRegisteredObj('C').executeCmd("").toString();
     }
 
     @POST
