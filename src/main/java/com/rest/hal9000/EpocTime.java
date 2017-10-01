@@ -111,7 +111,7 @@ public class EpocTime {
 
     public String getEpochOfActualTime() {
 	Calendar cal = Calendar.getInstance();
-	return calculateEpocTime(cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR),
+	return calculateEpocTime(cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.YEAR),
 		cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
     }
 

@@ -60,21 +60,51 @@ public class EpocTimeTest {
     @Test
     public void testGetEpocTime() {
 	Calendar cal = Calendar.getInstance();
-	String expDate = String.format("%02d-%02d-%4d", cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH),
+	String expDate = String.format("%02d-%02d-%4d", cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1,
 		cal.get(Calendar.YEAR));
 	String expTime = String.format("%02d:%02d", cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE));
 
 	String date = epocTime.getEpocTime(31, 9, 2017, 8, 7, 5);
 	Assert.assertNull("wrong epocTime calculation", date);
 
-	date = epocTime.getEpocTime(cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR),
+	date = epocTime.getEpocTime(cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.YEAR),
 		cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
 	Assert.assertNotNull("wrong epocTime calculation", date);
 
 	epocTime.setEpocTime(Integer.parseInt(date));
 	Assert.assertEquals("wrong date", expDate, epocTime.getDate());
 	Assert.assertEquals("wrong time", expTime, epocTime.getTime());
-	Assert.assertEquals("wrong weekDay", (cal.get(Calendar.DAY_OF_WEEK) + 4) % 7, epocTime.getWeekDay());
+	Assert.assertEquals("wrong weekDay", (cal.get(Calendar.DAY_OF_WEEK) + 6) % 7, epocTime.getWeekDay());
+
+	date = epocTime.getEpocTime(1, 10, 2017, 22, 1, 0);
+	epocTime.setEpocTime(Integer.parseInt(date));
+	Assert.assertEquals("wrong date", "01-10-2017", epocTime.getDate());
+	Assert.assertEquals("wrong time", "22:01", epocTime.getTime());
+	Assert.assertEquals("wrong weekDay", 0, epocTime.getWeekDay());
+    }
+
+    @Test
+    public void testGetEpochOfActualTime() {
+	Calendar cal = Calendar.getInstance();
+	epocTime.setEpocTime(Integer.parseInt(epocTime.getEpochOfActualTime()));
+	String date = epocTime.getDate();
+	String time = epocTime.getTime();
+	int day = Integer.parseInt(date.substring(0, 2));
+	int month = Integer.parseInt(date.substring(3, 5));
+	int year = Integer.parseInt(date.substring(6, 10));
+	int hour = Integer.parseInt(time.substring(0, 2));
+	int min = Integer.parseInt(time.substring(3, 5));
+
+	System.out.println("Actual date:" + date);
+	System.out.println("Actual time:" + time);
+
+	Assert.assertEquals("Wrong day", cal.get(Calendar.DAY_OF_MONTH), day);
+	Assert.assertEquals("Wrong month", cal.get(Calendar.MONTH) + 1, month);
+	Assert.assertEquals("Wrong year", cal.get(Calendar.YEAR), year);
+	Assert.assertEquals("Wrong hour", cal.get(Calendar.HOUR), hour);
+	Assert.assertEquals("Wrong minute", cal.get(Calendar.MINUTE), min);
+	Assert.assertTrue("Error in date part of getEpochOfActualTime", epocTime.isDateValid(day, month, year));
+	Assert.assertTrue("Error in time part of getEpochOfActualTime", epocTime.isTimeValid(hour, min, 0));
     }
 
 }
