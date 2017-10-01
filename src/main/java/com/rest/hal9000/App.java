@@ -15,12 +15,13 @@ public final class App {
 	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
 
 	TwoWaysSerialComms serial = new TwoWaysSerialComms();
-	
 
 	final ClockObjAgent clockAgent = new ClockObjAgent('C', (msg) -> serial.sendMsg(msg));
 	registry.registerObj(clockAgent);
 
 	parser.start();
+
+	clockAgent.alignAll();
 
 	ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 	context.setContextPath("/");

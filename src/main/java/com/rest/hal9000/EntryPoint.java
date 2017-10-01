@@ -26,10 +26,9 @@ public class EntryPoint {
 
     @GET
     @Path("clock")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public String clock() {
-	log.info("clock called");
-	return App.registry.getRegisteredObj('C').exposeData();
+	return App.registry.getRegisteredObj('C').exposeJsonData();
     }
 
     @POST

@@ -11,9 +11,10 @@ public abstract class HalObjAgent {
 	OK, ERROR, INVALID_CMD, NOT_FOUND, NOT_ENOUGHT_SPACE
     }
 
-    private static final Logger log = LoggerFactory.getLogger(HalObjAgent.class);
+    protected static final Logger log = LoggerFactory.getLogger(HalObjAgent.class);
 
     private final char id;
+
     private final Consumer<String> sendMsgCallBack;
 
     public HalObjAgent(char id, Consumer<String> sendMsgCallBack) {
@@ -43,6 +44,12 @@ public abstract class HalObjAgent {
     public abstract void parseEvent(char event, String msg);
 
     public abstract void alignAll();
+
+    public String exposeJsonData() {
+	String jsonInString = exposeData();
+	log.debug("exposed json:" + jsonInString);
+	return jsonInString;
+    }
 
     public abstract String exposeData();
 

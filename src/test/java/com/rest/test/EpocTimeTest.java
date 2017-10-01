@@ -71,13 +71,13 @@ public class EpocTimeTest {
 		cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
 	Assert.assertNotNull("wrong epocTime calculation", date);
 
-	epocTime.setEpocTime(Integer.parseInt(date));
+	epocTime.setEpocTime(Long.parseLong(date));
 	Assert.assertEquals("wrong date", expDate, epocTime.getDate());
 	Assert.assertEquals("wrong time", expTime, epocTime.getTime());
 	Assert.assertEquals("wrong weekDay", (cal.get(Calendar.DAY_OF_WEEK) + 6) % 7, epocTime.getWeekDay());
 
-	date = epocTime.getEpocTime(1, 10, 2017, 22, 1, 0);
-	epocTime.setEpocTime(Integer.parseInt(date));
+	date = epocTime.getEpocTime(1, 10, 2017, 22, 1, 0); // 1-oct-2017 is Sunday(0)
+	epocTime.setEpocTime(Long.parseLong(date));
 	Assert.assertEquals("wrong date", "01-10-2017", epocTime.getDate());
 	Assert.assertEquals("wrong time", "22:01", epocTime.getTime());
 	Assert.assertEquals("wrong weekDay", 0, epocTime.getWeekDay());
@@ -86,7 +86,7 @@ public class EpocTimeTest {
     @Test
     public void testGetEpochOfActualTime() {
 	Calendar cal = Calendar.getInstance();
-	epocTime.setEpocTime(Integer.parseInt(epocTime.getEpochOfActualTime()));
+	epocTime.setEpocTime(Long.parseLong(epocTime.getEpocOfActualTime()));
 	String date = epocTime.getDate();
 	String time = epocTime.getTime();
 	int day = Integer.parseInt(date.substring(0, 2));

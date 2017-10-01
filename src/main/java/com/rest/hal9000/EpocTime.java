@@ -19,47 +19,49 @@ public class EpocTime {
     private String date;
     private String time;
     private int weekDay; // 0:Sun -- 6:Sat
-    private int epochtime; // value in Sec from 1-1-2000
+    private long epochTime; // value in Sec from 1-1-2000
 
     public EpocTime() {
-	super();
 	date = "01-01-2000";
 	time = "00:00";
 	weekDay = 0;
-	epochtime = 0;
+	epochTime = 0;
     }
 
-    public void setEpocTime(int et) {
-
-	epochtime = et;
-	weekDay = (epochtime / 3600) / 24;
+    public void setEpocTime(long et) {
+	log.debug("Setting Epoc time:{}", et);
+	epochTime = et;
+	weekDay = (int) (epochTime / 3600) / 24;
 	weekDay = (weekDay + 6) % 7; // 0:Sun --- 6:Sat
 
-	int hour = ((epochtime / 3600) % 24);
-	int min = ((epochtime / 60) % 60);
+	int hour = (int) ((epochTime / 3600) % 24);
+	int min = (int) ((epochTime / 60) % 60);
 	time = String.format("%02d:%02d", hour, min);
+	log.debug("WeekDay:{}", weekDay);
+	log.debug("Time:" + time);
 
 	int years;
-	int epoch = epochtime / 3600;
-	epoch /= 24;
-	years = epoch / (365 * 4 + 1) * 4;
-	epoch %= 365 * 4 + 1;
+	long localEpoch = epochTime / 3600;
+	localEpoch /= 24;
+	years = (int) localEpoch / (365 * 4 + 1) * 4;
+	localEpoch %= 365 * 4 + 1;
 	int year;
 	int month;
 	int day;
 	for (year = 3; year > 0; year--) {
-	    if (epoch >= days[year][0])
+	    if (localEpoch >= days[year][0])
 		break;
 	}
 	for (month = 11; month > 0; month--) {
-	    if (epoch >= days[year][month])
+	    if (localEpoch >= days[year][month])
 		break;
 	}
-	day = epoch - days[year][month] + 1;
+	day = (int) localEpoch - days[year][month] + 1;
 	year = 2000 + years + year;
 	month += 1;
 
 	date = String.format("%02d-%02d-%4d", day, month, year);
+	log.debug("Date:" + date);
     }
 
     public String getDate() {
@@ -100,6 +102,7 @@ public class EpocTime {
     }
 
     public String getEpocTime(int day, int month, int year, int hour, int min, int sec) {
+	log.debug("getEpocTime of {}-{}-{} {}:{}:{}", day, month, year, hour, min, sec);
 	if (isTimeValid(hour, min, sec)) {
 	    String date = convertDateIfValid(day, month, year);
 	    if (date != null) {
@@ -109,19 +112,23 @@ public class EpocTime {
 	return null;
     }
 
-    public String getEpochOfActualTime() {
+    public String getEpocOfActualTime() {
+	log.debug("getEpocOfActualTime");
 	Calendar cal = Calendar.getInstance();
 	return calculateEpocTime(cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.YEAR),
 		cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
     }
 
     private String calculateEpocTime(int day, int month, int year, int hour, int min, int sec) {
+	log.debug("Calculate EpocTime of {}-{}-{} {}:{}:{}", day, month, year, hour, min, sec);
 	day -= 1;
 	month -= 1;
 	year -= 2000;
 
-	return Integer.toString(
+	String retVal = Integer.toString(
 		(((year / 4 * (365 * 4 + 1) + days[year % 4][month] + day) * 24 + hour) * 60 + min) * 60 + sec);
+	log.debug("Epoc is:{}", retVal);
+	return retVal;
     }
 
     private String convertDateIfValid(int day, int month, int year) {

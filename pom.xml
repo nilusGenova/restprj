@@ -11,6 +11,8 @@
   <properties>
      <jersey.version>2.26-b03</jersey.version>
      <jetty.version>9.4.6.v20170531</jetty.version>
+     <powermock.version>1.6.1</powermock.version>
+     <log4j.version>2.9.1</log4j.version>
   </properties>
     
     
@@ -25,12 +27,12 @@
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
-      <version>1.6.1</version>
+      <version>${powermock.version}</version>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-mockito</artifactId>
-      <version>1.6.1</version>
+      <version>${powermock.version}</version>
     </dependency>
 
     <dependency>
@@ -90,27 +92,25 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>2.9.1</version>
+      <version>${log4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>2.9.1</version>
+      <version>${log4j.version}</version>
     </dependency>
-    
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-json</artifactId>
-      <version>1.9</version>
-    </dependency>
-    
-    <dependency>
+       <dependency>
       <groupId>commons-validator</groupId>
       <artifactId>commons-validator</artifactId>
       <version>1.4.0</version>
     </dependency>
+    <dependency>
+	<groupId>com.fasterxml.jackson.core</groupId>
+	   <artifactId>jackson-databind</artifactId>
+	   <version>2.6.3</version>
+    </dependency>
     
-    
+
   </dependencies>
   <build>
   <plugins>  

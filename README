@@ -6,6 +6,10 @@ sudo apt-get install librxtx-java
 to execute:
 java -jar target/restprj-1.0-SNAPSHOT.jar
 
+to enable/disable debug:
+touch /tmp/hal900debug
+rm /tmp/hal900debug
+
 to browse:
 GET:
 http://localhost:8080/hal9000/test
