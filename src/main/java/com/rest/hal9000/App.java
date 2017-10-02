@@ -7,7 +7,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 public final class App {
 
     private final static String usbDevice = "/dev/ttyUSB0";
-    private final static String DEBUG_FILE_NAME = "/tmp/hal900debug";
+    private final static String DEBUG_FILE_NAME = "/tmp/hal9000debug";
     public final static Registry registry = new Registry();
     private final static Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
 

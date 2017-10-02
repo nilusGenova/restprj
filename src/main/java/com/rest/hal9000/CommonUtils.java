@@ -15,7 +15,10 @@ public final class CommonUtils {
     }
 
     public static void setLogLevel(String level) {
-	org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getRootLogger();
+	CommonUtils o = new CommonUtils();
+	String pkgName = o.getClass().getPackage().getName();
+	//org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getRootLogger();
+	org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getLogger(pkgName);
 	logger4j.setLevel(org.apache.log4j.Level.toLevel(level));
     }
 }

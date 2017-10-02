@@ -7,8 +7,8 @@ to execute:
 java -jar target/restprj-1.0-SNAPSHOT.jar
 
 to enable/disable debug:
-touch /tmp/hal900debug
-rm /tmp/hal900debug
+touch /tmp/hal9000debug
+rm /tmp/hal9000debug
 
 to browse:
 GET:
