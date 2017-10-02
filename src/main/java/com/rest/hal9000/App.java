@@ -17,11 +17,14 @@ public final class App {
 	TwoWaysSerialComms serial = new TwoWaysSerialComms();
 
 	final ClockObjAgent clockAgent = new ClockObjAgent('C', (msg) -> serial.sendMsg(msg));
+	final ThermoObjAgent thermoAgent = new ThermoObjAgent('T', (msg) -> serial.sendMsg(msg));
 	registry.registerObj(clockAgent);
+	registry.registerObj(thermoAgent);
 
 	parser.start();
 
 	clockAgent.alignAll();
+	thermoAgent.alignAll();
 
 	ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 	context.setContextPath("/");

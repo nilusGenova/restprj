@@ -36,7 +36,29 @@ public class EntryPoint {
     @Produces(MediaType.TEXT_PLAIN)
     public String clockSet() {
 	log.info("Setting actual time");
-	return App.registry.getRegisteredObj('C').executeCmd("").toString();
+	return App.registry.getRegisteredObj('C').executeCmd("", "").toString();
+    }
+
+    @GET
+    @Path("thermo")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getThermo() {
+	return App.registry.getRegisteredObj('T').exposeJsonData();
+    }
+
+    @POST
+    @Path("thermo")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String setThermo(@DefaultValue("-1") @QueryParam("required") int tempRequired,
+	    @DefaultValue("-1") @QueryParam("hysteresis") int hysteresis) {
+	log.info("Setting thermo vals");
+	if (tempRequired != -1) {
+	    return App.registry.getRegisteredObj('T').executeCmd("R", Integer.toString(tempRequired)).toString();
+	}
+	if (hysteresis != -1) {
+	    return App.registry.getRegisteredObj('T').executeCmd("H", Integer.toString(hysteresis)).toString();
+	}
+	return "ERROR: invalid cmd"; // TODO:
     }
 
     @POST

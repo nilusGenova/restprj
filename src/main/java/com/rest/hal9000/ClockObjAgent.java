@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ClockObjAgent extends HalObjAgent {
 
-    private EpocTime exposedAttributes = new EpocTime();
+    private EpocTime expAttr = new EpocTime();
 
     public ClockObjAgent(char id, Consumer<String> sendMsgCallBack) {
 	super(id, sendMsgCallBack);
@@ -20,24 +20,24 @@ public class ClockObjAgent extends HalObjAgent {
 
     public void setActualTime() {
 	log.debug("Sending actual time to hal9000");
-	String val = exposedAttributes.getEpocOfActualTime();
-	sendMsgToObj("SCE" + val);
+	String val = expAttr.getEpocOfActualTime();
+	sendMsgToHal("SCE" + val);
     }
 
     @Override
     public void parseGetAnswer(char attribute, String msg) {
 	switch (attribute) {
 	case 'D':
-	    exposedAttributes.setDate(msg);
+	    expAttr.setDate(msg);
 	    break;
 	case 'T':
-	    exposedAttributes.setTime(msg);
+	    expAttr.setTime(msg);
 	    break;
 	case 'W':
-	    exposedAttributes.setWeekDay(Integer.parseInt(msg));
+	    expAttr.setWeekDay(Integer.parseInt(msg));
 	    break;
 	case 'E':
-	    exposedAttributes.setEpocTime(Long.parseLong(msg));
+	    expAttr.setEpocTime(Long.parseLong(msg));
 	    break;
 	default:
 	    wrongAttribute();
@@ -58,7 +58,7 @@ public class ClockObjAgent extends HalObjAgent {
     @Override
     public void alignAll() {
 	log.info("Clock align all");
-	sendMsgToObj("GCE");
+	sendMsgToHal("GCE");
     }
 
     @Override
@@ -70,7 +70,7 @@ public class ClockObjAgent extends HalObjAgent {
 
 	try {
 	    // Convert object to JSON string
-	    return mapper.writeValueAsString(exposedAttributes);
+	    return mapper.writeValueAsString(expAttr);
 	} catch (JsonGenerationException e) {
 	    e.printStackTrace();
 	} catch (JsonMappingException e) {
@@ -83,7 +83,7 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    public CmdResult executeCmd(String cmd) {
+    public CmdResult executeCmd(String cmd, String prm) {
 	log.info("Setting actual time");
 	setActualTime();
 	return CmdResult.OK;

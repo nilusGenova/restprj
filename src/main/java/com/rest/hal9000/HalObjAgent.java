@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 public abstract class HalObjAgent {
 
     public enum CmdResult {
-	OK, ERROR, INVALID_CMD, NOT_FOUND, NOT_ENOUGHT_SPACE
+	OK, ERROR, INVALID_CMD, INVALID_VALUE, NOT_FOUND, NOT_ENOUGHT_SPACE
     }
 
     protected static final Logger log = LoggerFactory.getLogger(HalObjAgent.class);
@@ -35,7 +35,11 @@ public abstract class HalObjAgent {
 	log.error("Wrong event");
     }
 
-    protected void sendMsgToObj(String msg) {
+    protected void wrongValue() {
+	log.error("Wrong value");
+    }
+
+    protected void sendMsgToHal(String msg) {
 	this.sendMsgCallBack.accept(msg);
     }
 
@@ -53,15 +57,15 @@ public abstract class HalObjAgent {
 
     public abstract String exposeData();
 
-    public CmdResult executeCmd(String cmd) {
+    public CmdResult executeCmd(String cmd, String prm) {
 	return CmdResult.INVALID_CMD;
     }
 
-    public CmdResult deleteData(String cmd) {
+    public CmdResult deleteData(String cmd, String prm) {
 	return CmdResult.INVALID_CMD;
     }
 
-    public CmdResult createData(String cmd) {
+    public CmdResult createData(String cmd, String prm) {
 	return CmdResult.INVALID_CMD;
     }
 }

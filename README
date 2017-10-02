@@ -14,7 +14,10 @@ to browse:
 GET:
 http://localhost:8080/hal9000/test
 http://localhost:8080/hal9000/clock
+http://localhost:8080/hal9000/thermo
 
 POST:
 http://localhost:8080/hal9000/debug?enable=true
 http://localhost:8080/hal9000/setclock
+http://localhost:8080/hal9000/thermo?required=<Celsius*10>
+http://localhost:8080/hal9000/thermo?hysteresis=<Celsius*10>
