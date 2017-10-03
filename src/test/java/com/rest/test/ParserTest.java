@@ -4,6 +4,7 @@ import static org.mockito.Matchers.anyChar;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -110,9 +111,9 @@ public class ParserTest {
 	parser.msgToBeParsed("EA1Z");
 	delay();
 
-	verify(objA).parseGetAnswer('1', "parm");
-	verify(objB).parseGetAnswer('2', "Z");
-	verify(objB).parseEvent('3', "Zza");
-	verify(objA).parseEvent('1', "Z");
+	verify(objA, times(1)).parseGetAnswer('1', "parm");
+	verify(objB, times(1)).parseGetAnswer('2', "Z");
+	verify(objB, times(1)).parseEvent('3', "Zza");
+	verify(objA, times(1)).parseEvent('1', "Z");
     }
 }

@@ -37,4 +37,14 @@ public class Registry {
 	}
 	log.debug("Num of registered obj:{}", numOfRegisteredObj());
     }
+
+    public void callAlignAllForAllRegistered() {
+	synchronized (registeredMap) {
+	    // without lambda functions
+	    // for (Map.Entry<Character, HalObjAgent> entry : registeredMap.entrySet()) {
+	    // entry.getValue().alignAll();
+	    // }
+	    registeredMap.forEach((k, v) -> v.alignAll());
+	}
+    }
 }

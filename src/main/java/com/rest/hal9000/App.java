@@ -41,8 +41,7 @@ public final class App {
 	    // TODO: should retry and manage connection
 	    serial.connect(usbDevice, (str) -> parser.msgToBeParsed(str));
 
-	    clockAgent.alignAll();
-	    thermoAgent.alignAll();
+	    registry.callAlignAllForAllRegistered();
 
 	    Thread.sleep(5000);
 	    serial.sendMsg("GCE");

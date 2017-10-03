@@ -1,5 +1,8 @@
 package com.rest.test;
 
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Assert;
@@ -37,28 +40,34 @@ public class RegistryTest {
 	when(objA.getId()).thenReturn('A');
 	when(objB.getId()).thenReturn('B');
 	when(objC.getId()).thenReturn('C');
+	doNothing().when(objA).alignAll();
+	doNothing().when(objB).alignAll();
+	doNothing().when(objC).alignAll();
     }
 
     @Test
-    public void testSizeRegistry() {
+    public void testRegistry() {
 
 	Assert.assertEquals("Wrong empty size", 0, registry.numOfRegisteredObj());
 	registry.registerObj(objA);
 	registry.registerObj(objB);
 	registry.registerObj(objC);
-	Assert.assertEquals("Wrong size", registry.numOfRegisteredObj(), 3);
+	Assert.assertEquals("Wrong size", 3, registry.numOfRegisteredObj());
 	// test wrong Add
 	registry.registerObj(objB);
 	Assert.assertEquals("Wrong size", 3, registry.numOfRegisteredObj());
 
-    }
+	// test call AlignAll
+	registry.callAlignAllForAllRegistered();
 
-    @Test
-    public void testCorrectAssociation() {
+	verify(objC, times(1)).alignAll();
+	verify(objB, times(1)).alignAll();
+	verify(objA, times(1)).alignAll();
 
+	// correct association
 	Assert.assertEquals("wrong association for B", 'B', registry.getRegisteredObj('B').getId());
-	Assert.assertSame("wrong association for A", 'A', registry.getRegisteredObj('A').getId());
-	Assert.assertSame("wrong association for C", 'C', registry.getRegisteredObj('C').getId());
+	Assert.assertEquals("wrong association for A", 'A', registry.getRegisteredObj('A').getId());
+	Assert.assertEquals("wrong association for C", 'C', registry.getRegisteredObj('C').getId());
 
 	Assert.assertNull("wrong association for not existing obj", registry.getRegisteredObj('D'));
 
