@@ -18,14 +18,6 @@ public class EntryPoint {
     private static final Logger log = LoggerFactory.getLogger(EntryPoint.class);
 
     @GET
-    @Path("test")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String test() {
-	log.info("test called");
-	return "Test riuscito";
-    }
-
-    @GET
     @Path("clock")
     @Produces(MediaType.APPLICATION_JSON)
     public Response clock() {
@@ -53,14 +45,15 @@ public class EntryPoint {
     public Response setThermo(@DefaultValue("-1") @QueryParam("required") int tempRequired,
 	    @DefaultValue("-1") @QueryParam("hysteresis") int hysteresis) {
 	log.info("Setting thermo vals");
-	if (tempRequired != -1) {
-	    return App.registry.getRegisteredObj('T').executeCmd("R", Integer.toString(tempRequired));
+	if ((tempRequired != -1) || (hysteresis != -1)) {
+	    if (tempRequired != -1) {
+		return App.registry.getRegisteredObj('T').executeCmd("R", Integer.toString(tempRequired));
+	    }
+	    if (hysteresis != -1) {
+		return App.registry.getRegisteredObj('T').executeCmd("H", Integer.toString(hysteresis));
+	    }
 	}
-	if (hysteresis != -1) {
-	    return App.registry.getRegisteredObj('T').executeCmd("H", Integer.toString(hysteresis));
-	}
-	return Response.serverError().entity("ERROR: invalid cmd").build();
-	// TODO:
+	return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     @POST

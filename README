@@ -12,7 +12,6 @@ rm /tmp/hal9000debug
 
 to browse:
 GET:
-http://localhost:8080/hal9000/test
 http://localhost:8080/hal9000/clock
 http://localhost:8080/hal9000/thermo
 
