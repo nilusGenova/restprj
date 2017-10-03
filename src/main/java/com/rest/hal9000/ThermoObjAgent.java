@@ -3,6 +3,8 @@ package com.rest.hal9000;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import javax.ws.rs.core.Response;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -107,26 +109,26 @@ public class ThermoObjAgent extends HalObjAgent {
 	return "";
     }
 
-    private CmdResult setRequiredTemp(int temp) {
+    private Response setRequiredTemp(int temp) {
 	if (temp >= 0) {
 	    sendMsgToHal("STR" + temp);
-	    return CmdResult.OK;
+	    return Response.status(Response.Status.OK).build();
 	} else {
-	    return CmdResult.INVALID_VALUE;
+	    return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	}
     }
 
-    private CmdResult setRequiredHysteresis(int hyst) {
+    private Response setRequiredHysteresis(int hyst) {
 	if (hyst >= 0) {
 	    sendMsgToHal("STH" + hyst);
-	    return CmdResult.OK;
+	    return Response.status(Response.Status.OK).build();
 	} else {
-	    return CmdResult.INVALID_VALUE;
+	    return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	}
     }
 
     @Override
-    public CmdResult executeCmd(String cmd, String prm) {
+    public Response executeCmd(String cmd, String prm) {
 	switch (cmd) {
 	case "R":
 	    log.info("Setting required temp:{}", prm);
@@ -135,7 +137,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	    log.info("Setting hysteresis:{}", prm);
 	    return setRequiredHysteresis(Integer.parseInt(prm));
 	default:
-	    return CmdResult.INVALID_CMD;
+	    return Response.status(Response.Status.BAD_REQUEST).build();
 	}
     }
 }

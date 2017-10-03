@@ -21,6 +21,7 @@ public class TwoWaysSerialComms {
 
     SerialReader reader = null;
     SerialWriter writer = null;
+    boolean connected = false;
     private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
 
     public void connect(String portName, Consumer<String> rcvCallBack) throws Exception {
@@ -58,7 +59,9 @@ public class TwoWaysSerialComms {
 
     void sendMsg(String msg) {
 	try {
-	    outMsgQueue.put(msg);
+	    if (connected) {
+		outMsgQueue.put(msg);
+	    }
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
 	}

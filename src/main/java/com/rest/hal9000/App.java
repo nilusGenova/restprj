@@ -23,9 +23,6 @@ public final class App {
 
 	parser.start();
 
-	clockAgent.alignAll();
-	thermoAgent.alignAll();
-
 	ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 	context.setContextPath("/");
 
@@ -41,7 +38,11 @@ public final class App {
 	// Inizializza gestione porta seriale
 	try {
 	    // serial.connect(usbDevice, (str) -> System.out.println("*" + str + "*"));
+	    // TODO: should retry and manage connection
 	    serial.connect(usbDevice, (str) -> parser.msgToBeParsed(str));
+
+	    clockAgent.alignAll();
+	    thermoAgent.alignAll();
 
 	    Thread.sleep(5000);
 	    serial.sendMsg("GCE");

@@ -3,6 +3,8 @@ package com.rest.hal9000;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import javax.ws.rs.core.Response;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -83,10 +85,10 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    public CmdResult executeCmd(String cmd, String prm) {
+    public Response executeCmd(String cmd, String prm) {
 	log.info("Setting actual time");
 	setActualTime();
-	return CmdResult.OK;
+	return Response.status(Response.Status.OK).build();
     }
 
 }

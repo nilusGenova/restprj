@@ -2,14 +2,13 @@ package com.rest.hal9000;
 
 import java.util.function.Consumer;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class HalObjAgent {
-
-    public enum CmdResult {
-	OK, ERROR, INVALID_CMD, INVALID_VALUE, NOT_FOUND, NOT_ENOUGHT_SPACE
-    }
 
     protected static final Logger log = LoggerFactory.getLogger(HalObjAgent.class);
 
@@ -49,23 +48,23 @@ public abstract class HalObjAgent {
 
     public abstract void alignAll();
 
-    public String exposeJsonData() {
+    public Response exposeJsonData() {
 	String jsonInString = exposeData();
 	log.debug("exposed json:" + jsonInString);
-	return jsonInString;
+	return Response.ok(jsonInString, MediaType.APPLICATION_JSON).build();
     }
 
     public abstract String exposeData();
 
-    public CmdResult executeCmd(String cmd, String prm) {
-	return CmdResult.INVALID_CMD;
+    public Response executeCmd(String cmd, String prm) {
+	return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    public CmdResult deleteData(String cmd, String prm) {
-	return CmdResult.INVALID_CMD;
+    public Response deleteData(String cmd, String prm) {
+	return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    public CmdResult createData(String cmd, String prm) {
-	return CmdResult.INVALID_CMD;
+    public Response createData(String cmd, String prm) {
+	return Response.status(Response.Status.BAD_REQUEST).build();
     }
 }
