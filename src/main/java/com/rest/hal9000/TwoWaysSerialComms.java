@@ -47,6 +47,7 @@ public class TwoWaysSerialComms {
 
 		reader = new SerialReader(in, rcvCallBack);
 		writer = new SerialWriter(out);
+		connected = true;
 
 		(new Thread(reader)).start();
 		(new Thread(writer)).start();
