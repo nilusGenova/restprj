@@ -1,7 +1,5 @@
 package com.rest.hal9000;
 
-import java.io.IOException;
-
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -14,46 +12,43 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 @Path("/hal9000")
 public class EntryPoint {
 
     private static final Logger log = LoggerFactory.getLogger(EntryPoint.class);
-    
-    private Response executeCmdForObj(char obj,String cmd, String prm ) {
+
+    private Response executeCmdForObj(char obj, String cmd, String prm) {
 	try {
 	    return App.registry.getRegisteredObj(obj).executeCmd(cmd, prm);
 	} catch (Exception e) {
-	    log.debug("Failure in {} to execute {} with prm {}",obj,cmd,prm);
+	    log.debug("Failure in {} to execute {} with prm {}", obj, cmd, prm, e);
 	    return Response.status(Response.Status.BAD_REQUEST).build();
 	}
     }
-    
-    private Response createDataForObj(char obj,String cmd, String prm ) {
+
+    private Response createDataForObj(char obj, String cmd, String prm) {
 	try {
 	    return App.registry.getRegisteredObj(obj).createData(cmd, prm);
 	} catch (Exception e) {
-	    log.debug("Failure in {} to create {} with prm {}",obj,cmd,prm);
+	    log.debug("Failure in {} to create {} with prm {}", obj, cmd, prm, e);
 	    return Response.status(Response.Status.BAD_REQUEST).build();
 	}
     }
-    
-    private Response deleteDataForObj(char obj,String cmd, String prm ) {
+
+    private Response deleteDataForObj(char obj, String cmd, String prm) {
 	try {
 	    return App.registry.getRegisteredObj(obj).deleteData(cmd, prm);
 	} catch (Exception e) {
-	    log.debug("Failure in {} to delete {} with prm {}",obj,cmd,prm);
+	    log.debug("Failure in {} to delete {} with prm {}", obj, cmd, prm, e);
 	    return Response.status(Response.Status.BAD_REQUEST).build();
 	}
     }
-    
-    private Response exposeDataForObj(char obj ) {	
+
+    private Response exposeDataForObj(char obj) {
 	try {
 	    return App.registry.getRegisteredObj(obj).exposeJsonData();
 	} catch (Exception e) {
-	    log.debug("Failure exposing data of {} ",obj);
+	    log.debug("Failure exposing data of {} ", obj, e);
 	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 	}
     }
@@ -70,7 +65,7 @@ public class EntryPoint {
     @Produces(MediaType.TEXT_PLAIN)
     public Response clockSet() {
 	log.info("Setting actual time");
-	return executeCmdForObj('C',"","");
+	return executeCmdForObj('C', "", "");
     }
 
     @GET
@@ -88,10 +83,10 @@ public class EntryPoint {
 	log.info("Setting thermo vals");
 	if ((tempRequired != -1) || (hysteresis != -1)) {
 	    if (tempRequired != -1) {
-		return executeCmdForObj('T',"R",Integer.toString(tempRequired));
+		return executeCmdForObj('T', "R", Integer.toString(tempRequired));
 	    }
 	    if (hysteresis != -1) {
-		return executeCmdForObj('T',"H",Integer.toString(hysteresis));
+		return executeCmdForObj('T', "H", Integer.toString(hysteresis));
 	    }
 	}
 	return Response.status(Response.Status.BAD_REQUEST).build();

@@ -48,23 +48,23 @@ public abstract class HalObjAgent {
 
     public abstract void alignAll();
 
-    public Response exposeJsonData() {
+    public Response exposeJsonData() throws Exception {
 	String jsonInString = exposeData();
 	log.debug("exposed json:" + jsonInString);
 	return Response.ok(jsonInString, MediaType.APPLICATION_JSON).build();
     }
 
-    public abstract String exposeData();
+    public abstract String exposeData() throws Exception;
 
-    public Response executeCmd(String cmd, String prm) {
-	return Response.status(Response.Status.BAD_REQUEST).build();
+    public Response executeCmd(String cmd, String prm) throws Exception {
+	throw new Exception();
     }
 
-    public Response deleteData(String cmd, String prm) {
-	return Response.status(Response.Status.BAD_REQUEST).build();
+    public Response deleteData(String cmd, String prm) throws Exception {
+	throw new Exception();
     }
 
-    public Response createData(String cmd, String prm) {
-	return Response.status(Response.Status.BAD_REQUEST).build();
+    public Response createData(String cmd, String prm) throws Exception {
+	throw new Exception();
     }
 }

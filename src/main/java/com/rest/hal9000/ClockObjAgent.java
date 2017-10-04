@@ -1,14 +1,11 @@
 package com.rest.hal9000;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ClockObjAgent extends HalObjAgent {
@@ -64,24 +61,13 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    public String exposeData() {
+    public String exposeData() throws Exception {
 	log.info("Clock exposeData");
 	ObjectMapper mapper = new ObjectMapper();
 	mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
 	mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
-	try {
-	    // Convert object to JSON string
-	    return mapper.writeValueAsString(expAttr);
-	} catch (JsonGenerationException e) {
-	    e.printStackTrace();
-	} catch (JsonMappingException e) {
-	    e.printStackTrace();
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-
-	return "";
+	return mapper.writeValueAsString(expAttr);
     }
 
     @Override

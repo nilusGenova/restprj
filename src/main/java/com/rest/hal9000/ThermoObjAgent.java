@@ -1,14 +1,11 @@
 package com.rest.hal9000;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ThermoObjAgent extends HalObjAgent {
@@ -89,24 +86,13 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    public String exposeData() {
+    public String exposeData() throws Exception {
 	log.info("Thermo exposeData");
 	ObjectMapper mapper = new ObjectMapper();
 	mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
 	mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
-	try {
-	    // Convert object to JSON string
-	    return mapper.writeValueAsString(expAttr);
-	} catch (JsonGenerationException e) {
-	    e.printStackTrace();
-	} catch (JsonMappingException e) {
-	    e.printStackTrace();
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-
-	return "";
+	return mapper.writeValueAsString(expAttr);
     }
 
     private Response setRequiredTemp(int temp) {
@@ -128,7 +114,7 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    public Response executeCmd(String cmd, String prm) {
+    public Response executeCmd(String cmd, String prm) throws Exception {
 	switch (cmd) {
 	case "R":
 	    log.info("Setting required temp:{}", prm);
@@ -137,7 +123,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	    log.info("Setting hysteresis:{}", prm);
 	    return setRequiredHysteresis(Integer.parseInt(prm));
 	default:
-	    return Response.status(Response.Status.BAD_REQUEST).build();
+	    throw new Exception();
 	}
     }
 }
