@@ -1,5 +1,7 @@
 package com.rest.hal9000;
 
+import java.io.IOException;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -12,16 +14,55 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 @Path("/hal9000")
 public class EntryPoint {
 
     private static final Logger log = LoggerFactory.getLogger(EntryPoint.class);
+    
+    private Response executeCmdForObj(char obj,String cmd, String prm ) {
+	try {
+	    return App.registry.getRegisteredObj(obj).executeCmd(cmd, prm);
+	} catch (Exception e) {
+	    log.debug("Failure in {} to execute {} with prm {}",obj,cmd,prm);
+	    return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+    }
+    
+    private Response createDataForObj(char obj,String cmd, String prm ) {
+	try {
+	    return App.registry.getRegisteredObj(obj).createData(cmd, prm);
+	} catch (Exception e) {
+	    log.debug("Failure in {} to create {} with prm {}",obj,cmd,prm);
+	    return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+    }
+    
+    private Response deleteDataForObj(char obj,String cmd, String prm ) {
+	try {
+	    return App.registry.getRegisteredObj(obj).deleteData(cmd, prm);
+	} catch (Exception e) {
+	    log.debug("Failure in {} to delete {} with prm {}",obj,cmd,prm);
+	    return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+    }
+    
+    private Response exposeDataForObj(char obj ) {	
+	try {
+	    return App.registry.getRegisteredObj(obj).exposeJsonData();
+	} catch (Exception e) {
+	    log.debug("Failure exposing data of {} ",obj);
+	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+	}
+    }
 
     @GET
     @Path("clock")
     @Produces(MediaType.APPLICATION_JSON)
     public Response clock() {
-	return App.registry.getRegisteredObj('C').exposeJsonData();
+	return exposeDataForObj('C');
     }
 
     @POST
@@ -29,14 +70,14 @@ public class EntryPoint {
     @Produces(MediaType.TEXT_PLAIN)
     public Response clockSet() {
 	log.info("Setting actual time");
-	return App.registry.getRegisteredObj('C').executeCmd("", "");
+	return executeCmdForObj('C',"","");
     }
 
     @GET
     @Path("thermo")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getThermo() {
-	return App.registry.getRegisteredObj('T').exposeJsonData();
+	return exposeDataForObj('T');
     }
 
     @POST
@@ -47,10 +88,10 @@ public class EntryPoint {
 	log.info("Setting thermo vals");
 	if ((tempRequired != -1) || (hysteresis != -1)) {
 	    if (tempRequired != -1) {
-		return App.registry.getRegisteredObj('T').executeCmd("R", Integer.toString(tempRequired));
+		return executeCmdForObj('T',"R",Integer.toString(tempRequired));
 	    }
 	    if (hysteresis != -1) {
-		return App.registry.getRegisteredObj('T').executeCmd("H", Integer.toString(hysteresis));
+		return executeCmdForObj('T',"H",Integer.toString(hysteresis));
 	    }
 	}
 	return Response.status(Response.Status.BAD_REQUEST).build();
@@ -59,15 +100,15 @@ public class EntryPoint {
     @POST
     @Path("debug")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response debugEnabler(@DefaultValue("true") @QueryParam("enable") boolean enable) {
+    public String debugEnabler(@DefaultValue("true") @QueryParam("enable") boolean enable) {
 	if (enable) {
 	    CommonUtils.setLogLevel("DEBUG");
 	    log.debug("Debug enabled");
-	    return Response.status(Response.Status.OK).entity("Debug enabled").build();
+	    return "Debug enabled";
 	} else {
 	    log.debug("Debug disabled");
 	    CommonUtils.setLogLevel("INFO");
-	    return Response.status(Response.Status.OK).entity("Debug disabled").build();
+	    return "Debug disabled";
 	}
     }
 
