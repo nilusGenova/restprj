@@ -12,8 +12,8 @@ public class ClockObjAgent extends HalObjAgent {
 
     private EpocTime expAttr = new EpocTime();
 
-    public ClockObjAgent(char id, Consumer<String> sendMsgCallBack) {
-	super(id, sendMsgCallBack);
+    public ClockObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
+	super(pathName, sendMsgCallBack);
 	// TODO Auto-generated constructor stub
     }
 
@@ -71,7 +71,7 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    public Response executeCmd(String cmd, String prm) {
+    public Response executeSet(String attr, String val) {
 	log.info("Setting actual time");
 	setActualTime();
 	return Response.status(Response.Status.OK).build();

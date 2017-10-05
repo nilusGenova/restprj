@@ -21,8 +21,8 @@ public class ThermoObjAgent extends HalObjAgent {
 
     private ExposedAttributes expAttr = new ExposedAttributes();
 
-    public ThermoObjAgent(char id, Consumer<String> sendMsgCallBack) {
-	super(id, sendMsgCallBack);
+    public ThermoObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
+	super(pathName, sendMsgCallBack);
     }
 
     @Override
@@ -114,14 +114,14 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    public Response executeCmd(String cmd, String prm) throws Exception {
-	switch (cmd) {
-	case "R":
-	    log.info("Setting required temp:{}", prm);
-	    return setRequiredTemp(Integer.parseInt(prm));
-	case "H":
-	    log.info("Setting hysteresis:{}", prm);
-	    return setRequiredHysteresis(Integer.parseInt(prm));
+    public Response executeSet(String attr, String val) throws Exception {
+	switch (attr.toLowerCase()) {
+	case "required":
+	    log.info("Setting required temp:{}", val);
+	    return setRequiredTemp(Integer.parseInt(val));
+	case "hysteresis":
+	    log.info("Setting hysteresis:{}", val);
+	    return setRequiredHysteresis(Integer.parseInt(val));
 	default:
 	    throw new Exception();
 	}

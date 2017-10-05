@@ -12,18 +12,25 @@ public abstract class HalObjAgent {
 
     protected static final Logger log = LoggerFactory.getLogger(HalObjAgent.class);
 
-    private final char id;
+    private final char id; // id used on hal9000 MUST be the first letter of pathName
+
+    private final String pathName; // name used to identify obj in the REST call
 
     private final Consumer<String> sendMsgCallBack;
 
-    public HalObjAgent(char id, Consumer<String> sendMsgCallBack) {
+    public HalObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
 	super();
-	this.id = id;
+	this.id = Character.toUpperCase(pathName.charAt(0));
+	this.pathName = pathName;
 	this.sendMsgCallBack = sendMsgCallBack;
     }
 
     public char getId() {
 	return id;
+    }
+
+    public String getPathName() {
+	return pathName;
     }
 
     protected void wrongAttribute() {
@@ -56,7 +63,7 @@ public abstract class HalObjAgent {
 
     public abstract String exposeData() throws Exception;
 
-    public Response executeCmd(String cmd, String prm) throws Exception {
+    public Response executeSet(String attr, String val) throws Exception {
 	throw new Exception();
     }
 
