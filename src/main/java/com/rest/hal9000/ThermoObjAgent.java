@@ -14,7 +14,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	private int warmSwitchStatus = 0;
 	private double temperature = 0;
 	private int humidity = 0;
-	private double requiredTemp = 0;
+	private double required = 0;
 	private int manuallyForced = 0;
 	private int hysteresis = 0;
     }
@@ -38,10 +38,10 @@ public class ThermoObjAgent extends HalObjAgent {
 	}
 	    break;
 	case 'R':
-	    expAttr.requiredTemp = Integer.parseInt(msg) / 10;
-	    expAttr.manuallyForced = (expAttr.requiredTemp > 1000) ? 1 : 0;
+	    expAttr.required = Integer.parseInt(msg) / 10;
+	    expAttr.manuallyForced = (expAttr.required > 1000) ? 1 : 0;
 	    if (expAttr.manuallyForced == 1) {
-		expAttr.requiredTemp -= 1000;
+		expAttr.required -= 1000;
 	    }
 	    break;
 	case 'H':
@@ -62,10 +62,10 @@ public class ThermoObjAgent extends HalObjAgent {
 	    expAttr.temperature = Integer.parseInt(msg) / 10;
 	    break;
 	case 'R':
-	    expAttr.requiredTemp = Integer.parseInt(msg) / 10;
-	    expAttr.manuallyForced = (expAttr.requiredTemp > 1000) ? 1 : 0;
+	    expAttr.required = Integer.parseInt(msg) / 10;
+	    expAttr.manuallyForced = (expAttr.required > 1000) ? 1 : 0;
 	    if (expAttr.manuallyForced == 1) {
-		expAttr.requiredTemp -= 1000;
+		expAttr.required -= 1000;
 	    }
 	    break;
 	case 'E':
