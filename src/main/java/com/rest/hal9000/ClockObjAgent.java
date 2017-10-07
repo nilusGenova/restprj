@@ -4,27 +4,23 @@ import java.util.function.Consumer;
 
 import javax.ws.rs.core.Response;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class ClockObjAgent extends HalObjAgent {
 
     private EpocTime expAttr = new EpocTime();
 
     public ClockObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
-	// TODO Auto-generated constructor stub
-    }
-
-    public void setActualTime() {
-	log.debug("Sending actual time to hal9000");
-	String val = expAttr.getEpocOfActualTime();
-	sendMsgToHal("SCE" + val);
     }
 
     @Override
-    public void parseGetAnswer(char attribute, String msg) {
+    protected Object getExposedData() {
+	log.info("Clock exposeData");
+
+	return expAttr;
+    }
+
+    @Override
+    public void specializedParseGetAnswer(char attribute, String msg) {
 	switch (attribute) {
 	case 'D':
 	    expAttr.setDate(msg);
@@ -44,7 +40,7 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    public void parseEvent(char event, String msg) {
+    public void specializedParseEvent(char event, String msg) {
 	switch (event) {
 	case 'D':
 	    alignAll();
@@ -60,14 +56,10 @@ public class ClockObjAgent extends HalObjAgent {
 	sendMsgToHal("GCE");
     }
 
-    @Override
-    public String exposeData() throws Exception {
-	log.info("Clock exposeData");
-	ObjectMapper mapper = new ObjectMapper();
-	mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-	mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
-	return mapper.writeValueAsString(expAttr);
+    public void setActualTime() {
+	log.debug("Sending actual time to hal9000");
+	String val = expAttr.getEpocOfActualTime();
+	sendMsgToHal("SCE" + val);
     }
 
     @Override
@@ -76,5 +68,4 @@ public class ClockObjAgent extends HalObjAgent {
 	setActualTime();
 	return Response.status(Response.Status.OK).build();
     }
-
 }

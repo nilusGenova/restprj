@@ -4,10 +4,6 @@ import java.util.function.Consumer;
 
 import javax.ws.rs.core.Response;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class ThermoObjAgent extends HalObjAgent {
 
     private class ExposedAttributes {
@@ -26,7 +22,13 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    public void parseGetAnswer(char attribute, String msg) {
+    protected Object getExposedData() {
+	log.info("Thermo exposeData");
+	return expAttr;
+    }
+
+    @Override
+    public void specializedParseGetAnswer(char attribute, String msg) {
 	switch (attribute) {
 	case 'W':
 	    expAttr.warmSwitchStatus = "0".equals(msg) ? 0 : 1;
@@ -53,7 +55,7 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    public void parseEvent(char event, String msg) {
+    public void specializedParseEvent(char event, String msg) {
 	switch (event) {
 	case 'W':
 	    expAttr.warmSwitchStatus = "0".equals(msg) ? 0 : 1;
@@ -83,16 +85,6 @@ public class ThermoObjAgent extends HalObjAgent {
 	sendMsgToHal("GTW");
 	sendMsgToHal("GTR");
 	sendMsgToHal("GTH");
-    }
-
-    @Override
-    public String exposeData() throws Exception {
-	log.info("Thermo exposeData");
-	ObjectMapper mapper = new ObjectMapper();
-	mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-	mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
-	return mapper.writeValueAsString(expAttr);
     }
 
     private Response setRequiredTemp(int temp) {

@@ -1,5 +1,8 @@
 package com.rest.hal9000;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
 import javax.ws.rs.core.MediaType;
@@ -8,6 +11,10 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public abstract class HalObjAgent {
 
     protected static final Logger log = LoggerFactory.getLogger(HalObjAgent.class);
@@ -15,6 +22,8 @@ public abstract class HalObjAgent {
     private final char id; // id used on hal9000 MUST be the first letter of pathName
 
     private final String pathName; // name used to identify obj in the REST call
+
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final Consumer<String> sendMsgCallBack;
 
@@ -33,6 +42,60 @@ public abstract class HalObjAgent {
 	return pathName;
     }
 
+    protected abstract Object getExposedData();
+
+    protected abstract void specializedParseGetAnswer(char attribute, String msg);
+
+    protected abstract void specializedParseEvent(char event, String msg);
+
+    public abstract void alignAll();
+
+    public void parseGetAnswer(char attribute, String msg) {
+	synchWrite(new Callable<Boolean>() {
+	    public Boolean call() throws Exception {
+		specializedParseGetAnswer(attribute, msg);
+		return true;
+	    }
+	});
+    }
+
+    public void parseEvent(char event, String msg) {
+	synchWrite(new Callable<Boolean>() {
+	    public Boolean call() throws Exception {
+		specializedParseEvent(event, msg);
+		return true;
+	    }
+	});
+    }
+
+    public Response exposeJsonData() throws Exception {
+	ObjectMapper mapper = new ObjectMapper();
+	mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+	mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+
+	String jsonInString = synchRead(new Callable<String>() {
+	    public String call() throws Exception {
+		return mapper.writeValueAsString(getExposedData());
+	    }
+	});
+
+	log.debug("exposed json:" + jsonInString);
+	return Response.ok(jsonInString, MediaType.APPLICATION_JSON).build();
+
+    }
+
+    public Response executeSet(String attr, String val) throws Exception {
+	throw new Exception();
+    }
+
+    public Response deleteData(String cmd, String prm) throws Exception {
+	throw new Exception();
+    }
+
+    public Response createData(String cmd, String prm) throws Exception {
+	throw new Exception();
+    }
+
     protected void wrongAttribute() {
 	log.error("Wrong attribute");
     }
@@ -49,29 +112,27 @@ public abstract class HalObjAgent {
 	this.sendMsgCallBack.accept(msg);
     }
 
-    public abstract void parseGetAnswer(char attribute, String msg);
-
-    public abstract void parseEvent(char event, String msg);
-
-    public abstract void alignAll();
-
-    public Response exposeJsonData() throws Exception {
-	String jsonInString = exposeData();
-	log.debug("exposed json:" + jsonInString);
-	return Response.ok(jsonInString, MediaType.APPLICATION_JSON).build();
+    @SuppressWarnings("finally")
+    protected <T> T synchWrite(Callable<T> func) {
+	T retVal = null;
+	lock.writeLock().lock();
+	try {
+	    retVal = func.call();
+	} finally {
+	    lock.writeLock().unlock();
+	    return retVal;
+	}
     }
 
-    public abstract String exposeData() throws Exception;
-
-    public Response executeSet(String attr, String val) throws Exception {
-	throw new Exception();
-    }
-
-    public Response deleteData(String cmd, String prm) throws Exception {
-	throw new Exception();
-    }
-
-    public Response createData(String cmd, String prm) throws Exception {
-	throw new Exception();
+    @SuppressWarnings("finally")
+    protected <T> T synchRead(Callable<T> func) {
+	T retVal = null;
+	lock.readLock().lock();
+	try {
+	    retVal = func.call();
+	} finally {
+	    lock.readLock().unlock();
+	    return retVal;
+	}
     }
 }
