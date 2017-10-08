@@ -1,0 +1,118 @@
+package com.rest.hal9000;
+
+import java.util.function.Consumer;
+
+import javax.ws.rs.core.Response;
+
+public class AlarmObjAgent extends HalObjAgent {
+
+    private class ExposedAttributes {
+	private int mode = 0; // (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
+	private String key = ""; // (idxKey 0:master)(value 8 chars);(......)
+	private String masterKey = "";
+	private String pinOfKey = ""; // (idxKey 1:)(value 8 chars);(......)
+	private int sensValue = 0;
+	private int validSensValue = 0;
+    }
+
+    private ExposedAttributes expAttr = new ExposedAttributes();
+
+    public AlarmObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
+	super(pathName, sendMsgCallBack);
+    }
+
+    @Override
+    protected Object getExposedData() {
+	log.info("Alarm exposeData");
+	return expAttr;
+    }
+
+    @Override
+    protected String getExposedAttribute(String attr) throws Exception {
+	log.info("Alarm exposeAttribute");
+	if ("mode".equals(attr)) {
+	    // TODO:
+	    return Integer.toString(expAttr.mode);
+	}
+	wrongAttribute();
+	return null;
+    }
+
+    @Override
+    protected void specializedParseGetAnswer(char attribute, String msg) {
+	// TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void specializedParseEvent(char event, String msg) {
+	// TODO Auto-generated method stub
+	//
+	// Event Prm
+	// M Mode (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
+	// K Key changed
+	// R Key read (value 8 chars)
+	// P Pin read (value 8 chars)
+	// N New Pin set (value 8 chars)
+    }
+
+    @Override
+    public void alignAll() {
+	log.info("Alarm align all");
+	sendMsgToHal("GAM");
+	sendMsgToHal("GAK");
+	sendMsgToHal("GAX");
+	sendMsgToHal("GAP");
+    }
+
+    // Attr Set
+    // M Mode (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
+    // R Remote ctrl [0:verde 1:rosso]
+    @Override
+    public Response executeSet(String attr, String val) throws Exception {
+	// TODO:
+	switch (attr) {
+	// case "required":
+	// log.info("Setting required temp:{}", val);
+	// return setRequiredTemp(Integer.parseInt(val));
+
+	default:
+	    throw new Exception();
+	}
+    }
+
+    // Attr Reset
+    // K Key value to delete
+    // X Master Key cancella tutte le chiavi
+    // P Pin of key cancella tutti I PIN
+    @Override
+    public Response deleteData(String cmd, String prm) throws Exception {
+	// TODO:
+	switch (cmd) {
+	// case "required":
+	// log.info("Setting required temp:{}", val);
+	// return setRequiredTemp(Integer.parseInt(val));
+
+	default:
+	    throw new Exception();
+	}
+    }
+
+    // Attr Set
+    // K Key value to add
+    // X Master Key value
+    // P Pin of key idxKey:value to add(to be entered on keyboard)
+    @Override
+    public Response createData(String cmd, String prm) throws Exception {
+	// TODO:
+	switch (cmd) {
+	// case "required":
+	// log.info("Setting required temp:{}", val);
+	// return setRequiredTemp(Integer.parseInt(val));
+
+	default:
+	    throw new Exception();
+	}
+    }
+
+}

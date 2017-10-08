@@ -84,6 +84,10 @@ public class EpocTime {
 	return weekDay;
     }
 
+    public String getEpochTime() {
+	return Long.toString(epochTime);
+    }
+
     public void setWeekDay(int weekDay) {
 	this.weekDay = weekDay;
     }

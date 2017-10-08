@@ -1,5 +1,6 @@
 package com.rest.hal9000;
 
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 import javax.ws.rs.core.Response;
@@ -15,8 +16,17 @@ public class ClockObjAgent extends HalObjAgent {
     @Override
     protected Object getExposedData() {
 	log.info("Clock exposeData");
-
 	return expAttr;
+    }
+
+    @Override
+    protected String getExposedAttribute(String attr) throws Exception {
+	log.info("Clock exposeAttribute");
+	if ("epochtime".equals(attr)) {
+	    return expAttr.getEpochTime();
+	}
+	wrongAttribute();
+	return null;
     }
 
     @Override
@@ -46,7 +56,7 @@ public class ClockObjAgent extends HalObjAgent {
 	    alignAll();
 	    break;
 	default:
-	    wrongAttribute();
+	    wrongEvent();
 	}
     }
 
@@ -56,16 +66,14 @@ public class ClockObjAgent extends HalObjAgent {
 	sendMsgToHal("GCE");
     }
 
-    public void setActualTime() {
-	log.debug("Sending actual time to hal9000");
-	String val = expAttr.getEpocOfActualTime();
-	sendMsgToHal("SCE" + val);
-    }
-
     @Override
     public Response executeSet(String attr, String val) {
-	log.info("Setting actual time");
-	setActualTime();
-	return Response.status(Response.Status.OK).build();
+	if ("actualtime".equals(attr)) {
+	    log.debug("Sending actual time to hal9000");
+	    String eat = expAttr.getEpocOfActualTime();
+	    sendMsgToHal("SCE" + eat);
+	    return Response.status(Response.Status.OK).build();
+	}
+	throw new NoSuchElementException();
     }
 }

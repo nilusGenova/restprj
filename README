@@ -13,10 +13,20 @@ rm /tmp/hal9000debug
 to browse:
 GET:
 http://localhost:8080/hal9000/clock
+http://localhost:8080/hal9000/clock?a=epochtime
 http://localhost:8080/hal9000/thermo
+http://localhost:8080/hal9000/thermo?a=warming
+http://localhost:8080/hal9000/alarm
+http://localhost:8080/hal9000/alarm?a=mode
 
 POST:
 http://localhost:8080/hal9000/debug?enable=true
-http://localhost:8080/hal9000/setclock
-http://localhost:8080/hal9000/thermo?required=<Celsius*10>
-http://localhost:8080/hal9000/thermo?hysteresis=<Celsius*10>
+http://localhost:8080/hal9000/clock?a=actualtime
+http://localhost:8080/hal9000/thermo?a=required&v=<Celsius*10>
+http://localhost:8080/hal9000/thermo?a=hysteresis&v=<Celsius*10>
+
+POST(create):
+http://localhost:8080/hal9000/create/alarm
+
+DELETE:
+http://localhost:8080/hal9000/alarm

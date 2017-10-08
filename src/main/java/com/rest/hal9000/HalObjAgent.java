@@ -44,6 +44,8 @@ public abstract class HalObjAgent {
 
     protected abstract Object getExposedData();
 
+    protected abstract String getExposedAttribute(String attr) throws Exception;
+
     protected abstract void specializedParseGetAnswer(char attribute, String msg);
 
     protected abstract void specializedParseEvent(char event, String msg);
@@ -79,9 +81,23 @@ public abstract class HalObjAgent {
 	    }
 	});
 
-	log.debug("exposed json:" + jsonInString);
+	log.debug("exposed json:{}", jsonInString);
 	return Response.ok(jsonInString, MediaType.APPLICATION_JSON).build();
+    }
 
+    public Response exposeJsonAttribute(String attr) throws Exception {
+
+	String value = synchRead(new Callable<String>() {
+	    public String call() throws Exception {
+		return getExposedAttribute(attr);
+	    }
+	});
+	if (value == null) {
+	    return Response.status(Response.Status.BAD_REQUEST).build();
+	} else {
+	    log.debug("exposed json attribute {}:{}", attr, value);
+	    return Response.ok(value, MediaType.TEXT_PLAIN).build();
+	}
     }
 
     public Response executeSet(String attr, String val) throws Exception {
@@ -102,10 +118,6 @@ public abstract class HalObjAgent {
 
     protected void wrongEvent() {
 	log.error("Wrong event");
-    }
-
-    protected void wrongValue() {
-	log.error("Wrong value");
     }
 
     protected void sendMsgToHal(String msg) {

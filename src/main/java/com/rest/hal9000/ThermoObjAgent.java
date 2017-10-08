@@ -1,5 +1,6 @@
 package com.rest.hal9000;
 
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 import javax.ws.rs.core.Response;
@@ -7,7 +8,7 @@ import javax.ws.rs.core.Response;
 public class ThermoObjAgent extends HalObjAgent {
 
     private class ExposedAttributes {
-	private int warmSwitchStatus = 0;
+	private int warming = 0;
 	private double temperature = 0;
 	private int humidity = 0;
 	private double required = 0;
@@ -28,10 +29,20 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
+    protected String getExposedAttribute(String attr) throws Exception {
+	log.info("Thermo exposeAttribute");
+	if ("warming".equals(attr)) {
+	    return Integer.toString(expAttr.warming);
+	}
+	wrongAttribute();
+	return null;
+    }
+
+    @Override
     public void specializedParseGetAnswer(char attribute, String msg) {
 	switch (attribute) {
 	case 'W':
-	    expAttr.warmSwitchStatus = "0".equals(msg) ? 0 : 1;
+	    expAttr.warming = "0".equals(msg) ? 0 : 1;
 	    break;
 	case 'T': {
 	    String[] list = msg.split(";");
@@ -58,7 +69,7 @@ public class ThermoObjAgent extends HalObjAgent {
     public void specializedParseEvent(char event, String msg) {
 	switch (event) {
 	case 'W':
-	    expAttr.warmSwitchStatus = "0".equals(msg) ? 0 : 1;
+	    expAttr.warming = "0".equals(msg) ? 0 : 1;
 	    break;
 	case 'T':
 	    expAttr.temperature = Integer.parseInt(msg) / 10;
@@ -74,7 +85,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	    log.error("Sensor [{}] reading error (at least 1 min)", msg);
 	    break;
 	default:
-	    wrongAttribute();
+	    wrongEvent();
 	}
     }
 
@@ -107,7 +118,7 @@ public class ThermoObjAgent extends HalObjAgent {
 
     @Override
     public Response executeSet(String attr, String val) throws Exception {
-	switch (attr.toLowerCase()) {
+	switch (attr) {
 	case "required":
 	    log.info("Setting required temp:{}", val);
 	    return setRequiredTemp(Integer.parseInt(val));
@@ -115,7 +126,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	    log.info("Setting hysteresis:{}", val);
 	    return setRequiredHysteresis(Integer.parseInt(val));
 	default:
-	    throw new Exception();
+	    throw new NoSuchElementException();
 	}
     }
 }
