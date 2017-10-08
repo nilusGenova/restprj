@@ -7,7 +7,10 @@ import javax.ws.rs.core.Response;
 public class AlarmObjAgent extends HalObjAgent {
 
     private class ExposedAttributes {
-	private int mode = 0; // (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
+	// mode = (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
+	private int armed = 0;
+	private int alarmed = 0;
+	private int keyProgramming = 0;
 	private String key = ""; // (idxKey 0:master)(value 8 chars);(......)
 	private String masterKey = "";
 	private String pinOfKey = ""; // (idxKey 1:)(value 8 chars);(......)
@@ -31,8 +34,7 @@ public class AlarmObjAgent extends HalObjAgent {
     protected String getExposedAttribute(String attr) throws Exception {
 	log.info("Alarm exposeAttribute");
 	if ("mode".equals(attr)) {
-	    // TODO:
-	    return Integer.toString(expAttr.mode);
+	    return Integer.toString(expAttr.armed * 100 + expAttr.alarmed * 10 + expAttr.keyProgramming);
 	}
 	wrongAttribute();
 	return null;
