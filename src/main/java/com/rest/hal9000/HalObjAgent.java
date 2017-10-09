@@ -120,6 +120,21 @@ public abstract class HalObjAgent {
 	log.error("Wrong event");
     }
 
+    protected void wrongValue(int i) {
+	log.error("Wrong value {}", i);
+    }
+
+    protected int getBooleanVal(String val) throws Exception {
+	if ("0".equals(val)) {
+	    return 0;
+	}
+	if ("1".equals(val)) {
+	    return 1;
+	} else {
+	    throw new Exception();
+	}
+    }
+
     protected void sendMsgToHal(String msg) {
 	this.sendMsgCallBack.accept(msg);
     }

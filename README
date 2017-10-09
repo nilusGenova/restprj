@@ -24,6 +24,11 @@ http://localhost:8080/hal9000/debug?enable=true
 http://localhost:8080/hal9000/clock?a=actualtime
 http://localhost:8080/hal9000/thermo?a=required&v=<Celsius*10>
 http://localhost:8080/hal9000/thermo?a=hysteresis&v=<Celsius*10>
+http://localhost:8080/hal9000/alarm?a=readsensors
+http://localhost:8080/hal9000/alarm?a=remote&v=[0:green|1:red]
+http://localhost:8080/hal9000/alarm?a=armed&v=0|1
+http://localhost:8080/hal9000/alarm?a=program&v=0|1
+http://localhost:8080/hal9000/alarm?a=alarm&v=0|1
 
 POST(create):
 http://localhost:8080/hal9000/create/alarm

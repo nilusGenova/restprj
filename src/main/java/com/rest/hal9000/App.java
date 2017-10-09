@@ -22,6 +22,7 @@ public final class App {
 
 	registry.registerObj(clockAgent);
 	registry.registerObj(thermoAgent);
+	registry.registerObj(alarmObjAgent);
 
 	parser.start();
 
