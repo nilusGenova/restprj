@@ -4,6 +4,8 @@ import java.util.function.Consumer;
 
 import javax.ws.rs.core.Response;
 
+import javassist.compiler.ast.Expr;
+
 public class AlarmObjAgent extends HalObjAgent {
 
     private class ExposedAttributes {
@@ -43,7 +45,16 @@ public class AlarmObjAgent extends HalObjAgent {
     @Override
     protected void specializedParseGetAnswer(char attribute, String msg) {
 	// TODO Auto-generated method stub
-
+	switch (attribute) {
+	case 'M':
+	    expAttr.armed = msg.charAt(0)=='0' ? 0 : 1;
+	    expAttr.alarmed = msg.charAt(1)=='0' ? 0 : 1;
+	    expAttr.keyProgramming = msg.charAt(2)=='0' ? 0 : 1;
+	    break;
+	
+	default:
+	    wrongAttribute();
+	}
     }
 
     @Override
@@ -56,6 +67,16 @@ public class AlarmObjAgent extends HalObjAgent {
 	// R Key read (value 8 chars)
 	// P Pin read (value 8 chars)
 	// N New Pin set (value 8 chars)
+	switch (event) {
+	case 'M':
+	    expAttr.armed = msg.charAt(0)=='0' ? 0 : 1;
+	    expAttr.alarmed = msg.charAt(1)=='0' ? 0 : 1;
+	    expAttr.keyProgramming = msg.charAt(2)=='0' ? 0 : 1;
+	    break;
+	
+	default:
+	    wrongEvent();
+	}
     }
 
     @Override
