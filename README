@@ -29,9 +29,15 @@ http://localhost:8080/hal9000/alarm?a=remote&v=[0:green|1:red]
 http://localhost:8080/hal9000/alarm?a=armed&v=0|1
 http://localhost:8080/hal9000/alarm?a=program&v=0|1
 http://localhost:8080/hal9000/alarm?a=alarm&v=0|1
+http://localhost:8080/hal9000/alarm?a=masterkey&v=<key>
+http://localhost:8080/hal9000/alarm?a=enterpin&v=<idxKey>
+
 
 POST(create):
-http://localhost:8080/hal9000/create/alarm
+http://localhost:8080/hal9000/create/alarm?c=newkey&p=<key>
 
 DELETE:
-http://localhost:8080/hal9000/alarm
+http://localhost:8080/hal9000/alarm?c=key&p=<key>
+http://localhost:8080/hal9000/alarm?c=allkeys
+http://localhost:8080/hal9000/alarm?c=allpins
+

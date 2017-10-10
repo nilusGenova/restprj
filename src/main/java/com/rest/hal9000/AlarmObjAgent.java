@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 public class AlarmObjAgent extends HalObjAgent {
@@ -38,14 +39,23 @@ public class AlarmObjAgent extends HalObjAgent {
 	super(pathName, sendMsgCallBack);
     }
 
-    private void storeKey(int idx, int key) {
+    private void storeKey(int idx, int keyval) {
 	KeyPinRecord k = expAttr.keys.get(idx);
 	if (k == null) {
-	    k = new KeyPinRecord(key);
+	    k = new KeyPinRecord(keyval);
 	    expAttr.keys.put(idx, k);
 	} else {
-	    k.keyCode = key;
+	    k.keyCode = keyval;
 	}
+    }
+
+    private boolean keyExists(int keyval) {
+	for (Map.Entry<Integer, KeyPinRecord> e : expAttr.keys.entrySet()) {
+	    if (e.getValue().keyCode == keyval) {
+		return true;
+	    }
+	}
+	return false;
     }
 
     private void storePin(int idx, int pin) {
@@ -177,6 +187,7 @@ public class AlarmObjAgent extends HalObjAgent {
 
     @Override
     public Response executeSet(String attr, String val) throws Exception {
+	int n;
 	switch (attr) {
 	// need to force sensor read to have valid values
 	case "readsensors":
@@ -201,6 +212,28 @@ public class AlarmObjAgent extends HalObjAgent {
 	    log.info("Forcing mode keyProgram:{}", val);
 	    sendMsgToHal("SAM" + calcModeFormat(expAttr.armed, expAttr.alarmed, getBooleanVal(val)));
 	    break;
+	// X Master Key value
+	case "masterkey":
+	    n = Integer.parseInt(val);
+	    if (n <= 0) {
+		wrongValue(n);
+		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+	    } else {
+		log.info("Setting master key :{}", val);
+		sendMsgToHal("SAX" + val);
+	    }
+	    break;
+	// P Pin of key idxKey:value to add(to be entered on keyboard)
+	case "enterpin":
+	    n = Integer.parseInt(val);
+	    if ((n < 0) || (n >= 10)) {
+		wrongValue(n);
+		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+	    } else {
+		log.info("Setting pin for key #{}", n);
+		sendMsgToHal("SAP" + val);
+		return Response.ok("Enter PIN from Keyboard", MediaType.TEXT_PLAIN).build();
+	    }
 	default:
 	    throw new Exception();
 	}
@@ -208,34 +241,57 @@ public class AlarmObjAgent extends HalObjAgent {
     }
 
     // Attr Reset
-    // K Key value to delete
-    // X Master Key cancella tutte le chiavi
-    // P Pin of key cancella tutti I PIN
+
     @Override
     public Response deleteData(String cmd, String prm) throws Exception {
-	// TODO:
 	switch (cmd) {
-	// case "required":
-	// log.info("Setting required temp:{}", val);
-	// return setRequiredTemp(Integer.parseInt(val));
-
+	// K Key value to delete
+	case "key":
+	    int m = Integer.parseInt(prm);
+	    if (m <= 0) {
+		wrongValue(m);
+		break;
+	    } else {
+		if (keyExists(m)) {
+		    log.info("Deleting key :{}", prm);
+		    sendMsgToHal("RAK" + prm);
+		    return Response.status(Response.Status.OK).build();
+		} else {
+		    log.error("Key {} doesn't exists", prm);
+		    wrongValue(m);
+		}
+	    }
+	    break;
+	// X Master Key cancella tutte le chiavi
+	case "allkeys":
+	    log.info("Deleting all keys");
+	    sendMsgToHal("RAX");
+	    return Response.status(Response.Status.OK).build();
+	// P Pin of key cancella tutti I PIN
+	case "allpins":
+	    log.info("Deleting all pins");
+	    sendMsgToHal("RAP");
+	    return Response.status(Response.Status.OK).build();
 	default:
 	    throw new Exception();
 	}
+	return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
     }
 
-    // Attr Set
-    // K Key value to add
-    // X Master Key value
-    // P Pin of key idxKey:value to add(to be entered on keyboard)
     @Override
     public Response createData(String cmd, String prm) throws Exception {
-	// TODO:
 	switch (cmd) {
-	// case "required":
-	// log.info("Setting required temp:{}", val);
-	// return setRequiredTemp(Integer.parseInt(val));
-
+	// K Key value to add
+	case "newkey":
+	    int m = Integer.parseInt(prm);
+	    if (m <= 0) {
+		wrongValue(m);
+		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+	    } else {
+		log.info("Setting key :{}", prm);
+		sendMsgToHal("SAK" + prm);
+		return Response.status(Response.Status.OK).build();
+	    }
 	default:
 	    throw new Exception();
 	}
