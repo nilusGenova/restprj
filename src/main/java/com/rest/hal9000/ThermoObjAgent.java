@@ -13,7 +13,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	private int humidity = 0;
 	private double required = 0;
 	private int manuallyForced = 0;
-	private int hysteresis = 0;
+	private double hysteresis = 0;
     }
 
     private ExposedAttributes expAttr = new ExposedAttributes();
@@ -46,19 +46,19 @@ public class ThermoObjAgent extends HalObjAgent {
 	    break;
 	case 'T': {
 	    String[] list = msg.split(";");
-	    expAttr.temperature = Integer.parseInt(list[0]) / 10;
+	    expAttr.temperature = Integer.parseInt(list[0]) / 10.0;
 	    expAttr.humidity = Integer.parseInt(list[1]);
 	}
 	    break;
 	case 'R':
-	    expAttr.required = Integer.parseInt(msg) / 10;
+	    expAttr.required = Integer.parseInt(msg) / 10.0;
 	    expAttr.manuallyForced = (expAttr.required > 1000) ? 1 : 0;
 	    if (expAttr.manuallyForced == 1) {
 		expAttr.required -= 1000;
 	    }
 	    break;
 	case 'H':
-	    expAttr.hysteresis = Integer.parseInt(msg);
+	    expAttr.hysteresis = Integer.parseInt(msg) / 10.0;
 	    break;
 	default:
 	    wrongAttribute();
@@ -72,10 +72,10 @@ public class ThermoObjAgent extends HalObjAgent {
 	    expAttr.warming = "0".equals(msg) ? 0 : 1;
 	    break;
 	case 'T':
-	    expAttr.temperature = Integer.parseInt(msg) / 10;
+	    expAttr.temperature = Integer.parseInt(msg) / 10.0;
 	    break;
 	case 'R':
-	    expAttr.required = Integer.parseInt(msg) / 10;
+	    expAttr.required = Integer.parseInt(msg) / 10.0;
 	    expAttr.manuallyForced = (expAttr.required > 1000) ? 1 : 0;
 	    if (expAttr.manuallyForced == 1) {
 		expAttr.required -= 1000;
