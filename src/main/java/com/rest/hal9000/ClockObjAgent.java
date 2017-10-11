@@ -30,7 +30,7 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    public void specializedParseGetAnswer(char attribute, String msg) {
+    protected void specializedParseGetAnswer(char attribute, String msg) {
 	switch (attribute) {
 	case 'D':
 	    expAttr.setDate(msg);
@@ -50,7 +50,7 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    public void specializedParseEvent(char event, String msg) {
+    protected void specializedParseEvent(char event, String msg) {
 	switch (event) {
 	case 'D':
 	    alignAll();

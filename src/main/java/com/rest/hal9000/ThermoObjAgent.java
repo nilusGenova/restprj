@@ -39,7 +39,7 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    public void specializedParseGetAnswer(char attribute, String msg) {
+    protected void specializedParseGetAnswer(char attribute, String msg) {
 	switch (attribute) {
 	case 'W':
 	    expAttr.warming = "0".equals(msg) ? 0 : 1;
@@ -66,7 +66,7 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    public void specializedParseEvent(char event, String msg) {
+    protected void specializedParseEvent(char event, String msg) {
 	switch (event) {
 	case 'W':
 	    expAttr.warming = "0".equals(msg) ? 0 : 1;
