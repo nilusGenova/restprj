@@ -1,7 +1,5 @@
 package com.rest.hal9000;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.ws.rs.core.MediaType;
@@ -9,68 +7,13 @@ import javax.ws.rs.core.Response;
 
 public class AlarmObjAgent extends HalObjAgent {
 
-    private final static int MAX_NUM_OF_KEYS = 10;
-
-    private class KeyPinRecord {
-	private int keyCode;
-	private int pinCode;
-
-	public KeyPinRecord(int keyCode) {
-	    this.keyCode = 0;
-	    pinCode = 0;
-	}
-    }
-
-    private class ExposedAttributes {
-	private int armed = 0;
-	private int alarmed = 0;
-	private int keyProgramming = 0;
-	private int masterKey = 0;
-	private Map<Integer, KeyPinRecord> keys = new HashMap();
-	private int sensGreen = 0;
-	private int sensRed = 0;
-	private int sensAlm = 0;
-	private int validSensValue = 0;
-    }
-
-    private ExposedAttributes expAttr = new ExposedAttributes();
+    private AlarmObjAttributes expAttr = new AlarmObjAttributes();
 
     public AlarmObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
     }
 
-    private void storeKey(int idx, int keyval) {
-	KeyPinRecord k = expAttr.keys.get(idx);
-	if (k == null) {
-	    k = new KeyPinRecord(keyval);
-	    expAttr.keys.put(idx, k);
-	} else {
-	    k.keyCode = keyval;
-	}
-    }
-
-    private boolean keyExists(int keyval) {
-	for (Map.Entry<Integer, KeyPinRecord> e : expAttr.keys.entrySet()) {
-	    if (e.getValue().keyCode == keyval) {
-		return true;
-	    }
-	}
-	return false;
-    }
-
-    private void storePin(int idx, int pin) {
-	KeyPinRecord k = expAttr.keys.get(idx);
-	if (k == null) {
-	    k = new KeyPinRecord(0);
-	    expAttr.keys.put(idx, k);
-	}
-	k.pinCode = pin;
-    }
-
-    private void flushKeys() {
-	expAttr.keys.clear();
-    }
-
+   
     private String calcModeFormat(int armed, int alarmed, int programming) {
 	return String.format("%03d", armed * 100 + alarmed * 10 + programming);
     }
@@ -85,7 +28,7 @@ public class AlarmObjAgent extends HalObjAgent {
     protected String getExposedAttribute(String attr) throws Exception {
 	log.info("Alarm exposeAttribute");
 	if ("mode".equals(attr)) {
-	    return calcModeFormat(expAttr.armed, expAttr.alarmed, expAttr.keyProgramming);
+	    return calcModeFormat(expAttr.getArmed(), expAttr.getAlarmed(), expAttr.getKeyProgramming());
 	}
 	wrongAttribute();
 	return null;
@@ -100,24 +43,24 @@ public class AlarmObjAgent extends HalObjAgent {
 	    if ((m > 111) || (m < 0)) {
 		wrongValue(m);
 	    } else {
-		expAttr.keyProgramming = m & 1;
+		expAttr.setKeyProgramming(m & 1);
 		m /= 10;
-		expAttr.alarmed = m & 1;
+		expAttr.setAlarmed(m & 1);
 		m /= 10;
-		expAttr.armed = m & 1;
+		expAttr.setArmed(m & 1);
 	    }
 	    break;
 	// K key = (idxKey 0:master)(value 8 chars);(......)
 	case 'K':
-	    flushKeys();
+	    expAttr.flushKeys();
 	    String[] key = msg.split(";");
 	    for (String k : key) {
 		String[] rec = k.split(":");
 		int idx = Integer.parseInt(rec[0]);
 		if (idx == 0) {
-		    expAttr.masterKey = Integer.parseInt(rec[1]);
+		    expAttr.setMasterKey(Integer.parseInt(rec[1]));
 		} else {
-		    storeKey(idx - 1, Integer.parseInt(rec[1]));
+		    expAttr.storeKey(idx - 1, Integer.parseInt(rec[1]));
 		}
 	    }
 	    break;
@@ -126,16 +69,16 @@ public class AlarmObjAgent extends HalObjAgent {
 	    String[] pin = msg.split(";");
 	    for (String p : pin) {
 		String[] rec = p.split(":");
-		storePin(Integer.parseInt(rec[0]) - 1, Integer.parseInt(rec[1]));
+		expAttr.storePin(Integer.parseInt(rec[0]) - 1, Integer.parseInt(rec[1]));
 	    }
 	    break;
 	// S sensor values: (green);(red);(alm)
 	case 'S':
 	    String[] val = msg.split(";");
-	    expAttr.sensGreen = Integer.parseInt(val[0]);
-	    expAttr.sensRed = Integer.parseInt(val[1]);
-	    expAttr.sensAlm = Integer.parseInt(val[2]);
-	    expAttr.validSensValue = 1;
+	    expAttr.setSensGreen(Integer.parseInt(val[0]));
+	    expAttr.setSensRed(Integer.parseInt(val[1]));
+	    expAttr.setSensAlm(Integer.parseInt(val[2]));
+	    expAttr.setValidSensValue(1);
 	    break;
 	default:
 	    wrongAttribute();
@@ -151,11 +94,11 @@ public class AlarmObjAgent extends HalObjAgent {
 	    if ((m > 111) || (m < 0)) {
 		wrongValue(m);
 	    } else {
-		expAttr.keyProgramming = m & 1;
+		expAttr.setKeyProgramming(m & 1);
 		m /= 10;
-		expAttr.alarmed = m & 1;
+		expAttr.setAlarmed(m & 1);
 		m /= 10;
-		expAttr.armed = m & 1;
+		expAttr.setArmed(m & 1);
 	    }
 	    // K Key changed
 	    // N New Pin set (value 8 chars)
@@ -191,7 +134,7 @@ public class AlarmObjAgent extends HalObjAgent {
 	switch (attr) {
 	// need to force sensor read to have valid values
 	case "readsensors":
-	    expAttr.validSensValue = 0;
+	    expAttr.setValidSensValue(0);
 	    sendMsgToHal("GAS");
 	    break;
 	// R Remote ctrl [0:verde 1:rosso]
@@ -202,15 +145,15 @@ public class AlarmObjAgent extends HalObjAgent {
 	// M Mode (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
 	case "armed":
 	    log.info("Forcing mode armed:{}", val);
-	    sendMsgToHal("SAM" + calcModeFormat(getBooleanVal(val), expAttr.alarmed, expAttr.keyProgramming));
+	    sendMsgToHal("SAM" + calcModeFormat(getBooleanVal(val), expAttr.getAlarmed(), expAttr.getKeyProgramming()));
 	    break;
 	case "alarm":
 	    log.info("Forcing mode alarmed:{}", val);
-	    sendMsgToHal("SAM" + calcModeFormat(expAttr.armed, getBooleanVal(val), expAttr.keyProgramming));
+	    sendMsgToHal("SAM" + calcModeFormat(expAttr.getArmed(), getBooleanVal(val), expAttr.getKeyProgramming()));
 	    break;
 	case "program":
 	    log.info("Forcing mode keyProgram:{}", val);
-	    sendMsgToHal("SAM" + calcModeFormat(expAttr.armed, expAttr.alarmed, getBooleanVal(val)));
+	    sendMsgToHal("SAM" + calcModeFormat(expAttr.getArmed(), expAttr.getAlarmed(), getBooleanVal(val)));
 	    break;
 	// X Master Key value
 	case "masterkey":
@@ -252,7 +195,7 @@ public class AlarmObjAgent extends HalObjAgent {
 		wrongValue(m);
 		break;
 	    } else {
-		if (keyExists(m)) {
+		if (expAttr.keyExists(m)) {
 		    log.info("Deleting key :{}", prm);
 		    sendMsgToHal("RAK" + prm);
 		    return Response.status(Response.Status.OK).build();
