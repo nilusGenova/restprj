@@ -118,6 +118,9 @@ public class ThermoObjAgent extends HalObjAgent {
 
     @Override
     public Response executeSet(String attr, String val) throws Exception {
+	if ("".equals(val)) {
+	    val = "-1";
+	}
 	switch (attr) {
 	case "required":
 	    log.info("Setting required temp:{}", val);

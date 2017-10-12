@@ -2,6 +2,7 @@ package com.rest.test;
 
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -24,11 +25,25 @@ import com.rest.hal9000.ThermoObjAgent;
 @PrepareForTest({ ThermoObjAgent.class })
 public class ThermoObjAgentTest {
 
-    String msgSent = "";
+    ArrayList<String> msgSent = new ArrayList<>();
 
     void sendMsg(String msg) {
-	msgSent = msg;
+	msgSent.add(msg);
 	System.out.println("MSG SENT:" + msg);
+    }
+
+    String getSentMsg() {
+	String msg = msgSent.get(0);
+	msgSent.remove(0);
+	return msg;
+    }
+
+    boolean noMsgSent() {
+	return msgSent.size() == 0;
+    }
+
+    void emptySentMsg() {
+	msgSent.clear();
     }
 
     @InjectMocks
@@ -65,6 +80,7 @@ public class ThermoObjAgentTest {
     @Test
     public void testParseGetAnswer() {
 	// W T R H
+	emptySentMsg();
 	thermo.parseGetAnswer('W', "0");
 	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("warming"));
 	thermo.parseGetAnswer('W', "1");
@@ -83,11 +99,13 @@ public class ThermoObjAgentTest {
 	Assert.assertEquals("ERROR:", 5.2, extractAttributeValueAsDouble("hysteresis"), 0);
 	thermo.parseGetAnswer('H', "30");
 	Assert.assertEquals("ERROR:", 3, extractAttributeValueAsDouble("hysteresis"), 0);
+	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
     @Test
     public void testParseEvent() {
 	// W T R (E)
+	emptySentMsg();
 	thermo.parseEvent('W', "0");
 	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("warming"));
 	thermo.parseEvent('W', "1");
@@ -100,10 +118,12 @@ public class ThermoObjAgentTest {
 	Assert.assertEquals("ERROR:", 21.5, extractAttributeValueAsDouble("required"), 0);
 	thermo.parseEvent('R', "60");
 	Assert.assertEquals("ERROR:", 6, extractAttributeValueAsDouble("required"), 0);
+	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
     @Test
     public void testExposeJsonAttribute() {
+	emptySentMsg();
 	thermo.parseGetAnswer('W', "1");
 	String et = null;
 	String err = null;
@@ -125,34 +145,37 @@ public class ThermoObjAgentTest {
 	Assert.assertNull("ERROR:", err);
 	Assert.assertEquals("ERROR in return value", st, Response.Status.OK);
 	Assert.assertEquals("ERROR in return value", sterr, Response.Status.BAD_REQUEST);
+	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
     @Test
     public void testExecuteSetRequired() {
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
-	msgSent = null;
+	emptySentMsg();
 	try {
 	    et = Response.Status.fromStatusCode(thermo.executeSet("required", "214").getStatus());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("exception");
 	}
-	Assert.assertEquals("ERROR:", "STR214", msgSent);
+	Assert.assertEquals("ERROR:", "STR214", getSentMsg());
 	Assert.assertEquals("ERROR in return value", et, Response.Status.OK);
+	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
     @Test
     public void testExecuteSetHysteresis() {
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
-	msgSent = null;
+	emptySentMsg();
 	try {
 	    et = Response.Status.fromStatusCode(thermo.executeSet("hysteresis", "32").getStatus());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("exception");
 	}
-	Assert.assertEquals("ERROR:", "STH32", msgSent);
+	Assert.assertEquals("ERROR:", "STH32", getSentMsg());
 	Assert.assertEquals("ERROR in return value", et, Response.Status.OK);
+	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
 }

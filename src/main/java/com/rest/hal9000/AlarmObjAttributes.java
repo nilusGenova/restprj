@@ -6,138 +6,156 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class AlarmObjAttributes {
 
     private static final Logger log = LoggerFactory.getLogger(AlarmObjAttributes.class);
 
     private final static int MAX_NUM_OF_KEYS = 10;
-    
-    private class KeyPinRecord {
+
+    private static class KeyPinRecord {
 	private int keyCode;
 	private int pinCode;
+
+	@JsonCreator
+	public KeyPinRecord(@JsonProperty("keyCode") int keyCode, @JsonProperty("pinCode") int pincode) {
+	    this.keyCode = keyCode;
+	    this.pinCode = pincode;
+	}
 
 	public KeyPinRecord(int keyCode) {
 	    this.keyCode = keyCode;
 	    pinCode = 0;
 	}
+
     }
 
-	private int armed = 0;
-	private int alarmed = 0;
-	private int keyProgramming = 0;
-	private int masterKey = 0;
-	private Map<Integer, KeyPinRecord> keys = new HashMap();
-	private int sensGreen = 0;
-	private int sensRed = 0;
-	private int sensAlm = 0;
-	private int validSensValue = 0;
-	
-	public void storeKey(int idx, int keyval) {
-		KeyPinRecord k = keys.get(idx);
-		if (k == null) {
-		    k = new KeyPinRecord(keyval);
-		    keys.put(idx, k);
-		} else {
-		    k.keyCode = keyval;
-		}
-	}
+    private int armed = 0;
+    private int alarmed = 0;
+    private int keyProgramming = 0;
+    private int masterKey = 0;
+    private Map<Integer, KeyPinRecord> keys = new HashMap();
+    private int sensGreen = 0;
+    private int sensRed = 0;
+    private int sensAlm = 0;
+    private int validSensValue = 0;
 
-	public boolean keyExists(int keyval) {
-		for (Map.Entry<Integer, KeyPinRecord> e : keys.entrySet()) {
-		    if (e.getValue().keyCode == keyval) {
-			return true;
-		    }
-		}
-		return false;
+    public void storeKey(int idx, int keyval) {
+	KeyPinRecord k = keys.get(idx);
+	if (k == null) {
+	    k = new KeyPinRecord(keyval);
+	    keys.put(idx, k);
+	} else {
+	    k.keyCode = keyval;
 	}
+    }
 
-	public void storePin(int idx, int pin) {
-		KeyPinRecord k = keys.get(idx);
-		if (k == null) {
-		    k = new KeyPinRecord(0);
-		    keys.put(idx, k);
-		}
-		k.pinCode = pin;
-	}
-
-	public void flushKeys() {
-		keys.clear();
+    public boolean keyExists(int keyval) {
+	for (Map.Entry<Integer, KeyPinRecord> e : keys.entrySet()) {
+	    if (e.getValue().keyCode == keyval) {
+		return true;
 	    }
-	 
-	public int getPin(int idx) {
-	     KeyPinRecord k = keys.get(idx);
-	     if (k != null) {
-		 return k.pinCode;		 
-	     }
-	     return -1;
-	 }
-
-	public int getArmed() {
-	    return armed;
 	}
-	
-	public AlarmObjAttributes() {
-		
-	}	
+	return false;
+    }
 
-	public void setArmed(int armed) {
-	    this.armed = armed;
+    public void storePin(int idx, int pin) {
+	KeyPinRecord k = keys.get(idx);
+	if (k == null) {
+	    k = new KeyPinRecord(0);
+	    keys.put(idx, k);
 	}
+	k.pinCode = pin;
+    }
 
-	public int getAlarmed() {
-	    return alarmed;
-	}
+    public void flushKeys() {
+	keys.clear();
+    }
 
-	public void setAlarmed(int alarmed) {
-	    this.alarmed = alarmed;
+    public int getPin(int idx) {
+	KeyPinRecord k = keys.get(idx);
+	if (k != null) {
+	    return k.pinCode;
 	}
+	return -1;
+    }
 
-	public int getKeyProgramming() {
-	    return keyProgramming;
-	}
+    public Map<Integer, KeyPinRecord> getKeys() {
+	return keys;
+    }
 
-	public void setKeyProgramming(int keyProgramming) {
-	    this.keyProgramming = keyProgramming;
-	}
+    public void setKeys(Map<Integer, KeyPinRecord> keys) {
+	this.keys = keys;
+    }
 
-	public int getMasterKey() {
-	    return masterKey;
-	}
+    public int getArmed() {
+	return armed;
+    }
 
-	public void setMasterKey(int masterKey) {
-	    this.masterKey = masterKey;
-	}
+    public AlarmObjAttributes() {
 
-	public int getSensGreen() {
-	    return sensGreen;
-	}
+    }
 
-	public void setSensGreen(int sensGreen) {
-	    this.sensGreen = sensGreen;
-	}
+    public void setArmed(int armed) {
+	this.armed = armed;
+    }
 
-	public int getSensRed() {
-	    return sensRed;
-	}
+    public int getAlarmed() {
+	return alarmed;
+    }
 
-	public void setSensRed(int sensRed) {
-	    this.sensRed = sensRed;
-	}
+    public void setAlarmed(int alarmed) {
+	this.alarmed = alarmed;
+    }
 
-	public int getSensAlm() {
-	    return sensAlm;
-	}
+    public int getKeyProgramming() {
+	return keyProgramming;
+    }
 
-	public void setSensAlm(int sensAlm) {
-	    this.sensAlm = sensAlm;
-	}
+    public void setKeyProgramming(int keyProgramming) {
+	this.keyProgramming = keyProgramming;
+    }
 
-	public int getValidSensValue() {
-	    return validSensValue;
-	}
+    public int getMasterKey() {
+	return masterKey;
+    }
 
-	public void setValidSensValue(int validSensValue) {
-	    this.validSensValue = validSensValue;
-	}
+    public void setMasterKey(int masterKey) {
+	this.masterKey = masterKey;
+    }
+
+    public int getSensGreen() {
+	return sensGreen;
+    }
+
+    public void setSensGreen(int sensGreen) {
+	this.sensGreen = sensGreen;
+    }
+
+    public int getSensRed() {
+	return sensRed;
+    }
+
+    public void setSensRed(int sensRed) {
+	this.sensRed = sensRed;
+    }
+
+    public int getSensAlm() {
+	return sensAlm;
+    }
+
+    public void setSensAlm(int sensAlm) {
+	this.sensAlm = sensAlm;
+    }
+
+    public int getValidSensValue() {
+	return validSensValue;
+    }
+
+    public void setValidSensValue(int validSensValue) {
+	this.validSensValue = validSensValue;
+    }
 
 }

@@ -13,7 +13,6 @@ public class AlarmObjAgent extends HalObjAgent {
 	super(pathName, sendMsgCallBack);
     }
 
-   
     private String calcModeFormat(int armed, int alarmed, int programming) {
 	return String.format("%03d", armed * 100 + alarmed * 10 + programming);
     }
@@ -100,10 +99,12 @@ public class AlarmObjAgent extends HalObjAgent {
 		m /= 10;
 		expAttr.setArmed(m & 1);
 	    }
-	    // K Key changed
-	    // N New Pin set (value 8 chars)
-	case 'K':
+	    break;
+	// K Key changed
+	// N New Pin set (value 8 chars)
 	case 'N':
+	    log.info("New PIN: {}", msg);
+	case 'K':
 	    sendMsgToHal("GAK");
 	    sendMsgToHal("GAP");
 	    break;
@@ -157,6 +158,9 @@ public class AlarmObjAgent extends HalObjAgent {
 	    break;
 	// X Master Key value
 	case "masterkey":
+	    if ("".equals(val)) {
+		val = "-1";
+	    }
 	    n = Integer.parseInt(val);
 	    if (n <= 0) {
 		wrongValue(n);
@@ -168,6 +172,9 @@ public class AlarmObjAgent extends HalObjAgent {
 	    break;
 	// P Pin of key idxKey:value to add(to be entered on keyboard)
 	case "enterpin":
+	    if ("".equals(val)) {
+		val = "-1";
+	    }
 	    n = Integer.parseInt(val);
 	    if ((n < 0) || (n >= 10)) {
 		wrongValue(n);
@@ -190,6 +197,9 @@ public class AlarmObjAgent extends HalObjAgent {
 	switch (cmd) {
 	// K Key value to delete
 	case "key":
+	    if ("".equals(prm)) {
+		prm = "-1";
+	    }
 	    int m = Integer.parseInt(prm);
 	    if (m <= 0) {
 		wrongValue(m);
@@ -226,6 +236,9 @@ public class AlarmObjAgent extends HalObjAgent {
 	switch (cmd) {
 	// K Key value to add
 	case "newkey":
+	    if ("".equals(prm)) {
+		prm = "-1";
+	    }
 	    int m = Integer.parseInt(prm);
 	    if (m <= 0) {
 		wrongValue(m);
