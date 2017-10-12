@@ -69,10 +69,12 @@ public class ThermoObjAgentTest {
 	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("warming"));
 	thermo.parseGetAnswer('W', "1");
 	Assert.assertEquals("ERROR:", 1, extractAttributeValueAsInt("warming"));
-	thermo.parseGetAnswer('T', "324");
+	thermo.parseGetAnswer('T', "324;35");
 	Assert.assertEquals("ERROR:", 32.4, extractAttributeValueAsDouble("temperature"), 0);
-	thermo.parseGetAnswer('T', "80");
+	Assert.assertEquals("ERROR:", 35, extractAttributeValueAsInt("humidity"));
+	thermo.parseGetAnswer('T', "80;9");
 	Assert.assertEquals("ERROR:", 8, extractAttributeValueAsDouble("temperature"), 0);
+	Assert.assertEquals("ERROR:", 9, extractAttributeValueAsInt("humidity"));
 	thermo.parseGetAnswer('R', "215");
 	Assert.assertEquals("ERROR:", 21.5, extractAttributeValueAsDouble("required"), 0);
 	thermo.parseGetAnswer('R', "60");
