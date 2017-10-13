@@ -31,9 +31,13 @@ public class ClockObjAgentTest {
     }
 
     String getSentMsg() {
-	String msg = msgSent.get(0);
-	msgSent.remove(0);
-	return msg;
+	if (noMsgSent()) {
+	    return "";
+	} else {
+	    String msg = msgSent.get(0);
+	    msgSent.remove(0);
+	    return msg;
+	}
     }
 
     boolean noMsgSent() {
@@ -107,8 +111,8 @@ public class ClockObjAgentTest {
 	}
 	Assert.assertEquals("ERROR:", "38569341", et);
 	Assert.assertNull("ERROR:", err);
-	Assert.assertEquals("ERROR in return value", st, Response.Status.OK);
-	Assert.assertEquals("ERROR in return value", sterr, Response.Status.BAD_REQUEST);
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, st);
+	Assert.assertEquals("ERROR in return value", Response.Status.BAD_REQUEST, sterr);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
@@ -123,7 +127,21 @@ public class ClockObjAgentTest {
 	    fail("exception");
 	}
 	Assert.assertEquals("ERROR:", "SCE", getSentMsg().substring(0, 3));
-	Assert.assertEquals("ERROR in return value", et, Response.Status.OK);
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetWrong() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	int exc = 0;
+	try {
+	    et = Response.Status.fromStatusCode(clock.executeSet("citrullo", "").getStatus());
+	} catch (Exception e) {
+	    exc = 1;
+	}
+	Assert.assertEquals("ERROR", 1, exc);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 }

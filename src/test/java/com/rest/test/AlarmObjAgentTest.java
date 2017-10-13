@@ -31,9 +31,13 @@ public class AlarmObjAgentTest {
     }
 
     String getSentMsg() {
-	String msg = msgSent.get(0);
-	msgSent.remove(0);
-	return msg;
+	if (noMsgSent()) {
+	    return "";
+	} else {
+	    String msg = msgSent.get(0);
+	    msgSent.remove(0);
+	    return msg;
+	}
     }
 
     boolean noMsgSent() {
@@ -103,7 +107,7 @@ public class AlarmObjAgentTest {
     }
 
     @Test
-    public void testParseGetAnswerKeysPins() {
+    public void testParseGetAnswerKeysPinsDelete() {
 	emptySentMsg();
 	// K key = (idxKey 0:master)(value 8 chars);(......)
 	alarm.parseGetAnswer('K', "0:07345196;1:91234567;5:00001234;7:36");
@@ -123,6 +127,18 @@ public class AlarmObjAgentTest {
 	Assert.assertEquals("ERROR:", 99811022, extractAttributeValue().getPin(7 - 1));
 	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getPin(5 - 1));
 	Assert.assertEquals("ERROR:", -1, extractAttributeValue().getPin(2 - 1));
+	Assert.assertTrue("ERROR:", noMsgSent());
+	// Delete
+	emptySentMsg();
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	try {
+	    et = Response.Status.fromStatusCode(alarm.deleteData("key", "1234").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "RAK1234", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
@@ -148,8 +164,8 @@ public class AlarmObjAgentTest {
 	}
 	Assert.assertEquals("ERROR:", "001", et);
 	Assert.assertNull("ERROR:", err);
-	Assert.assertEquals("ERROR in return value", st, Response.Status.OK);
-	Assert.assertEquals("ERROR in return value", sterr, Response.Status.BAD_REQUEST);
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, st);
+	Assert.assertEquals("ERROR in return value", Response.Status.BAD_REQUEST, sterr);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
@@ -197,37 +213,312 @@ public class AlarmObjAgentTest {
     public void testCreateData() {
 	emptySentMsg();
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
-	Response.Status er = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
-	Response.Status er2 = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
 	emptySentMsg();
 	try {
 	    et = Response.Status.fromStatusCode(alarm.createData("newkey", "128").getStatus());
-	    er = Response.Status.fromStatusCode(alarm.createData("newkey", "0").getStatus());
-	    er2 = Response.Status.fromStatusCode(alarm.createData("newkey", "").getStatus());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("exception");
 	}
 	Assert.assertEquals("ERROR:", "SAK128", getSentMsg());
-	Assert.assertEquals("ERROR in return value", et, Response.Status.OK);
-	Assert.assertEquals("ERROR in return value", er, Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE);
-	Assert.assertEquals("ERROR in return value", er2, Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE);
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
     @Test
-    public void testExecuteSet() {
+    public void testCreateDataWrong0() {
 	emptySentMsg();
-
+	Response.Status er = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	try {
+	    er = Response.Status.fromStatusCode(alarm.createData("newkey", "0").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR in return value", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE, er);
 	Assert.assertTrue("ERROR:", noMsgSent());
-	fail("Not yet implemented");
     }
 
     @Test
-    public void testDeleteData() {
+    public void testCreateDataWrongEmpty() {
 	emptySentMsg();
-
+	Response.Status er2 = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	try {
+	    er2 = Response.Status.fromStatusCode(alarm.createData("newkey", "").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR in return value", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE, er2);
 	Assert.assertTrue("ERROR:", noMsgSent());
-	fail("Not yet implemented");
     }
+
+    @Test
+    public void testDeleteWrongKey0() {
+	emptySentMsg();
+	Response.Status er = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	try {
+	    er = Response.Status.fromStatusCode(alarm.deleteData("key", "0").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR in return value", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE, er);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testDeleteWrongKeyEmpty() {
+	emptySentMsg();
+	Response.Status er = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	try {
+	    er = Response.Status.fromStatusCode(alarm.deleteData("key", "").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR in return value", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE, er);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testDeleteWrong() {
+	emptySentMsg();
+	int exc = 0;
+	Response.Status er = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	try {
+	    er = Response.Status.fromStatusCode(alarm.deleteData("mucca", "").getStatus());
+	} catch (Exception e) {
+	    exc = 1;
+	}
+	Assert.assertEquals("ERROR", 1, exc);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testDeleteAllKey() {
+	emptySentMsg();
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	try {
+	    et = Response.Status.fromStatusCode(alarm.deleteData("allkeys", "").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "RAX", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testDeleteAllPins() {
+	emptySentMsg();
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	try {
+	    et = Response.Status.fromStatusCode(alarm.deleteData("allpins", "").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "RAP", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetReadSensors() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("readsensors", "").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "GAS", getSentMsg());
+	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getValidSensValue());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetWrong() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	int exc = 0;
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("piripicchio", "").getStatus());
+	} catch (Exception e) {
+	    exc = 1;
+	}
+	Assert.assertEquals("ERROR", 1, exc);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetRemote0() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("remote", "0").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAR0", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetRemote1() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("remote", "1").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAR1", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetRemotewrong() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	int exc = 0;
+	emptySentMsg();
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("remote", "3").getStatus());
+	} catch (Exception e) {
+	    exc = 1;
+	}
+	Assert.assertEquals("ERROR", 1, exc);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetArmed() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	alarm.parseGetAnswer('M', "000");
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("armed", "1").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAM100", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetAlarm() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	alarm.parseGetAnswer('M', "000");
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("alarm", "1").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAM010", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetProg() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	alarm.parseGetAnswer('M', "000");
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("program", "1").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAM001", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetMasterKey() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("masterkey", "34921").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAX34921", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetMasterKeyWrong() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("masterkey", "").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR in return value", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetEnterPin() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("enterpin", "4").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAP4", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetEnterWrongPin() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("enterpin", "10").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR in return value", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetEnterEmptyPin() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("enterpin", "").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR in return value", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
 }

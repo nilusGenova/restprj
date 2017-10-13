@@ -33,9 +33,13 @@ public class ThermoObjAgentTest {
     }
 
     String getSentMsg() {
-	String msg = msgSent.get(0);
-	msgSent.remove(0);
-	return msg;
+	if (noMsgSent()) {
+	    return "";
+	} else {
+	    String msg = msgSent.get(0);
+	    msgSent.remove(0);
+	    return msg;
+	}
     }
 
     boolean noMsgSent() {
@@ -143,8 +147,8 @@ public class ThermoObjAgentTest {
 	}
 	Assert.assertEquals("ERROR:", "1", et);
 	Assert.assertNull("ERROR:", err);
-	Assert.assertEquals("ERROR in return value", st, Response.Status.OK);
-	Assert.assertEquals("ERROR in return value", sterr, Response.Status.BAD_REQUEST);
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, st);
+	Assert.assertEquals("ERROR in return value", Response.Status.BAD_REQUEST, sterr);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
@@ -159,7 +163,7 @@ public class ThermoObjAgentTest {
 	    fail("exception");
 	}
 	Assert.assertEquals("ERROR:", "STR214", getSentMsg());
-	Assert.assertEquals("ERROR in return value", et, Response.Status.OK);
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
@@ -174,7 +178,21 @@ public class ThermoObjAgentTest {
 	    fail("exception");
 	}
 	Assert.assertEquals("ERROR:", "STH32", getSentMsg());
-	Assert.assertEquals("ERROR in return value", et, Response.Status.OK);
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetWrong() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	emptySentMsg();
+	int exc = 0;
+	try {
+	    et = Response.Status.fromStatusCode(thermo.executeSet("citrullo", "").getStatus());
+	} catch (Exception e) {
+	    exc = 1;
+	}
+	Assert.assertEquals("ERROR", 1, exc);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
