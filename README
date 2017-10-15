@@ -18,6 +18,9 @@ http://localhost:8080/hal9000/thermo
 http://localhost:8080/hal9000/thermo?a=warming
 http://localhost:8080/hal9000/alarm
 http://localhost:8080/hal9000/alarm?a=mode
+http://localhost:8080/hal9000/program
+http://localhost:8080/hal9000/program?a=mode  OFF, AUTO, SPECIAL, MAN_OFF, MAN_ON
+http://localhost:8080/hal9000/program?a=countdown
 
 POST:
 http://localhost:8080/hal9000/debug?enable=true
@@ -31,13 +34,23 @@ http://localhost:8080/hal9000/alarm?a=program&v=0|1
 http://localhost:8080/hal9000/alarm?a=alarm&v=0|1
 http://localhost:8080/hal9000/alarm?a=masterkey&v=<key>
 http://localhost:8080/hal9000/alarm?a=enterpin&v=<idxKey>
-
+http://localhost:8080/hal9000/alarm?a=newkey&v=<key>
+http://localhost:8080/hal9000/program?a=mode&v=<mode>  
+http://localhost:8080/hal9000/program?a=countdown&v=<hours> 
+http://localhost:8080/hal9000/program?a=temp1&v=<Celsius*10>
+http://localhost:8080/hal9000/program?a=temp2&v=<Celsius*10>
+http://localhost:8080/hal9000/program?a=temp3&v=<Celsius*10>
+http://localhost:8080/hal9000/program?a=temp_off&v=<Celsius*10>
+http://localhost:8080/hal9000/program?a=temp_on&v=<Celsius*10>
+http://localhost:8080/hal9000/create/program?a=entry&v=<val>
 
 POST(create):
-http://localhost:8080/hal9000/create/alarm?c=newkey&p=<key>
+
 
 DELETE:
 http://localhost:8080/hal9000/alarm?c=key&p=<key>
 http://localhost:8080/hal9000/alarm?c=allkeys
 http://localhost:8080/hal9000/alarm?c=allpins
+http://localhost:8080/hal9000/program?c=allprograms
+http://localhost:8080/hal9000/program?c=entry&p=<val>
 

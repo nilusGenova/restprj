@@ -108,10 +108,6 @@ public abstract class HalObjAgent {
 	throw new Exception();
     }
 
-    public Response createData(String cmd, String prm) throws Exception {
-	throw new Exception();
-    }
-
     protected void wrongAttribute() {
 	log.error("Wrong attribute");
     }
@@ -122,6 +118,10 @@ public abstract class HalObjAgent {
 
     protected void wrongValue(int i) {
 	log.error("Wrong value {}", i);
+    }
+
+    protected void wrongValue(String s) {
+	log.error("Wrong value {}", s);
     }
 
     protected int getBooleanVal(String val) throws Exception {

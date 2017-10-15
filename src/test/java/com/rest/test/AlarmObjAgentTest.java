@@ -215,7 +215,7 @@ public class AlarmObjAgentTest {
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
 	emptySentMsg();
 	try {
-	    et = Response.Status.fromStatusCode(alarm.createData("newkey", "128").getStatus());
+	    et = Response.Status.fromStatusCode(alarm.executeSet("newkey", "128").getStatus());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("exception");
@@ -231,7 +231,7 @@ public class AlarmObjAgentTest {
 	Response.Status er = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
 	emptySentMsg();
 	try {
-	    er = Response.Status.fromStatusCode(alarm.createData("newkey", "0").getStatus());
+	    er = Response.Status.fromStatusCode(alarm.executeSet("newkey", "0").getStatus());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("exception");
@@ -246,7 +246,7 @@ public class AlarmObjAgentTest {
 	Response.Status er2 = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
 	emptySentMsg();
 	try {
-	    er2 = Response.Status.fromStatusCode(alarm.createData("newkey", "").getStatus());
+	    er2 = Response.Status.fromStatusCode(alarm.executeSet("newkey", "").getStatus());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("exception");

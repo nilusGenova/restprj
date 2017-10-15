@@ -184,6 +184,20 @@ public class AlarmObjAgent extends HalObjAgent {
 		sendMsgToHal("SAP" + val);
 		return Response.ok("Enter PIN from Keyboard", MediaType.TEXT_PLAIN).build();
 	    }
+	    // K Key value to add
+	case "newkey":
+	    if ("".equals(val)) {
+		val = "-1";
+	    }
+	    n = Integer.parseInt(val);
+	    if (n <= 0) {
+		wrongValue(n);
+		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+	    } else {
+		log.info("Setting key :{}", val);
+		sendMsgToHal("SAK" + val);
+	    }
+	    break;
 	default:
 	    throw new Exception();
 	}
@@ -191,7 +205,6 @@ public class AlarmObjAgent extends HalObjAgent {
     }
 
     // Attr Reset
-
     @Override
     public Response deleteData(String cmd, String prm) throws Exception {
 	switch (cmd) {
@@ -229,28 +242,6 @@ public class AlarmObjAgent extends HalObjAgent {
 	    throw new Exception();
 	}
 	return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
-    }
-
-    @Override
-    public Response createData(String cmd, String prm) throws Exception {
-	switch (cmd) {
-	// K Key value to add
-	case "newkey":
-	    if ("".equals(prm)) {
-		prm = "-1";
-	    }
-	    int m = Integer.parseInt(prm);
-	    if (m <= 0) {
-		wrongValue(m);
-		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
-	    } else {
-		log.info("Setting key :{}", prm);
-		sendMsgToHal("SAK" + prm);
-		return Response.status(Response.Status.OK).build();
-	    }
-	default:
-	    throw new Exception();
-	}
     }
 
 }

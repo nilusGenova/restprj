@@ -66,22 +66,6 @@ public class EntryPoint {
 	}
     }
 
-    @POST
-    @Path("create/{object}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response createOnObject(@PathParam("object") String path, @QueryParam("c") String cmd,
-	    @QueryParam("p") String prm) {
-	try {
-	    return getRegisteredObjFromPath(path).createData(cmd.toLowerCase(), prm);
-	} catch (NoSuchElementException e) {
-	    log.debug("Not Found path:{} cmd:{}", path, cmd);
-	    return Response.status(Response.Status.BAD_REQUEST).build();
-	} catch (Exception e) {
-	    log.debug("Failure in {} to create cmd:{} with prm:{}", path, cmd, prm, e);
-	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-	}
-    }
-
     @DELETE
     @Path("{object}")
     @Produces(MediaType.TEXT_PLAIN)

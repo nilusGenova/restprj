@@ -19,10 +19,12 @@ public final class App {
 	final ClockObjAgent clockAgent = new ClockObjAgent("clock", (msg) -> serial.sendMsg(msg));
 	final ThermoObjAgent thermoAgent = new ThermoObjAgent("thermo", (msg) -> serial.sendMsg(msg));
 	final AlarmObjAgent alarmObjAgent = new AlarmObjAgent("alarm", (msg) -> serial.sendMsg(msg));
+	final ProgramObjAgent programObjAgent = new ProgramObjAgent("program", (msg) -> serial.sendMsg(msg));
 
 	registry.registerObj(clockAgent);
 	registry.registerObj(thermoAgent);
 	registry.registerObj(alarmObjAgent);
+	registry.registerObj(programObjAgent);
 
 	parser.start();
 
