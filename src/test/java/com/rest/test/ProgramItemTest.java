@@ -55,17 +55,17 @@ public class ProgramItemTest {
     public void testSetFromHalFormat() {
 	ProgramItem progItem = new ProgramItem();
 	progItem.setFromHalFormat(Integer.toString(0x5c7a));
-	Assert.assertEquals("wrong Prog Item constructor", 7, progItem.getHour());
-	Assert.assertEquals("wrong Prog Item constructor", 50, progItem.getMin());
-	Assert.assertEquals("wrong Prog Item constructor", 2, progItem.getDay());
-	Assert.assertEquals("wrong Prog Item constructor", 2, progItem.getTempLevel());
-	Assert.assertEquals("wrong Prog Item constructor", true, progItem.isInterpolation());
+	Assert.assertEquals("wrong set", 7, progItem.getHour());
+	Assert.assertEquals("wrong set", 50, progItem.getMin());
+	Assert.assertEquals("wrong set", 2, progItem.getDay());
+	Assert.assertEquals("wrong set", 2, progItem.getTempLevel());
+	Assert.assertEquals("wrong set", true, progItem.isInterpolation());
 	progItem.setFromHalFormat(Integer.toString(0xf161));
-	Assert.assertEquals("wrong Prog Item constructor", 18, progItem.getHour());
-	Assert.assertEquals("wrong Prog Item constructor", 5, progItem.getMin());
-	Assert.assertEquals("wrong Prog Item constructor", 7, progItem.getDay());
-	Assert.assertEquals("wrong Prog Item constructor", 0, progItem.getTempLevel());
-	Assert.assertEquals("wrong Prog Item constructor", false, progItem.isInterpolation());
+	Assert.assertEquals("wrong set", 18, progItem.getHour());
+	Assert.assertEquals("wrong set", 5, progItem.getMin());
+	Assert.assertEquals("wrong set", 7, progItem.getDay());
+	Assert.assertEquals("wrong set", 0, progItem.getTempLevel());
+	Assert.assertEquals("wrong set", false, progItem.isInterpolation());
     }
 
 }
