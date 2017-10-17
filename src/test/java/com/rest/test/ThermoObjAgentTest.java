@@ -26,6 +26,7 @@ import com.rest.hal9000.ThermoObjAgent;
 public class ThermoObjAgentTest {
 
     ArrayList<String> msgSent = new ArrayList<>();
+    String logMsg = "";
 
     void sendMsg(String msg) {
 	msgSent.add(msg);
@@ -46,12 +47,16 @@ public class ThermoObjAgentTest {
 	return msgSent.size() == 0;
     }
 
+    void logger(String msg) {
+	logMsg = msg;
+    }
+
     void emptySentMsg() {
 	msgSent.clear();
     }
 
     @InjectMocks
-    private final ThermoObjAgent thermo = new ThermoObjAgent("thermo", (s) -> sendMsg(s));
+    private final ThermoObjAgent thermo = new ThermoObjAgent("thermo", (s) -> sendMsg(s), (s) -> logger(s));
 
     @Before
     public void setUp() throws Exception {
@@ -110,19 +115,25 @@ public class ThermoObjAgentTest {
     public void testParseEvent() {
 	// W T R (E)
 	emptySentMsg();
+	logMsg = "";
 	thermo.parseEvent('W', "0");
 	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("warming"));
 	thermo.parseEvent('W', "1");
 	Assert.assertEquals("ERROR:", 1, extractAttributeValueAsInt("warming"));
+	Assert.assertEquals("LOG ERROR", "", logMsg);
 	thermo.parseEvent('T', "324");
 	Assert.assertEquals("ERROR:", 32.4, extractAttributeValueAsDouble("temperature"), 0);
+	Assert.assertEquals("LOG ERROR", "324", logMsg);
 	thermo.parseEvent('T', "80");
+	Assert.assertEquals("LOG ERROR", "80", logMsg);
+	logMsg = "";
 	Assert.assertEquals("ERROR:", 8, extractAttributeValueAsDouble("temperature"), 0);
 	thermo.parseEvent('R', "215");
 	Assert.assertEquals("ERROR:", 21.5, extractAttributeValueAsDouble("required"), 0);
 	thermo.parseEvent('R', "60");
 	Assert.assertEquals("ERROR:", 6, extractAttributeValueAsDouble("required"), 0);
 	Assert.assertTrue("ERROR:", noMsgSent());
+	Assert.assertEquals("LOG ERROR", "", logMsg);
     }
 
     @Test

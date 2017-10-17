@@ -18,8 +18,11 @@ public class ThermoObjAgent extends HalObjAgent {
 
     private ExposedAttributes expAttr = new ExposedAttributes();
 
-    public ThermoObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
+    private final Consumer<String> tempLoggerCallBack;
+
+    public ThermoObjAgent(String pathName, Consumer<String> sendMsgCallBack, Consumer<String> tempLoggerCallBack) {
 	super(pathName, sendMsgCallBack);
+	this.tempLoggerCallBack = tempLoggerCallBack;
     }
 
     @Override
@@ -73,6 +76,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	    break;
 	case 'T':
 	    expAttr.temperature = Integer.parseInt(msg) / 10.0;
+	    tempLoggerCallBack.accept(msg);
 	    break;
 	case 'R':
 	    expAttr.required = Integer.parseInt(msg) / 10.0;
