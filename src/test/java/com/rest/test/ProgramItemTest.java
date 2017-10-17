@@ -61,11 +61,44 @@ public class ProgramItemTest {
 	Assert.assertEquals("wrong set", 2, progItem.getTempLevel());
 	Assert.assertEquals("wrong set", true, progItem.isInterpolation());
 	progItem.setFromHalFormat(Integer.toString(0xf161));
+	System.out.println(progItem.toString());
 	Assert.assertEquals("wrong set", 18, progItem.getHour());
 	Assert.assertEquals("wrong set", 5, progItem.getMin());
 	Assert.assertEquals("wrong set", 7, progItem.getDay());
 	Assert.assertEquals("wrong set", 0, progItem.getTempLevel());
 	Assert.assertEquals("wrong set", false, progItem.isInterpolation());
+    }
+
+    @Test
+    public void testProgramItemCompare1() {
+	final int BEFORE = -1;
+	final int EQUAL = 0;
+	final int AFTER = 1;
+	ProgramItem progItem = new ProgramItem(18, 5, 3, 0, false);
+	ProgramItem progItem2 = new ProgramItem(18, 5, 7, 0, false);
+	Assert.assertEquals("wrong Comparator", BEFORE, progItem.compareTo(progItem2));
+	Assert.assertEquals("wrong Comparator", AFTER, progItem2.compareTo(progItem));
+	Assert.assertEquals("wrong Comparator", EQUAL, progItem.compareTo(progItem));
+    }
+
+    @Test
+    public void testProgramItemCompare2() {
+	final int BEFORE = -1;
+	final int AFTER = 1;
+	ProgramItem progItem = new ProgramItem(17, 5, 3, 0, false);
+	ProgramItem progItem2 = new ProgramItem(18, 5, 3, 0, false);
+	Assert.assertEquals("wrong Comparator", BEFORE, progItem.compareTo(progItem2));
+	Assert.assertEquals("wrong Comparator", AFTER, progItem2.compareTo(progItem));
+    }
+
+    @Test
+    public void testProgramItemCompare3() {
+	final int BEFORE = -1;
+	final int AFTER = 1;
+	ProgramItem progItem = new ProgramItem(18, 5, 3, 0, false);
+	ProgramItem progItem2 = new ProgramItem(18, 25, 3, 0, false);
+	Assert.assertEquals("wrong Comparator", BEFORE, progItem.compareTo(progItem2));
+	Assert.assertEquals("wrong Comparator", AFTER, progItem2.compareTo(progItem));
     }
 
 }

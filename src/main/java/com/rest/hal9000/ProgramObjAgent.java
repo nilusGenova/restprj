@@ -1,7 +1,8 @@
 package com.rest.hal9000;
 
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 import javax.ws.rs.core.Response;
@@ -31,7 +32,7 @@ public class ProgramObjAgent extends HalObjAgent {
     // N ManOn 10C_X_____X_____________________10ofCelsius degrees
 
     private class ExposedAttributes {
-	private ArrayList<ProgramItem> progItems = new ArrayList<>();
+	private SortedSet<ProgramItem> program = new TreeSet<>();
 	private String mode = ModeStates.OFF.toString();
 	private int countdown = 0;
 	private int dayTemp = 0;
@@ -42,6 +43,9 @@ public class ProgramObjAgent extends HalObjAgent {
 	private int toff = 0;
 	private int ton = 0;
     }
+
+    int itemsToAsk = 0;
+    int numOfProgItems = 0;
 
     private ExposedAttributes expAttr = new ExposedAttributes();
 
@@ -69,34 +73,73 @@ public class ProgramObjAgent extends HalObjAgent {
     }
 
     private void askProgramItems() {
+	itemsToAsk = 0;
+	numOfProgItems = 0;
+	expAttr.program.clear();
 	sendMsgToHal("GPP0");
-	// TODO: devo chiedere gli altri
     }
 
-    // Attr________Req____answer_______________Set___________________Reset
-    // P Program_n:0=qty__Hour-5Min-Day-Mode___val_to_add__________val to del
-    private void receivedProgramGetAsnw(String msg) {
-	// TODO:
+    private void receivedProgramGetAnsw(String msg) {
+	if (itemsToAsk == 0) {
+	    numOfProgItems = Integer.parseInt(msg);
+	} else {
+	    ProgramItem item = new ProgramItem();
+	    item.setFromHalFormat(msg);
+	    expAttr.program.add(item);
+	}
+	if (itemsToAsk >= numOfProgItems) {
+	    itemsToAsk = 0; // end of query loop
+	} else {
+	    itemsToAsk++;
+	    sendMsgToHal("GPP" + itemsToAsk);
+	}
     }
 
-    private boolean validateFormatItem(String val) {
-	// TODO:
-	return true;
+    private int getValFromFormattedRequest(String s) {
+	String[] v = s.split(":");
+	return Integer.parseInt(v[1]);
     }
 
-    // Attr________Req____answer_______________Set___________________Reset
-    // P Program_n:0=qty__Hour-5Min-Day-Mode___val_to_add__________val to del
+    // Format of msg
+    // h:<hour>-m:<min>-d:<day>-t:<temp>-i:<0|1 interp>
+    private ProgramItem validateFormatItem(String val) {
+	String[] vals = val.split("-");
+	if ((vals.length != 5) || (val.chars().filter(ch -> ch == ':').count() != 5)) {
+	    return null;
+	}
+	if ((vals[0].charAt(0) != 'h') || (vals[1].charAt(0) != 'm') || (vals[2].charAt(0) != 'd')
+		|| (vals[3].charAt(0) != 't') || (vals[4].charAt(0) != 'i')) {
+	    return null;
+	}
+	int h = getValFromFormattedRequest(vals[0]);
+	int m = getValFromFormattedRequest(vals[1]);
+	int d = getValFromFormattedRequest(vals[2]);
+	int t = getValFromFormattedRequest(vals[3]);
+	int i = getValFromFormattedRequest(vals[4]);
+	if ((h < 0) || (h > 23) || (m < 0) || (m > 59) || (d < 0) || (d > 7) || (t < 0) || (t > 3) || (i < 0)
+		|| (i > 1)) {
+	    return null;
+	}
+	// int hour, int min, int day, int tempLevel, boolean interpolation
+	ProgramItem item = new ProgramItem(h, m, d, t, i == 1);
+	return item;
+    }
+
     // return false if item already exists
-    private boolean addProgramItem(String msg) {
-	// TODO:
+    private boolean addProgramItem(ProgramItem item) {
+	if (expAttr.program.contains(item)) {
+	    return false;
+	}
+	sendMsgToHal("SPP" + item.getHalFormat());
 	return true;
     }
 
-    // Attr________Req____answer_______________Set___________________Reset
-    // P Program_n:0=qty__Hour-5Min-Day-Mode___val_to_add__________val to del
     // return false if item doesn't exists
-    private boolean deleteProgramItem(String msg) {
-	// TODO:
+    private boolean deleteProgramItem(ProgramItem item) {
+	if (!expAttr.program.contains(item)) {
+	    return false;
+	}
+	sendMsgToHal("RPP" + item.getHalFormat());
 	return true;
     }
 
@@ -164,7 +207,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	    expAttr.ton = Integer.parseInt(pin[4]);
 	    break;
 	case 'P':
-	    receivedProgramGetAsnw(msg);
+	    receivedProgramGetAnsw(msg);
 	    break;
 	default:
 	    wrongAttribute();
@@ -254,16 +297,19 @@ public class ProgramObjAgent extends HalObjAgent {
 		return setPrgAttr('N', n);
 	    }
 	    // P Program_n:0=qty__Hour-5Min-Day-Mode___val_to_add__________val to del
-	case "entry":
-	    if (!validateFormatItem(val)) {
+	case "entry": {
+	    ProgramItem item = validateFormatItem(val);
+	    if (item == null) {
 		wrongValue(val);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
 		log.info("Adding program item:{}", val);
-		if (!addProgramItem(val)) {
+		if (!addProgramItem(item)) {
+		    log.info("Item already exists");
 		    return Response.status(Response.Status.FOUND).build();
 		}
 	    }
+	}
 	    break;
 	default:
 	    throw new NoSuchElementException();
@@ -281,17 +327,20 @@ public class ProgramObjAgent extends HalObjAgent {
 	    // M Mode______*_____[oFf|oN|-|Auto|Spec]__[oFf|oN|-o|Auto|Spec]_CancAll
 	    sendMsgToHal("RPM");
 	    return Response.status(Response.Status.OK).build();
-	case "entry":
-	    if (!validateFormatItem(prm)) {
+	case "entry": {
+	    ProgramItem item = validateFormatItem(prm);
+	    if (item == null) {
 		wrongValue(prm);
 	    } else {
 		log.info("Deleting program item:{}", prm);
-		if (!addProgramItem(prm)) {
+		if (!deleteProgramItem(item)) {
+		    log.info("Item does'n exist");
 		    return Response.status(Response.Status.BAD_REQUEST).build();
 		} else {
 		    return Response.status(Response.Status.OK).build();
 		}
 	    }
+	}
 	    break;
 	default:
 	    throw new Exception();

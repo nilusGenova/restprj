@@ -1,6 +1,6 @@
 package com.rest.hal9000;
 
-public class ProgramItem {
+public class ProgramItem implements Comparable<ProgramItem> {
 
     private final static int MASK_DAY = 0xe0;
     private final static int MASK_TERM_MODE = 0x10;
@@ -135,6 +135,26 @@ public class ProgramItem {
 
     public void setInterpolation(boolean interpolation) {
 	this.interpolation = interpolation;
+    }
+
+    @Override
+    public int compareTo(final ProgramItem item) {
+	// final int BEFORE = -1;
+	// final int EQUAL = 0;
+	// final int AFTER = 1;
+
+	if (this.day != item.day) {
+	    return Integer.compare(this.day, item.day);
+	}
+	if (this.hour != item.hour) {
+	    return Integer.compare(this.hour, item.hour);
+	}
+	return Integer.compare(this.min, item.min);
+    }
+
+    @Override
+    public String toString() {
+	return "[" + day + "-" + hour + ":" + min + "]T" + tempLevel + (interpolation ? "i" : "");
     }
 
 }

@@ -42,15 +42,12 @@ http://localhost:8080/hal9000/program?a=temp2&v=<Celsius*10>
 http://localhost:8080/hal9000/program?a=temp3&v=<Celsius*10>
 http://localhost:8080/hal9000/program?a=temp_off&v=<Celsius*10>
 http://localhost:8080/hal9000/program?a=temp_on&v=<Celsius*10>
-http://localhost:8080/hal9000/create/program?a=entry&v=<val>
-
-POST(create):
-
+http://localhost:8080/hal9000/program?a=entry&v=h:<hour>-m:<min>-d:<day>-t:<temp>-i:<0|1 interp>
 
 DELETE:
 http://localhost:8080/hal9000/alarm?c=key&p=<key>
 http://localhost:8080/hal9000/alarm?c=allkeys
 http://localhost:8080/hal9000/alarm?c=allpins
 http://localhost:8080/hal9000/program?c=allprograms
-http://localhost:8080/hal9000/program?c=entry&p=<val>
+http://localhost:8080/hal9000/program?c=entry&p=h:<hour>-m:<min>-d:<day>-t:<temp>-i:<0|1 interp>
 
