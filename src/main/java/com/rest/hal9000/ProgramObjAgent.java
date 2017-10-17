@@ -19,6 +19,8 @@ public class ProgramObjAgent extends HalObjAgent {
 	}
     }
 
+    private SortedSet<ProgramItem> newProgram = null;
+
     // Attr________Req____answer_______________Set___________________Reset
     // P Program_n:0=qty__Hour-5Min-Day-Mode___val_to_add__________val to del
     // M Mode______*_____[oFf|oN|-|Auto|Spec]__[oFf|oN|-o|Auto|Spec]_CancAll
@@ -75,7 +77,7 @@ public class ProgramObjAgent extends HalObjAgent {
     private void askProgramItems() {
 	itemsToAsk = 0;
 	numOfProgItems = 0;
-	expAttr.program.clear();
+	newProgram = new TreeSet<>();
 	sendMsgToHal("GPP0");
     }
 
@@ -85,10 +87,12 @@ public class ProgramObjAgent extends HalObjAgent {
 	} else {
 	    ProgramItem item = new ProgramItem();
 	    item.setFromHalFormat(msg);
-	    expAttr.program.add(item);
+	    newProgram.add(item);
 	}
 	if (itemsToAsk >= numOfProgItems) {
 	    itemsToAsk = 0; // end of query loop
+	    expAttr.program.clear();
+	    expAttr.program = newProgram;
 	} else {
 	    itemsToAsk++;
 	    sendMsgToHal("GPP" + itemsToAsk);
