@@ -27,7 +27,7 @@ public abstract class HalObjAgent {
 
     private final Consumer<String> sendMsgCallBack;
 
-    public HalObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
+    public HalObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super();
 	this.id = Character.toUpperCase(pathName.charAt(0));
 	this.pathName = pathName;
@@ -44,15 +44,15 @@ public abstract class HalObjAgent {
 
     protected abstract Object getExposedData();
 
-    protected abstract String getExposedAttribute(String attr) throws Exception;
+    protected abstract String getExposedAttribute(final String attr) throws Exception;
 
-    protected abstract void specializedParseGetAnswer(char attribute, String msg);
+    protected abstract void specializedParseGetAnswer(final char attribute, final String msg);
 
-    protected abstract void specializedParseEvent(char event, String msg);
+    protected abstract void specializedParseEvent(final char event, final String msg);
 
     public abstract void alignAll();
 
-    public void parseGetAnswer(char attribute, String msg) {
+    public void parseGetAnswer(final char attribute, final String msg) {
 	synchWrite(new Callable<Boolean>() {
 	    public Boolean call() throws Exception {
 		specializedParseGetAnswer(attribute, msg);
@@ -61,7 +61,7 @@ public abstract class HalObjAgent {
 	});
     }
 
-    public void parseEvent(char event, String msg) {
+    public void parseEvent(final char event, final String msg) {
 	synchWrite(new Callable<Boolean>() {
 	    public Boolean call() throws Exception {
 		specializedParseEvent(event, msg);
@@ -85,7 +85,7 @@ public abstract class HalObjAgent {
 	return Response.ok(jsonInString, MediaType.APPLICATION_JSON).build();
     }
 
-    public Response exposeJsonAttribute(String attr) throws Exception {
+    public Response exposeJsonAttribute(final String attr) throws Exception {
 
 	String value = synchRead(new Callable<String>() {
 	    public String call() throws Exception {
@@ -100,11 +100,11 @@ public abstract class HalObjAgent {
 	}
     }
 
-    public Response executeSet(String attr, String val) throws Exception {
+    public Response executeSet(final String attr, final String val) throws Exception {
 	throw new Exception();
     }
 
-    public Response deleteData(String cmd, String prm) throws Exception {
+    public Response deleteData(final String cmd, final String prm) throws Exception {
 	throw new Exception();
     }
 
@@ -120,11 +120,11 @@ public abstract class HalObjAgent {
 	log.error("Wrong value {}", i);
     }
 
-    protected void wrongValue(String s) {
+    protected void wrongValue(final String s) {
 	log.error("Wrong value {}", s);
     }
 
-    protected int getBooleanVal(String val) throws Exception {
+    protected int getBooleanVal(final String val) throws Exception {
 	if ("0".equals(val)) {
 	    return 0;
 	}
@@ -135,12 +135,12 @@ public abstract class HalObjAgent {
 	}
     }
 
-    protected void sendMsgToHal(String msg) {
+    protected void sendMsgToHal(final String msg) {
 	this.sendMsgCallBack.accept(msg);
     }
 
     @SuppressWarnings("finally")
-    protected <T> T synchWrite(Callable<T> func) {
+    protected <T> T synchWrite(final Callable<T> func) {
 	T retVal = null;
 	lock.writeLock().lock();
 	try {
@@ -152,7 +152,7 @@ public abstract class HalObjAgent {
     }
 
     @SuppressWarnings("finally")
-    protected <T> T synchRead(Callable<T> func) {
+    protected <T> T synchRead(final Callable<T> func) {
 	T retVal = null;
 	lock.readLock().lock();
 	try {

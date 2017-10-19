@@ -52,7 +52,7 @@ public class ProgramObjAgent extends HalObjAgent {
     private ExposedAttributes expAttr = new ExposedAttributes();
 
     // [oFf|oN|-|Auto|Spec]
-    private void setMode(char cm) {
+    private void setMode(final char cm) {
 	for (ModeStates m : ModeStates.values()) {
 	    if (m.halPmode == cm) {
 		expAttr.mode = m.toString();
@@ -81,7 +81,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	sendMsgToHal("GPP0");
     }
 
-    private void receivedProgramGetAnsw(String msg) {
+    private void receivedProgramGetAnsw(final String msg) {
 	if (itemsToAsk == 0) {
 	    numOfProgItems = Integer.parseInt(msg);
 	} else {
@@ -99,14 +99,18 @@ public class ProgramObjAgent extends HalObjAgent {
 	}
     }
 
-    private int getValFromFormattedRequest(String s) {
-	String[] v = s.split(":");
-	return Integer.parseInt(v[1]);
+    private int getValFromFormattedRequest(final String s) {
+	try {
+	    String[] v = s.split(":");
+	    return Integer.parseInt(v[1]);
+	} catch (NumberFormatException e) {
+	    return -1;
+	}
     }
 
     // Format of msg
     // h:<hour>-m:<min>-d:<day>-t:<temp>-i:<0|1 interp>
-    private ProgramItem validateFormatItem(String val) {
+    private ProgramItem validateFormatItem(final String val) {
 	String[] vals = val.split("-");
 	if ((vals.length != 5) || (val.chars().filter(ch -> ch == ':').count() != 5)) {
 	    return null;
@@ -130,7 +134,7 @@ public class ProgramObjAgent extends HalObjAgent {
     }
 
     // return false if item already exists
-    private boolean addProgramItem(ProgramItem item) {
+    private boolean addProgramItem(final ProgramItem item) {
 	if (expAttr.program.contains(item)) {
 	    return false;
 	}
@@ -139,7 +143,7 @@ public class ProgramObjAgent extends HalObjAgent {
     }
 
     // return false if item doesn't exists
-    private boolean deleteProgramItem(ProgramItem item) {
+    private boolean deleteProgramItem(final ProgramItem item) {
 	if (!expAttr.program.contains(item)) {
 	    return false;
 	}
@@ -147,7 +151,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	return true;
     }
 
-    public ProgramObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
+    public ProgramObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
     }
 
@@ -171,7 +175,7 @@ public class ProgramObjAgent extends HalObjAgent {
     // C Countdown changed timeout in hours
     // Program datas changed
     @Override
-    protected void specializedParseEvent(char event, String msg) {
+    protected void specializedParseEvent(final char event, final String msg) {
 	switch (event) {
 	case 'M':
 	    setMode(msg.charAt(0));
@@ -194,7 +198,7 @@ public class ProgramObjAgent extends HalObjAgent {
     // (D)Day Temp 0-7;min_temp in 10ofCelsius degrees
     // T Prgr Temp_*_____(T1;T2;T3;Moff;Mon in 10ofCelsius degrees
     @Override
-    protected void specializedParseGetAnswer(char attribute, String msg) {
+    protected void specializedParseGetAnswer(final char attribute, final String msg) {
 	switch (attribute) {
 	case 'M':
 	    setMode(msg.charAt(0));
@@ -219,7 +223,7 @@ public class ProgramObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected String getExposedAttribute(String attr) throws Exception {
+    protected String getExposedAttribute(final String attr) throws Exception {
 	log.info("Program exposeAttribute");
 	if ("countdown".equals(attr)) {
 	    return Integer.toString(expAttr.countdown);
@@ -227,18 +231,25 @@ public class ProgramObjAgent extends HalObjAgent {
 	if ("mode".equals(attr)) {
 	    return expAttr.mode.toString();
 	}
+	if ("size".equals(attr)) {
+	    return Integer.toString(expAttr.program.size());
+	}
 	wrongAttribute();
 	return null;
     }
 
     private int convertVal(String val) {
-	if ("".equals(val)) {
-	    val = "-1";
+	try {
+	    if ("".equals(val)) {
+		val = "-1";
+	    }
+	    return Integer.parseInt(val);
+	} catch (NumberFormatException e) {
+	    return -1;
 	}
-	return Integer.parseInt(val);
     }
 
-    private Response setPrgAttr(char prgAttr, int temp) {
+    private Response setPrgAttr(final char prgAttr, final int temp) {
 	if (temp >= 0) {
 	    sendMsgToHal("SP" + prgAttr + temp);
 	    return Response.status(Response.Status.OK).build();
@@ -248,7 +259,7 @@ public class ProgramObjAgent extends HalObjAgent {
     }
 
     @Override
-    public Response executeSet(String attr, String val) throws Exception {
+    public Response executeSet(final String attr, final String val) throws Exception {
 	int n;
 	switch (attr) {
 	// M Mode______*_____[oFf|oN|-|Auto|Spec]
@@ -323,7 +334,7 @@ public class ProgramObjAgent extends HalObjAgent {
     }
 
     @Override
-    public Response deleteData(String cmd, String prm) throws Exception {
+    public Response deleteData(final String cmd, final String prm) throws Exception {
 	switch (cmd) {
 	case "allprograms":
 	    log.info("Deleting all programs");

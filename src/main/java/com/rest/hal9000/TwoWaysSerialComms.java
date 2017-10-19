@@ -24,7 +24,7 @@ public class TwoWaysSerialComms {
     boolean connected = false;
     private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
 
-    public void connect(String portName, Consumer<String> rcvCallBack) throws Exception {
+    public void connect(final String portName, final Consumer<String> rcvCallBack) throws Exception {
 	log.debug("Connecting to: {}", portName);
 	CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 	if (portIdentifier.isCurrentlyOwned()) {
@@ -58,7 +58,7 @@ public class TwoWaysSerialComms {
 	}
     }
 
-    void sendMsg(String msg) {
+    void sendMsg(final String msg) {
 	try {
 	    if (connected) {
 		outMsgQueue.put(msg);
@@ -73,7 +73,7 @@ public class TwoWaysSerialComms {
 	InputStream in;
 	Consumer<String> rcvCallBack;
 
-	public SerialReader(InputStream in, Consumer<String> rcvCallBack) {
+	public SerialReader(final InputStream in, final Consumer<String> rcvCallBack) {
 	    this.in = in;
 	    this.rcvCallBack = rcvCallBack;
 	}
@@ -126,7 +126,7 @@ public class TwoWaysSerialComms {
 
 	OutputStream out;
 
-	public SerialWriter(OutputStream out) {
+	public SerialWriter(final OutputStream out) {
 	    this.out = out;
 	}
 

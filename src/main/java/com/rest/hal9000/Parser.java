@@ -14,11 +14,11 @@ public class Parser implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(Parser.class);
 
-    public Parser(Function<Character, HalObjAgent> getRegisteredObj) {
+    public Parser(final Function<Character, HalObjAgent> getRegisteredObj) {
 	this.getRegisteredObj = getRegisteredObj;
     }
 
-    public void msgToBeParsed(String msg) {
+    public void msgToBeParsed(final String msg) {
 	try {
 	    msgQueue.put(msg);
 	} catch (InterruptedException e) {

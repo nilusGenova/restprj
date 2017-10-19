@@ -9,7 +9,7 @@ public class ClockObjAgent extends HalObjAgent {
 
     private EpocTime expAttr = new EpocTime();
 
-    public ClockObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
+    public ClockObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
     }
 
@@ -20,7 +20,7 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected String getExposedAttribute(String attr) throws Exception {
+    protected String getExposedAttribute(final String attr) throws Exception {
 	log.info("Clock exposeAttribute");
 	if ("epochtime".equals(attr)) {
 	    return expAttr.getEpochTime();
@@ -30,7 +30,7 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected void specializedParseGetAnswer(char attribute, String msg) {
+    protected void specializedParseGetAnswer(final char attribute, final String msg) {
 	switch (attribute) {
 	case 'D':
 	    expAttr.setDate(msg);
@@ -50,7 +50,7 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected void specializedParseEvent(char event, String msg) {
+    protected void specializedParseEvent(final char event, final String msg) {
 	switch (event) {
 	case 'D':
 	    alignAll();
@@ -67,7 +67,7 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    public Response executeSet(String attr, String val) {
+    public Response executeSet(final String attr, final String val) {
 	if ("actualtime".equals(attr)) {
 	    log.debug("Sending actual time to hal9000");
 	    String eat = expAttr.getEpocOfActualTime();

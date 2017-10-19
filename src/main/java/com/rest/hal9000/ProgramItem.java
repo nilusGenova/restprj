@@ -26,7 +26,7 @@ public class ProgramItem implements Comparable<ProgramItem> {
 	interpolation = false;
     }
 
-    public ProgramItem(int hour, int min, int day, int tempLevel, boolean interpolation) {
+    public ProgramItem(final int hour, final int min, final int day, final int tempLevel, final boolean interpolation) {
 	this.hour = hour;
 	this.min = (min / 5) * 5;
 	this.day = day;
@@ -59,7 +59,7 @@ public class ProgramItem implements Comparable<ProgramItem> {
 	return Integer.toString((byte1 << 8) + byte2);
     }
 
-    public boolean isValidFormat(String val) {
+    public boolean isValidFormat(final String val) {
 	int value = Integer.parseInt(val);
 	int byte1 = (byte) (value >> 8);
 	int byte2 = (byte) (value & 0xff);
@@ -76,7 +76,7 @@ public class ProgramItem implements Comparable<ProgramItem> {
 	return true;
     }
 
-    public boolean setFromHalFormat(String val) {
+    public boolean setFromHalFormat(final String val) {
 	if (!isValidFormat(val)) {
 	    return false;
 	}
@@ -101,7 +101,7 @@ public class ProgramItem implements Comparable<ProgramItem> {
 	return hour;
     }
 
-    public void setHour(int hour) {
+    public void setHour(final int hour) {
 	this.hour = hour;
     }
 
@@ -109,7 +109,7 @@ public class ProgramItem implements Comparable<ProgramItem> {
 	return min;
     }
 
-    public void setMin(int min) {
+    public void setMin(final int min) {
 	this.min = min;
     }
 
@@ -117,7 +117,7 @@ public class ProgramItem implements Comparable<ProgramItem> {
 	return day;
     }
 
-    public void setDay(int day) {
+    public void setDay(final int day) {
 	this.day = day;
     }
 
@@ -125,7 +125,7 @@ public class ProgramItem implements Comparable<ProgramItem> {
 	return tempLevel;
     }
 
-    public void setTempLevel(int temp) {
+    public void setTempLevel(final int temp) {
 	this.tempLevel = temp;
     }
 
@@ -133,7 +133,7 @@ public class ProgramItem implements Comparable<ProgramItem> {
 	return interpolation;
     }
 
-    public void setInterpolation(boolean interpolation) {
+    public void setInterpolation(final boolean interpolation) {
 	this.interpolation = interpolation;
     }
 

@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 public class TempLogger extends HalObjAgent {
 
-    public TempLogger(String pathName, Consumer<String> sendMsgCallBack) {
+    public TempLogger(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
 	// TODO Auto-generated constructor stub
     }
@@ -18,24 +18,24 @@ public class TempLogger extends HalObjAgent {
     }
 
     @Override
-    protected String getExposedAttribute(String attr) throws Exception {
+    protected String getExposedAttribute(final String attr) throws Exception {
 	// TODO Auto-generated method stub
 	return null;
     }
 
-    public void logTemperature(String val) {
+    public void logTemperature(final String val) {
 	Calendar cal = Calendar.getInstance();
 	SimpleDateFormat date_format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	log.info("LOG_TEMP [{}]{}", date_format.format(cal.getTime()), val);
     }
 
     @Override
-    protected void specializedParseGetAnswer(char attribute, String msg) {
+    protected void specializedParseGetAnswer(final char attribute, final String msg) {
 	return;
     }
 
     @Override
-    protected void specializedParseEvent(char event, String msg) {
+    protected void specializedParseEvent(final char event, final String msg) {
 	return;
     }
 

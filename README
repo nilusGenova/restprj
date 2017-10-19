@@ -21,6 +21,7 @@ http://localhost:8080/hal9000/alarm?a=mode
 http://localhost:8080/hal9000/program
 http://localhost:8080/hal9000/program?a=mode  OFF, AUTO, SPECIAL, MAN_OFF, MAN_ON
 http://localhost:8080/hal9000/program?a=countdown
+http://localhost:8080/hal9000/program?a=size
 http://localhost:8080/hal9000/logger
 
 POST:

@@ -28,7 +28,7 @@ public class EpocTime {
 	epochTime = 0;
     }
 
-    public void setEpocTime(long et) {
+    public void setEpocTime(final long et) {
 	log.debug("Setting Epoc time:{}", et);
 	epochTime = et;
 	weekDay = (int) (epochTime / 3600) / 24;
@@ -68,7 +68,7 @@ public class EpocTime {
 	return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(final String date) {
 	this.date = date;
     }
 
@@ -76,7 +76,7 @@ public class EpocTime {
 	return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(final String time) {
 	this.time = time;
     }
 
@@ -88,15 +88,15 @@ public class EpocTime {
 	return Long.toString(epochTime);
     }
 
-    public void setWeekDay(int weekDay) {
+    public void setWeekDay(final int weekDay) {
 	this.weekDay = weekDay;
     }
 
-    public boolean isDateValid(int day, int month, int year) {
+    public boolean isDateValid(final int day, final int month, final int year) {
 	return convertDateIfValid(day, month, year) != null;
     }
 
-    public boolean isTimeValid(int hour, int min, int sec) {
+    public boolean isTimeValid(final int hour, final int min, final int sec) {
 	if ((0 <= sec && sec <= 59) && (0 <= min && min <= 59) && (0 <= hour && hour <= 23)) {
 	    return true;
 	} else {
@@ -105,7 +105,8 @@ public class EpocTime {
 	}
     }
 
-    public String getEpocTime(int day, int month, int year, int hour, int min, int sec) {
+    public String getEpocTime(final int day, final int month, final int year, final int hour, final int min,
+	    final int sec) {
 	log.debug("getEpocTime of {}-{}-{} {}:{}:{}", day, month, year, hour, min, sec);
 	if (isTimeValid(hour, min, sec)) {
 	    String date = convertDateIfValid(day, month, year);
@@ -123,7 +124,7 @@ public class EpocTime {
 		cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
     }
 
-    private String calculateEpocTime(int day, int month, int year, int hour, int min, int sec) {
+    private String calculateEpocTime(int day, int month, int year, final int hour, final int min, final int sec) {
 	log.debug("Calculate EpocTime of {}-{}-{} {}:{}:{}", day, month, year, hour, min, sec);
 	day -= 1;
 	month -= 1;
@@ -135,7 +136,7 @@ public class EpocTime {
 	return retVal;
     }
 
-    private String convertDateIfValid(int day, int month, int year) {
+    private String convertDateIfValid(final int day, final int month, final int year) {
 	final String date = String.format("%02d-%02d-%4d", day, month, year);
 	if ((1 <= month && month <= 12) && (1 <= day && day <= 31) && (2000 <= year && year <= 2099)) {
 	    if (GenericValidator.isDate(date, "dd-MM-yyyy", true)) {

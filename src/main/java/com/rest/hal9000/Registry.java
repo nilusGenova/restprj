@@ -13,7 +13,7 @@ public class Registry {
     public Registry() {
     }
 
-    public HalObjAgent getRegisteredObj(char objId) {
+    public HalObjAgent getRegisteredObj(final char objId) {
 	synchronized (registeredMap) {
 	    return registeredMap.get(objId);
 	}
@@ -25,7 +25,7 @@ public class Registry {
 	}
     }
 
-    public void registerObj(HalObjAgent obj) {
+    public void registerObj(final HalObjAgent obj) {
 	final char id = obj.getId();
 	log.info("Register obj {}", id);
 	if (getRegisteredObj(id) != null) {

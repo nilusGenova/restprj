@@ -9,11 +9,11 @@ public class AlarmObjAgent extends HalObjAgent {
 
     private AlarmObjAttributes expAttr = new AlarmObjAttributes();
 
-    public AlarmObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
+    public AlarmObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
     }
 
-    private String calcModeFormat(int armed, int alarmed, int programming) {
+    private String calcModeFormat(final int armed, final int alarmed, final int programming) {
 	return String.format("%03d", armed * 100 + alarmed * 10 + programming);
     }
 
@@ -24,7 +24,7 @@ public class AlarmObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected String getExposedAttribute(String attr) throws Exception {
+    protected String getExposedAttribute(final String attr) throws Exception {
 	log.info("Alarm exposeAttribute");
 	if ("mode".equals(attr)) {
 	    return calcModeFormat(expAttr.getArmed(), expAttr.getAlarmed(), expAttr.getKeyProgramming());
@@ -34,11 +34,12 @@ public class AlarmObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected void specializedParseGetAnswer(char attribute, String msg) {
+    protected void specializedParseGetAnswer(final char attribute, final String msg) {
 	switch (attribute) {
 	// M mode = (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
 	case 'M':
-	    int m = Integer.parseInt(msg);
+	    int m;
+	    m = Integer.parseInt(msg);
 	    if ((m > 111) || (m < 0)) {
 		wrongValue(m);
 	    } else {
@@ -85,7 +86,7 @@ public class AlarmObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected void specializedParseEvent(char event, String msg) {
+    protected void specializedParseEvent(final char event, final String msg) {
 	switch (event) {
 	// M Mode (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
 	case 'M':
@@ -130,7 +131,7 @@ public class AlarmObjAgent extends HalObjAgent {
     }
 
     @Override
-    public Response executeSet(String attr, String val) throws Exception {
+    public Response executeSet(final String attr, String val) throws Exception {
 	int n;
 	switch (attr) {
 	// need to force sensor read to have valid values
@@ -161,7 +162,11 @@ public class AlarmObjAgent extends HalObjAgent {
 	    if ("".equals(val)) {
 		val = "-1";
 	    }
-	    n = Integer.parseInt(val);
+	    try {
+		n = Integer.parseInt(val);
+	    } catch (Exception e) {
+		n = -1;
+	    }
 	    if (n <= 0) {
 		wrongValue(n);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
@@ -175,7 +180,11 @@ public class AlarmObjAgent extends HalObjAgent {
 	    if ("".equals(val)) {
 		val = "-1";
 	    }
-	    n = Integer.parseInt(val);
+	    try {
+		n = Integer.parseInt(val);
+	    } catch (Exception e) {
+		n = -1;
+	    }
 	    if ((n < 0) || (n >= 10)) {
 		wrongValue(n);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
@@ -189,7 +198,11 @@ public class AlarmObjAgent extends HalObjAgent {
 	    if ("".equals(val)) {
 		val = "-1";
 	    }
-	    n = Integer.parseInt(val);
+	    try {
+		n = Integer.parseInt(val);
+	    } catch (Exception e) {
+		n = -1;
+	    }
 	    if (n <= 0) {
 		wrongValue(n);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
@@ -206,14 +219,19 @@ public class AlarmObjAgent extends HalObjAgent {
 
     // Attr Reset
     @Override
-    public Response deleteData(String cmd, String prm) throws Exception {
+    public Response deleteData(final String cmd, String prm) throws Exception {
 	switch (cmd) {
 	// K Key value to delete
 	case "key":
 	    if ("".equals(prm)) {
 		prm = "-1";
 	    }
-	    int m = Integer.parseInt(prm);
+	    int m;
+	    try {
+		m = Integer.parseInt(prm);
+	    } catch (Exception e) {
+		m = -1;
+	    }
 	    if (m <= 0) {
 		wrongValue(m);
 		break;

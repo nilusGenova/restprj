@@ -25,7 +25,7 @@ public class AlarmObjAttributes {
 	    this.pinCode = pincode;
 	}
 
-	public KeyPinRecord(int keyCode) {
+	public KeyPinRecord(final int keyCode) {
 	    this.keyCode = keyCode;
 	    pinCode = 0;
 	}
@@ -42,7 +42,7 @@ public class AlarmObjAttributes {
     private int sensAlm = 0;
     private int validSensValue = 0;
 
-    public void storeKey(int idx, int keyval) {
+    public void storeKey(final int idx, final int keyval) {
 	KeyPinRecord k = keys.get(idx);
 	if (k == null) {
 	    k = new KeyPinRecord(keyval);
@@ -52,7 +52,7 @@ public class AlarmObjAttributes {
 	}
     }
 
-    public boolean keyExists(int keyval) {
+    public boolean keyExists(final int keyval) {
 	for (Map.Entry<Integer, KeyPinRecord> e : keys.entrySet()) {
 	    if (e.getValue().keyCode == keyval) {
 		return true;
@@ -61,7 +61,7 @@ public class AlarmObjAttributes {
 	return false;
     }
 
-    public void storePin(int idx, int pin) {
+    public void storePin(final int idx, final int pin) {
 	KeyPinRecord k = keys.get(idx);
 	if (k == null) {
 	    k = new KeyPinRecord(0);
@@ -74,7 +74,7 @@ public class AlarmObjAttributes {
 	keys.clear();
     }
 
-    public int getPin(int idx) {
+    public int getPin(final int idx) {
 	KeyPinRecord k = keys.get(idx);
 	if (k != null) {
 	    return k.pinCode;
@@ -86,7 +86,7 @@ public class AlarmObjAttributes {
 	return keys;
     }
 
-    public void setKeys(Map<Integer, KeyPinRecord> keys) {
+    public void setKeys(final Map<Integer, KeyPinRecord> keys) {
 	this.keys = keys;
     }
 
@@ -98,7 +98,7 @@ public class AlarmObjAttributes {
 
     }
 
-    public void setArmed(int armed) {
+    public void setArmed(final int armed) {
 	this.armed = armed;
     }
 
@@ -106,7 +106,7 @@ public class AlarmObjAttributes {
 	return alarmed;
     }
 
-    public void setAlarmed(int alarmed) {
+    public void setAlarmed(final int alarmed) {
 	this.alarmed = alarmed;
     }
 
@@ -114,7 +114,7 @@ public class AlarmObjAttributes {
 	return keyProgramming;
     }
 
-    public void setKeyProgramming(int keyProgramming) {
+    public void setKeyProgramming(final int keyProgramming) {
 	this.keyProgramming = keyProgramming;
     }
 
@@ -122,7 +122,7 @@ public class AlarmObjAttributes {
 	return masterKey;
     }
 
-    public void setMasterKey(int masterKey) {
+    public void setMasterKey(final int masterKey) {
 	this.masterKey = masterKey;
     }
 
@@ -130,7 +130,7 @@ public class AlarmObjAttributes {
 	return sensGreen;
     }
 
-    public void setSensGreen(int sensGreen) {
+    public void setSensGreen(final int sensGreen) {
 	this.sensGreen = sensGreen;
     }
 
@@ -138,7 +138,7 @@ public class AlarmObjAttributes {
 	return sensRed;
     }
 
-    public void setSensRed(int sensRed) {
+    public void setSensRed(final int sensRed) {
 	this.sensRed = sensRed;
     }
 
@@ -146,7 +146,7 @@ public class AlarmObjAttributes {
 	return sensAlm;
     }
 
-    public void setSensAlm(int sensAlm) {
+    public void setSensAlm(final int sensAlm) {
 	this.sensAlm = sensAlm;
     }
 
@@ -154,7 +154,7 @@ public class AlarmObjAttributes {
 	return validSensValue;
     }
 
-    public void setValidSensValue(int validSensValue) {
+    public void setValidSensValue(final int validSensValue) {
 	this.validSensValue = validSensValue;
     }
 

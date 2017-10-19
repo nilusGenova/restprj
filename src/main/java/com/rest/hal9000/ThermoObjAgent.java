@@ -32,7 +32,7 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected String getExposedAttribute(String attr) throws Exception {
+    protected String getExposedAttribute(final String attr) throws Exception {
 	log.info("Thermo exposeAttribute");
 	if ("warming".equals(attr)) {
 	    return Integer.toString(expAttr.warming);
@@ -42,7 +42,7 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected void specializedParseGetAnswer(char attribute, String msg) {
+    protected void specializedParseGetAnswer(final char attribute, final String msg) {
 	switch (attribute) {
 	case 'W':
 	    expAttr.warming = "0".equals(msg) ? 0 : 1;
@@ -69,7 +69,7 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected void specializedParseEvent(char event, String msg) {
+    protected void specializedParseEvent(final char event, final String msg) {
 	switch (event) {
 	case 'W':
 	    expAttr.warming = "0".equals(msg) ? 0 : 1;
@@ -102,7 +102,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	sendMsgToHal("GTH");
     }
 
-    private Response setRequiredTemp(int temp) {
+    private Response setRequiredTemp(final int temp) {
 	if (temp >= 0) {
 	    sendMsgToHal("STR" + temp);
 	    return Response.status(Response.Status.OK).build();
@@ -111,7 +111,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	}
     }
 
-    private Response setRequiredHysteresis(int hyst) {
+    private Response setRequiredHysteresis(final int hyst) {
 	if (hyst >= 0) {
 	    sendMsgToHal("STH" + hyst);
 	    return Response.status(Response.Status.OK).build();
@@ -121,8 +121,13 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    public Response executeSet(String attr, String val) throws Exception {
+    public Response executeSet(final String attr, String val) throws Exception {
 	if ("".equals(val)) {
+	    val = "-1";
+	}
+	try {
+	    Integer.parseInt(val);
+	} catch (Exception e) {
 	    val = "-1";
 	}
 	switch (attr) {
