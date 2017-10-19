@@ -43,10 +43,10 @@ public class EntryPoint {
 	    }
 	} catch (NoSuchElementException e) {
 	    log.debug("Not Found path:{} attr:{}", path, attribute);
-	    return Response.status(Response.Status.BAD_REQUEST).build();
+	    return Response.status(Response.Status.NOT_FOUND).build();
 	} catch (Exception e) {
 	    log.debug("Failure exposing data of {} attr:{}", path, attribute, e);
-	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+	    return Response.status(Response.Status.BAD_REQUEST).build();
 	}
     }
 
@@ -59,10 +59,10 @@ public class EntryPoint {
 	    return getRegisteredObjFromPath(path).executeSet(attribute.toLowerCase(), value);
 	} catch (NoSuchElementException e) {
 	    log.debug("Not Found path:{} attr:{}", path, attribute);
-	    return Response.status(Response.Status.BAD_REQUEST).build();
+	    return Response.status(Response.Status.NOT_FOUND).build();
 	} catch (Exception e) {
 	    log.debug("Failure in {} to set attr:{} with val:{}", path, attribute, value, e);
-	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+	    return Response.status(Response.Status.BAD_REQUEST).build();
 	}
     }
 
@@ -75,10 +75,10 @@ public class EntryPoint {
 	    return getRegisteredObjFromPath(path).deleteData(cmd.toLowerCase(), prm);
 	} catch (NoSuchElementException e) {
 	    log.debug("Not Found path:{} cmd:{}", path, cmd);
-	    return Response.status(Response.Status.BAD_REQUEST).build();
+	    return Response.status(Response.Status.NOT_FOUND).build();
 	} catch (Exception e) {
 	    log.debug("Failure in {} to delete cmd:{} with prm:{}", path, cmd, prm, e);
-	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+	    return Response.status(Response.Status.BAD_REQUEST).build();
 	}
     }
 

@@ -212,7 +212,7 @@ public class AlarmObjAgentTest {
     @Test
     public void testCreateData() {
 	emptySentMsg();
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
 	    et = Response.Status.fromStatusCode(alarm.executeSet("newkey", "128").getStatus());
@@ -228,7 +228,7 @@ public class AlarmObjAgentTest {
     @Test
     public void testCreateDataWrong0() {
 	emptySentMsg();
-	Response.Status er = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status er = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
 	    er = Response.Status.fromStatusCode(alarm.executeSet("newkey", "0").getStatus());
@@ -243,7 +243,7 @@ public class AlarmObjAgentTest {
     @Test
     public void testCreateDataWrongEmpty() {
 	emptySentMsg();
-	Response.Status er2 = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status er2 = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
 	    er2 = Response.Status.fromStatusCode(alarm.executeSet("newkey", "").getStatus());
@@ -258,7 +258,7 @@ public class AlarmObjAgentTest {
     @Test
     public void testDeleteWrongKey0() {
 	emptySentMsg();
-	Response.Status er = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status er = Response.Status.BAD_REQUEST;
 	try {
 	    er = Response.Status.fromStatusCode(alarm.deleteData("key", "0").getStatus());
 	} catch (Exception e) {
@@ -272,7 +272,7 @@ public class AlarmObjAgentTest {
     @Test
     public void testDeleteWrongKeyEmpty() {
 	emptySentMsg();
-	Response.Status er = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status er = Response.Status.BAD_REQUEST;
 	try {
 	    er = Response.Status.fromStatusCode(alarm.deleteData("key", "").getStatus());
 	} catch (Exception e) {
@@ -287,7 +287,7 @@ public class AlarmObjAgentTest {
     public void testDeleteWrong() {
 	emptySentMsg();
 	int exc = 0;
-	Response.Status er = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status er = Response.Status.BAD_REQUEST;
 	try {
 	    er = Response.Status.fromStatusCode(alarm.deleteData("mucca", "").getStatus());
 	} catch (Exception e) {
@@ -300,7 +300,7 @@ public class AlarmObjAgentTest {
     @Test
     public void testDeleteAllKey() {
 	emptySentMsg();
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	try {
 	    et = Response.Status.fromStatusCode(alarm.deleteData("allkeys", "").getStatus());
 	} catch (Exception e) {
@@ -315,7 +315,7 @@ public class AlarmObjAgentTest {
     @Test
     public void testDeleteAllPins() {
 	emptySentMsg();
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	try {
 	    et = Response.Status.fromStatusCode(alarm.deleteData("allpins", "").getStatus());
 	} catch (Exception e) {
@@ -329,7 +329,7 @@ public class AlarmObjAgentTest {
 
     @Test
     public void testExecuteSetReadSensors() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
 	    et = Response.Status.fromStatusCode(alarm.executeSet("readsensors", "").getStatus());
@@ -345,7 +345,7 @@ public class AlarmObjAgentTest {
 
     @Test
     public void testExecuteSetWrong() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	int exc = 0;
 	try {
@@ -357,53 +357,35 @@ public class AlarmObjAgentTest {
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
-    @Test
-    public void testExecuteSetRemote0() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+    public void testExecuteSetAttr(final String attr, final String val, final String expMsg, Response.Status retVal) {
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
-	    et = Response.Status.fromStatusCode(alarm.executeSet("remote", "0").getStatus());
+	    et = Response.Status.fromStatusCode(alarm.executeSet(attr, val).getStatus());
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    fail("exception");
+	    if (retVal == Response.Status.OK) {
+		e.printStackTrace();
+		fail("exception");
+	    }
 	}
-	Assert.assertEquals("ERROR:", "SAR0", getSentMsg());
-	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertEquals("ERROR:", expMsg, getSentMsg());
+	Assert.assertEquals("ERROR in return value", retVal, et);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
     @Test
-    public void testExecuteSetRemote1() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
-	emptySentMsg();
-	try {
-	    et = Response.Status.fromStatusCode(alarm.executeSet("remote", "1").getStatus());
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    fail("exception");
-	}
-	Assert.assertEquals("ERROR:", "SAR1", getSentMsg());
-	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
-	Assert.assertTrue("ERROR:", noMsgSent());
-    }
-
-    @Test
-    public void testExecuteSetRemotewrong() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
-	int exc = 0;
-	emptySentMsg();
-	try {
-	    et = Response.Status.fromStatusCode(alarm.executeSet("remote", "3").getStatus());
-	} catch (Exception e) {
-	    exc = 1;
-	}
-	Assert.assertEquals("ERROR", 1, exc);
-	Assert.assertTrue("ERROR:", noMsgSent());
+    public void testExecuteSetSimples() {
+	testExecuteSetAttr("remote", "0", "SAR0", Response.Status.OK);
+	testExecuteSetAttr("remote", "1", "SAR1", Response.Status.OK);
+	testExecuteSetAttr("remote", "3", "", Response.Status.BAD_REQUEST);
+	testExecuteSetAttr("armed", "3", "", Response.Status.BAD_REQUEST);
+	testExecuteSetAttr("alarm", "3", "", Response.Status.BAD_REQUEST);
+	testExecuteSetAttr("program", "3", "", Response.Status.BAD_REQUEST);
     }
 
     @Test
     public void testExecuteSetArmed() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	alarm.parseGetAnswer('M', "000");
 	try {
@@ -419,7 +401,7 @@ public class AlarmObjAgentTest {
 
     @Test
     public void testExecuteSetAlarm() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	alarm.parseGetAnswer('M', "000");
 	try {
@@ -435,7 +417,7 @@ public class AlarmObjAgentTest {
 
     @Test
     public void testExecuteSetProg() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	alarm.parseGetAnswer('M', "000");
 	try {
@@ -451,7 +433,7 @@ public class AlarmObjAgentTest {
 
     @Test
     public void testExecuteSetMasterKey() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
 	    et = Response.Status.fromStatusCode(alarm.executeSet("masterkey", "34921").getStatus());
@@ -466,7 +448,7 @@ public class AlarmObjAgentTest {
 
     @Test
     public void testExecuteSetMasterKeyWrong() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
 	    et = Response.Status.fromStatusCode(alarm.executeSet("masterkey", "").getStatus());
@@ -480,7 +462,7 @@ public class AlarmObjAgentTest {
 
     @Test
     public void testExecuteSetEnterPin() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
 	    et = Response.Status.fromStatusCode(alarm.executeSet("enterpin", "4").getStatus());
@@ -495,7 +477,7 @@ public class AlarmObjAgentTest {
 
     @Test
     public void testExecuteSetEnterWrongPin() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
 	    et = Response.Status.fromStatusCode(alarm.executeSet("enterpin", "10").getStatus());
@@ -509,7 +491,7 @@ public class AlarmObjAgentTest {
 
     @Test
     public void testExecuteSetEnterEmptyPin() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
 	    et = Response.Status.fromStatusCode(alarm.executeSet("enterpin", "").getStatus());

@@ -163,48 +163,29 @@ public class ThermoObjAgentTest {
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
-    @Test
-    public void testExecuteSetRequired() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+    public void testExecuteSetAttr(final String attr, final String val, final String expMsg, Response.Status retVal) {
+	Response.Status et = Response.Status.BAD_REQUEST;
 	emptySentMsg();
 	try {
-	    et = Response.Status.fromStatusCode(thermo.executeSet("required", "214").getStatus());
+	    et = Response.Status.fromStatusCode(thermo.executeSet(attr, val).getStatus());
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    fail("exception");
+	    if (retVal == Response.Status.OK) {
+		e.printStackTrace();
+		fail("exception");
+	    }
 	}
-	Assert.assertEquals("ERROR:", "STR214", getSentMsg());
-	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertEquals("ERROR:", expMsg, getSentMsg());
+	Assert.assertEquals("ERROR in return value", retVal, et);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
     @Test
-    public void testExecuteSetHysteresis() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
-	emptySentMsg();
-	try {
-	    et = Response.Status.fromStatusCode(thermo.executeSet("hysteresis", "32").getStatus());
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    fail("exception");
-	}
-	Assert.assertEquals("ERROR:", "STH32", getSentMsg());
-	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
-	Assert.assertTrue("ERROR:", noMsgSent());
-    }
-
-    @Test
-    public void testExecuteSetWrong() {
-	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
-	emptySentMsg();
-	int exc = 0;
-	try {
-	    et = Response.Status.fromStatusCode(thermo.executeSet("citrullo", "").getStatus());
-	} catch (Exception e) {
-	    exc = 1;
-	}
-	Assert.assertEquals("ERROR", 1, exc);
-	Assert.assertTrue("ERROR:", noMsgSent());
+    public void testExecuteSets() {
+	testExecuteSetAttr("required", "214", "STR214", Response.Status.OK);
+	testExecuteSetAttr("hysteresis", "32", "STH32", Response.Status.OK);
+	testExecuteSetAttr("required", "-3", "", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE);
+	testExecuteSetAttr("hysteresis", "-3", "", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE);
+	testExecuteSetAttr("citrullo", "", "", Response.Status.BAD_REQUEST);
     }
 
 }
