@@ -56,6 +56,9 @@ public class EntryPoint {
     public Response postOnObject(@PathParam("object") String path, @QueryParam("a") String attribute,
 	    @QueryParam("v") String value) {
 	try {
+	    if (value == null) {
+		value = "";
+	    }
 	    return getRegisteredObjFromPath(path).executeSet(attribute.toLowerCase(), value);
 	} catch (NoSuchElementException e) {
 	    log.debug("Not Found path:{} attr:{}", path, attribute);
@@ -72,6 +75,9 @@ public class EntryPoint {
     public Response deleteOnObject(@PathParam("object") String path, @QueryParam("c") String cmd,
 	    @QueryParam("p") String prm) {
 	try {
+	    if (prm == null) {
+		prm = "";
+	    }
 	    return getRegisteredObjFromPath(path).deleteData(cmd.toLowerCase(), prm);
 	} catch (NoSuchElementException e) {
 	    log.debug("Not Found path:{} cmd:{}", path, cmd);
