@@ -81,6 +81,9 @@ public class EpocTimeTest {
 	Assert.assertEquals("wrong date", "01-10-2017", epocTime.getDate());
 	Assert.assertEquals("wrong time", "22:01", epocTime.getTime());
 	Assert.assertEquals("wrong weekDay", 0, epocTime.getWeekDay());
+
+	Assert.assertEquals("wrong year calculation", epocTime.getEpocTime(1, 10, 2017, 22, 1, 0),
+		epocTime.getEpocTime(1, 10, 17, 22, 1, 0));
     }
 
     @Test

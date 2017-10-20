@@ -66,14 +66,53 @@ public class ClockObjAgent extends HalObjAgent {
 	sendMsgToHal("GCE");
     }
 
+    // Format of msg
+    // v=<hour>:<min>-<day>-<month>-<year>
+    private String epocFromValidatedFormatTime(final String val) {
+	String[] vals = val.split("-");
+	if ((vals.length != 4) || (val.chars().filter(ch -> ch == ':').count() != 1)) {
+	    return null;
+	}
+	if (!vals[0].contains(":")) {
+	    return null;
+	}
+	int h;
+	int m;
+	int d;
+	int mo;
+	int y;
+	try {
+	    h = Integer.parseInt(vals[0].split(":")[0]);
+	    m = Integer.parseInt(vals[0].split(":")[1]);
+	    d = Integer.parseInt(vals[1]);
+	    mo = Integer.parseInt(vals[2]);
+	    y = Integer.parseInt(vals[3]);
+	} catch (NumberFormatException e) {
+	    return null;
+	}
+	return expAttr.getEpocTime(d, mo, y, h, m, 0);
+    }
+
     @Override
     public Response executeSet(final String attr, final String val) {
-	if ("actualtime".equals(attr)) {
+	String eat;
+	switch (attr) {
+	case "actualtime":
 	    log.debug("Sending actual time to hal9000");
-	    String eat = expAttr.getEpocOfActualTime();
+	    eat = expAttr.getEpocOfActualTime();
 	    sendMsgToHal("SCE" + eat);
-	    return Response.status(Response.Status.OK).build();
+	    break;
+	case "time":
+	    log.debug("Sending time to hal9000");
+	    eat = epocFromValidatedFormatTime(val);
+	    if (eat == null) {
+		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+	    }
+	    sendMsgToHal("SCE" + eat);
+	    break;
+	default:
+	    throw new NoSuchElementException();
 	}
-	throw new NoSuchElementException();
+	return Response.status(Response.Status.OK).build();
     }
 }

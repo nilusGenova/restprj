@@ -117,7 +117,7 @@ public class ClockObjAgentTest {
     }
 
     @Test
-    public void testExecuteSet() {
+    public void testExecuteSetActualtime() {
 	emptySentMsg();
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
 	try {
@@ -129,6 +129,60 @@ public class ClockObjAgentTest {
 	Assert.assertEquals("ERROR:", "SCE", getSentMsg().substring(0, 3));
 	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
 	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetKnewTime() {
+	emptySentMsg();
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	try {
+	    et = Response.Status.fromStatusCode(clock.executeSet("time", "0:23-12-12-17").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SCE566353380", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+
+    @Test
+    public void testExecuteSetTime() {
+	// v=<hour>:<min>-<day>-<month>-<year>
+	final String[] DATES_OK = { "4:0-12-12-17", "4:23-12-12-17", "4:23-12-12-2017", "04:23-12-12-2017",
+		"14:2-12-12-2017", "14:21-1-12-2017", "14:21-1-2-2017", "4:9-1-2-17" };
+	for (int i = 0; i < DATES_OK.length; i++) {
+	    emptySentMsg();
+	    Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	    try {
+		et = Response.Status.fromStatusCode(clock.executeSet("time", DATES_OK[i]).getStatus());
+	    } catch (Exception e) {
+		e.printStackTrace();
+		fail("exception");
+	    }
+	    Assert.assertEquals("ERROR:", "SCE", getSentMsg().substring(0, 3));
+	    Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	    Assert.assertTrue("ERROR:", noMsgSent());
+	}
+    }
+
+    @Test
+    public void testExecuteSetWrongTime() {
+	// v=<hour>:<min>-<day>-<month>-<year>
+	final String[] DATES_WRONG = { "4:23-12-13-17", "40:23-12-12-2017", "04:23-31-11-2017", "14-12-12-2017",
+		"14:21-1-12", "14:21-1-0-2017", "4:9:32-1-2-17", "4:9:32-1-2-17", "" };
+	for (int i = 0; i < DATES_WRONG.length; i++) {
+	    emptySentMsg();
+	    Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	    try {
+		et = Response.Status.fromStatusCode(clock.executeSet("time", DATES_WRONG[i]).getStatus());
+	    } catch (Exception e) {
+		e.printStackTrace();
+		fail("exception");
+	    }
+	    Assert.assertEquals("ERROR in return value", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE, et);
+	    Assert.assertTrue("ERROR:", noMsgSent());
+	}
     }
 
     @Test

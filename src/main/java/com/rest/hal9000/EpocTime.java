@@ -105,8 +105,10 @@ public class EpocTime {
 	}
     }
 
-    public String getEpocTime(final int day, final int month, final int year, final int hour, final int min,
-	    final int sec) {
+    public String getEpocTime(final int day, final int month, int year, final int hour, final int min, final int sec) {
+	if (year < 2000) {
+	    year += 2000;
+	}
 	log.debug("getEpocTime of {}-{}-{} {}:{}:{}", day, month, year, hour, min, sec);
 	if (isTimeValid(hour, min, sec)) {
 	    String date = convertDateIfValid(day, month, year);
