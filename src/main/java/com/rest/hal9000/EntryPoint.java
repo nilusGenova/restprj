@@ -32,6 +32,13 @@ public class EntryPoint {
     }
 
     @GET
+    @Path("connected")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String checkConnection() {
+	return App.isSerialConnected() ? "YES" : "NO";
+    }
+    
+    @GET
     @Path("{object}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOnObject(@PathParam("object") String path, @QueryParam("a") String attribute) {
@@ -102,5 +109,4 @@ public class EntryPoint {
 	    return "Debug disabled";
 	}
     }
-
 }

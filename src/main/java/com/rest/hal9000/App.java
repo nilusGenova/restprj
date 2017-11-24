@@ -10,11 +10,14 @@ public final class App {
     private final static String DEBUG_FILE_NAME = "/tmp/hal9000debug";
     public final static Registry registry = new Registry();
     private final static Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
+    private final static TwoWaysSerialComms serial = new TwoWaysSerialComms();
 
+    public static boolean isSerialConnected() {
+	return serial.isConnected();
+    }
+    
     public static void main(String[] args) throws Exception {
 	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
-
-	TwoWaysSerialComms serial = new TwoWaysSerialComms();
 
 	final TempLogger tempLogger = new TempLogger("logger", (msg) -> serial.sendMsg(msg));
 	final ClockObjAgent clockAgent = new ClockObjAgent("clock", (msg) -> serial.sendMsg(msg));
@@ -51,6 +54,7 @@ public final class App {
 
 	    registry.callAlignAllForAllRegistered();
 
+	    // TODO: to remove following lines
 	    Thread.sleep(5000);
 	    serial.sendMsg("GCE");
 	    Thread.sleep(2000);
@@ -61,6 +65,7 @@ public final class App {
 	    e.printStackTrace();
 	}
 
+	// Inizializza il rest-server
 	try {
 	    jettyServer.start();
 	    jettyServer.join();

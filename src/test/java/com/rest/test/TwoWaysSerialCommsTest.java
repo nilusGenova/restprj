@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import org.junit.Assert;
@@ -23,6 +24,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.rest.hal9000.App;
 import com.rest.hal9000.TwoWaysSerialComms;
 
 import gnu.io.CommPortIdentifier;

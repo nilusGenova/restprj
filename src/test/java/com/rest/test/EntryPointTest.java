@@ -67,6 +67,14 @@ public class EntryPointTest {
 	when(reg.getRegisteredObj(anyChar())).thenReturn(objA);
 	when(objA.getPathName()).thenReturn("mypath");
 
+	server.getOnObject("connected", null);
+	try {
+	    verify(objA, never()).exposeJsonData();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("Exception");
+	}
+	
 	server.getOnObject("mypath", null);
 	try {
 	    verify(objA, times(1)).exposeJsonData();

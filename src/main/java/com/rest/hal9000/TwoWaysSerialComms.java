@@ -19,43 +19,18 @@ public class TwoWaysSerialComms {
     private static final int RCV_BUFFER_SIZE = 100;
     private static final Logger log = LoggerFactory.getLogger(TwoWaysSerialComms.class);
 
-    SerialReader reader = null;
-    SerialWriter writer = null;
-    boolean connected = false;
+    ConnectionManager connectionManager = null;
+    private boolean connected = false;
     private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
 
+    public boolean isConnected( ) {
+	return connected;
+    }
+    
     public void connect(final String portName, final Consumer<String> rcvCallBack) throws Exception {
-	log.debug("Connecting to: {}", portName);
-	CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
-	if (portIdentifier.isCurrentlyOwned()) {
-	    log.error("Port {} is currently in use", portName);
-	} else {
-	    int timeout = 2000;
-	    CommPort commPort = portIdentifier.open(this.getClass().getName(), timeout);
-
-	    if (commPort instanceof SerialPort) {
-		SerialPort serialPort = (SerialPort) commPort;
-		serialPort.setSerialPortParams(115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
-			SerialPort.PARITY_NONE);
-
-		// This delay is required because Arduino restarts after connection
-		log.debug("Delay to wait for Arduino restart");
-		Thread.sleep(2000);
-
-		InputStream in = serialPort.getInputStream();
-		OutputStream out = serialPort.getOutputStream();
-
-		reader = new SerialReader(in, rcvCallBack);
-		writer = new SerialWriter(out);
-		connected = true;
-
-		(new Thread(reader)).start();
-		(new Thread(writer)).start();
-
-	    } else {
-		log.error("Only serial ports are handled by this example.");
-	    }
-	}
+	log.debug("Starting connection manager for: {}", portName);		
+	connectionManager = new ConnectionManager(portName,rcvCallBack);
+	(new Thread(connectionManager)).start();
     }
 
     void sendMsg(final String msg) {
@@ -65,6 +40,61 @@ public class TwoWaysSerialComms {
 	    }
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
+	}
+    }
+    
+    private class ConnectionManager implements Runnable {
+	
+	//TODO:
+	String portName = null;
+	Consumer<String> rcvCallBack;
+	SerialReader reader = null;
+	SerialWriter writer = null;
+
+	
+	public ConnectionManager(final String portName, final Consumer<String> rcvCallBack) {
+	    this.portName = portName;
+	    this.rcvCallBack = rcvCallBack;
+	}
+	
+	public void run() {
+	    //TODO:
+		log.debug("Connecting to: {}", portName);
+		try {
+		    CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
+		    if (portIdentifier.isCurrentlyOwned()) {
+			log.error("Port {} is currently in use", portName);
+		    } else {
+			int timeout = 2000;
+			CommPort commPort = portIdentifier.open(this.getClass().getName(), timeout);
+
+			if (commPort instanceof SerialPort) {
+			    SerialPort serialPort = (SerialPort) commPort;
+			    serialPort.setSerialPortParams(115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
+				SerialPort.PARITY_NONE);
+
+			    // This delay is required because Arduino restarts after connection
+			    log.debug("Delay to wait for Arduino restart");
+			    Thread.sleep(2000);
+
+			    InputStream in = serialPort.getInputStream();
+			    OutputStream out = serialPort.getOutputStream();
+
+			    reader = new SerialReader(in, rcvCallBack);
+			    writer = new SerialWriter(out);
+			    connected = true;
+
+			    (new Thread(reader)).start();
+			    (new Thread(writer)).start();
+
+			} else {
+			    log.error("Only serial ports are handled by this code.");
+			}
+		    }
+		} catch (Exception e) {
+		    //TODO:completa
+		    e.printStackTrace();
+		}
 	}
     }
 
