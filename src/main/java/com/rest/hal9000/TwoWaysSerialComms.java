@@ -17,48 +17,50 @@ import gnu.io.SerialPort;
 public class TwoWaysSerialComms {
 
     private static final int RCV_BUFFER_SIZE = 100;
+    private static final int CONN_RETRY_TIMEOUT = 5000; // in mSec
     private static final Logger log = LoggerFactory.getLogger(TwoWaysSerialComms.class);
 
     ConnectionManager connectionManager = null;
-    private boolean connected = false;
+    private Boolean connected = false;
     private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
+    String portName = null;
+    Consumer<String> rcvCallBack;
 
-    public boolean isConnected( ) {
-	return connected;
+    public boolean isConnected() {
+	synchronized (connected) {
+	    return connected;
+	}
     }
-    
+
     public void connect(final String portName, final Consumer<String> rcvCallBack) throws Exception {
-	log.debug("Starting connection manager for: {}", portName);		
-	connectionManager = new ConnectionManager(portName,rcvCallBack);
+	this.portName = portName;
+	this.rcvCallBack = rcvCallBack;
+	log.debug("Starting connection manager for: {}", portName);
+	connectionManager = new ConnectionManager();
 	(new Thread(connectionManager)).start();
     }
 
     void sendMsg(final String msg) {
 	try {
-	    if (connected) {
-		outMsgQueue.put(msg);
+	    synchronized (connected) {
+		if (connected) {
+		    outMsgQueue.put(msg);
+		}
 	    }
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
 	}
     }
-    
+
     private class ConnectionManager implements Runnable {
-	
-	//TODO:
-	String portName = null;
-	Consumer<String> rcvCallBack;
+
+	// TODO:
 	SerialReader reader = null;
 	SerialWriter writer = null;
 
-	
-	public ConnectionManager(final String portName, final Consumer<String> rcvCallBack) {
-	    this.portName = portName;
-	    this.rcvCallBack = rcvCallBack;
-	}
-	
 	public void run() {
-	    //TODO:
+	    // TODO:
+	    while (true) {
 		log.debug("Connecting to: {}", portName);
 		try {
 		    CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
@@ -71,7 +73,7 @@ public class TwoWaysSerialComms {
 			if (commPort instanceof SerialPort) {
 			    SerialPort serialPort = (SerialPort) commPort;
 			    serialPort.setSerialPortParams(115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
-				SerialPort.PARITY_NONE);
+				    SerialPort.PARITY_NONE);
 
 			    // This delay is required because Arduino restarts after connection
 			    log.debug("Delay to wait for Arduino restart");
@@ -80,32 +82,48 @@ public class TwoWaysSerialComms {
 			    InputStream in = serialPort.getInputStream();
 			    OutputStream out = serialPort.getOutputStream();
 
-			    reader = new SerialReader(in, rcvCallBack);
+			    reader = new SerialReader(in);
 			    writer = new SerialWriter(out);
-			    connected = true;
+			    synchronized (connected) {
+				connected = true;
+			    }
 
-			    (new Thread(reader)).start();
-			    (new Thread(writer)).start();
+			    Thread readThread = new Thread(reader);
+			    Thread writeThread = new Thread(writer);
+			    readThread.start();
+			    writeThread.start();
+
+			    // wait for reader stop
+			    readThread.join();
+			    // then proceed to stop writer too
+			    writer.cancel();
+			    synchronized (connected) {
+				connected = false;
+			    }
+			    writeThread.join();
 
 			} else {
 			    log.error("Only serial ports are handled by this code.");
 			}
 		    }
 		} catch (Exception e) {
-		    //TODO:completa
+		    log.error("Connection lost, retry to connet in {} secs", CONN_RETRY_TIMEOUT / 1000);
+		}
+		try {
+		    Thread.sleep(CONN_RETRY_TIMEOUT);
+		} catch (InterruptedException e) {
 		    e.printStackTrace();
 		}
+	    }
 	}
     }
 
-    private static class SerialReader implements Runnable {
+    private class SerialReader implements Runnable {
 
 	InputStream in;
-	Consumer<String> rcvCallBack;
 
-	public SerialReader(final InputStream in, final Consumer<String> rcvCallBack) {
+	public SerialReader(final InputStream in) {
 	    this.in = in;
-	    this.rcvCallBack = rcvCallBack;
 	}
 
 	public void run() {
@@ -160,10 +178,15 @@ public class TwoWaysSerialComms {
 	    this.out = out;
 	}
 
+	public void cancel() throws Exception {
+	    Thread.currentThread().interrupt();
+	    outMsgQueue.put(";"); // just to force wake up of the writer
+	}
+
 	public void run() {
 	    log.info("Writer started");
 	    try {
-		while (true) {
+		while (!Thread.currentThread().isInterrupted()) {
 		    // block until a msg to send arrives
 		    String msgToSend = outMsgQueue.take();
 		    log.debug("Writer: sending <{}>", msgToSend);
