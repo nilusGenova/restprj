@@ -8,8 +8,9 @@ import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Vector;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,7 +25,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.rest.hal9000.App;
 import com.rest.hal9000.TwoWaysSerialComms;
 
 import gnu.io.CommPortIdentifier;
@@ -81,6 +81,12 @@ public class TwoWaysSerialCommsTest {
     public void test() throws Exception {
 	PowerMockito.mockStatic(CommPortIdentifier.class);
 	PowerMockito.when(CommPortIdentifier.getPortIdentifier(anyString())).thenReturn(portIdentifier);
+	Vector<CommPortIdentifier> devs = new Vector<>();
+	devs.add(portIdentifier);
+	Enumeration<CommPortIdentifier> list;
+	list = devs.elements();
+	PowerMockito.when(CommPortIdentifier.getPortIdentifiers()).thenReturn(list);
+	when(portIdentifier.getName()).thenReturn("/dev/ttyUSB0");
 	when(portIdentifier.isCurrentlyOwned()).thenReturn(false);
 	when(portIdentifier.open(anyString(), anyInt())).thenReturn(serialPort);
 	doNothing().when(serialPort).setSerialPortParams(anyInt(), anyInt(), anyInt(), anyInt());

@@ -3,6 +3,8 @@ package com.rest.hal9000;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
@@ -19,6 +21,7 @@ public class TwoWaysSerialComms {
     private static final int RCV_BUFFER_SIZE = 100;
     private static final int CONN_RETRY_TIMEOUT = 5000; // in mSec
     private static final Logger log = LoggerFactory.getLogger(TwoWaysSerialComms.class);
+    private final static String usbDevicePrefix = "/dev/ttyUSB";
 
     ConnectionManager connectionManager = null;
     private Boolean connected = false;
@@ -58,57 +61,95 @@ public class TwoWaysSerialComms {
 	SerialReader reader = null;
 	SerialWriter writer = null;
 
-	public void run() {
-	    // TODO:
-	    while (true) {
-		log.debug("Connecting to: {}", portName);
+	private ArrayList<String> getUsbPorts() {
+	    ArrayList<String> portList = new ArrayList<>();
+	    Enumeration<CommPortIdentifier> portEnum = CommPortIdentifier.getPortIdentifiers();
+	    while (portEnum.hasMoreElements()) {
+		CommPortIdentifier currPort = (CommPortIdentifier) portEnum.nextElement();
+		String portName = currPort.getName();
+		if (portName.startsWith(usbDevicePrefix)) {
+		    portList.add(portName);
+		}
+	    }
+	    if (portList.isEmpty()) {
+		log.error("No USB port found");
+	    }
+	    return portList;
+	}
+
+	private SerialPort connectToSerialPort(ArrayList<String> usbPortList) {
+	    CommPortIdentifier portIdentifier;
+	    CommPort commPort = null;
+	    for (String portName : usbPortList) {
 		try {
-		    CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
+		    log.debug("Connecting to: {}", portName);
+		    portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 		    if (portIdentifier.isCurrentlyOwned()) {
-			log.error("Port {} is currently in use", portName);
+			log.error("Port is currently in use");
 		    } else {
 			int timeout = 2000;
-			CommPort commPort = portIdentifier.open(this.getClass().getName(), timeout);
+			commPort = portIdentifier.open(this.getClass().getName(), timeout);
 
 			if (commPort instanceof SerialPort) {
 			    SerialPort serialPort = (SerialPort) commPort;
 			    serialPort.setSerialPortParams(115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
 				    SerialPort.PARITY_NONE);
-
-			    // This delay is required because Arduino restarts after connection
-			    log.debug("Delay to wait for Arduino restart");
-			    Thread.sleep(2000);
-
-			    InputStream in = serialPort.getInputStream();
-			    OutputStream out = serialPort.getOutputStream();
-
-			    reader = new SerialReader(in);
-			    writer = new SerialWriter(out);
-			    synchronized (connected) {
-				connected = true;
-			    }
-
-			    Thread readThread = new Thread(reader);
-			    Thread writeThread = new Thread(writer);
-			    readThread.start();
-			    writeThread.start();
-
-			    // wait for reader stop
-			    readThread.join();
-			    // then proceed to stop writer too
-			    writer.cancel();
-			    synchronized (connected) {
-				connected = false;
-			    }
-			    writeThread.join();
-
-			} else {
-			    log.error("Only serial ports are handled by this code.");
+			    log.debug("Connected");
+			    return serialPort;
 			}
 		    }
 		} catch (Exception e) {
-		    log.error("Connection lost, retry to connet in {} secs", CONN_RETRY_TIMEOUT / 1000);
+		    log.error("Internal error during connection");
 		}
+	    }
+	    return null;
+	}
+
+	public void run() {
+	    SerialPort serialPort = null;
+	    while (true) {
+		try {
+		    serialPort = connectToSerialPort(getUsbPorts());
+		    if (serialPort != null) {
+
+			// This delay is required because Arduino restarts after connection
+			log.debug("Delay to wait for Arduino restart");
+			Thread.sleep(2000);
+
+			InputStream in = serialPort.getInputStream();
+			OutputStream out = serialPort.getOutputStream();
+
+			reader = new SerialReader(in);
+			writer = new SerialWriter(out);
+			synchronized (connected) {
+			    connected = true;
+			}
+
+			Thread readThread = new Thread(reader);
+			Thread writeThread = new Thread(writer);
+			readThread.start();
+			writeThread.start();
+
+			// wait for reader stop
+			readThread.join();
+			// then proceed to stop writer too
+			writer.cancel();
+			writeThread.join();
+			log.error("Read/write threads closed");
+		    } else {
+			log.error("Only serial ports are handled by this code.");
+		    }
+		} catch (Exception e) {
+		    log.error("Connection lost by exception");
+		} finally {
+		    if (serialPort != null) {
+			serialPort.close();
+		    }
+		    synchronized (connected) {
+			connected = false;
+		    }
+		}
+		log.error("Retry to connet in {} secs", CONN_RETRY_TIMEOUT / 1000);
 		try {
 		    Thread.sleep(CONN_RETRY_TIMEOUT);
 		} catch (InterruptedException e) {
@@ -116,6 +157,7 @@ public class TwoWaysSerialComms {
 		}
 	    }
 	}
+
     }
 
     private class SerialReader implements Runnable {
@@ -165,6 +207,7 @@ public class TwoWaysSerialComms {
 		    }
 		}
 	    } catch (IOException e) {
+		log.error("Reader error");
 		e.printStackTrace();
 	    }
 	}
