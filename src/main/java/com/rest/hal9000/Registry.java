@@ -39,6 +39,7 @@ public class Registry {
     }
 
     public void callAlignAllForAllRegistered() {
+	log.debug("Align all objects");
 	synchronized (registeredMap) {
 	    // without lambda functions
 	    // for (Map.Entry<Character, HalObjAgent> entry : registeredMap.entrySet()) {

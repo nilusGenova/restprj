@@ -35,7 +35,7 @@ public class TwoWaysSerialComms {
 	}
     }
 
-    public void connect(final String portName, final Consumer<String> rcvCallBack) throws Exception {
+    public void startConnectionManager(final String portName, final Consumer<String> rcvCallBack) throws Exception {
 	this.portName = portName;
 	this.rcvCallBack = rcvCallBack;
 	log.debug("Starting connection manager for: {}", portName);
@@ -129,6 +129,8 @@ public class TwoWaysSerialComms {
 			Thread writeThread = new Thread(writer);
 			readThread.start();
 			writeThread.start();
+
+			App.registry.callAlignAllForAllRegistered();
 
 			// wait for reader stop
 			readThread.join();

@@ -15,7 +15,7 @@ public final class App {
     public static boolean isSerialConnected() {
 	return serial.isConnected();
     }
-    
+
     public static void main(String[] args) throws Exception {
 	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
 
@@ -50,17 +50,8 @@ public final class App {
 	try {
 	    // serial.connect(usbDevice, (str) -> System.out.println("*" + str + "*"));
 	    // TODO: should retry and manage connection
-	    serial.connect(usbDevice, (str) -> parser.msgToBeParsed(str));
+	    serial.startConnectionManager(usbDevice, (str) -> parser.msgToBeParsed(str));
 
-	    registry.callAlignAllForAllRegistered();
-
-	    // TODO: to remove following lines
-	    Thread.sleep(5000);
-	    serial.sendMsg("GCE");
-	    Thread.sleep(2000);
-	    serial.sendMsg("GCD");
-	    serial.sendMsg("GCE");
-	    serial.sendMsg("GCD");
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
