@@ -24,15 +24,13 @@ public class TwoWaysSerialComms {
     private final static String usbDevicePrefix = "/dev/ttyUSB";
 
     ConnectionManager connectionManager = null;
-    private Boolean connected = false;
+    private volatile boolean connectedStatus = false;
     private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
     String portName = null;
     Consumer<String> rcvCallBack;
 
     public boolean isConnected() {
-	synchronized (connected) {
-	    return connected;
-	}
+	return connectedStatus;
     }
 
     public void startConnectionManager(final String portName, final Consumer<String> rcvCallBack) throws Exception {
@@ -45,10 +43,8 @@ public class TwoWaysSerialComms {
 
     void sendMsg(final String msg) {
 	try {
-	    synchronized (connected) {
-		if (connected) {
-		    outMsgQueue.put(msg);
-		}
+	    if (connectedStatus) {
+		outMsgQueue.put(msg);
 	    }
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
@@ -57,7 +53,6 @@ public class TwoWaysSerialComms {
 
     private class ConnectionManager implements Runnable {
 
-	// TODO:
 	SerialReader reader = null;
 	SerialWriter writer = null;
 
@@ -121,9 +116,7 @@ public class TwoWaysSerialComms {
 
 			reader = new SerialReader(in);
 			writer = new SerialWriter(out);
-			synchronized (connected) {
-			    connected = true;
-			}
+			connectedStatus = true;
 
 			Thread readThread = new Thread(reader);
 			Thread writeThread = new Thread(writer);
@@ -147,9 +140,7 @@ public class TwoWaysSerialComms {
 		    if (serialPort != null) {
 			serialPort.close();
 		    }
-		    synchronized (connected) {
-			connected = false;
-		    }
+		    connectedStatus = false;
 		}
 		log.error("Retry to connet in {} secs", CONN_RETRY_TIMEOUT / 1000);
 		try {
