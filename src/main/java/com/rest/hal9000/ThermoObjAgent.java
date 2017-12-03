@@ -42,7 +42,7 @@ public class ThermoObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected void specializedParseGetAnswer(final char attribute, final String msg) {
+    protected boolean specializedParseGetAnswer(final char attribute, final String msg) {
 	switch (attribute) {
 	case 'W':
 	    expAttr.warming = "0".equals(msg) ? 0 : 1;
@@ -65,11 +65,13 @@ public class ThermoObjAgent extends HalObjAgent {
 	    break;
 	default:
 	    wrongAttribute();
+	    return false;
 	}
+	return true;
     }
 
     @Override
-    protected void specializedParseEvent(final char event, final String msg) {
+    protected boolean specializedParseEvent(final char event, final String msg) {
 	switch (event) {
 	case 'W':
 	    expAttr.warming = "0".equals(msg) ? 0 : 1;
@@ -87,10 +89,12 @@ public class ThermoObjAgent extends HalObjAgent {
 	    break;
 	case 'E':
 	    log.error("Sensor [{}] reading error (at least 1 min)", msg);
-	    break;
+	    return false;
 	default:
 	    wrongEvent();
+	    return false;
 	}
+	return true;
     }
 
     @Override

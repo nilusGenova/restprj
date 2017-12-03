@@ -1,2 +1,2 @@
 #!/bin/sh
-java -jar target/restprj-1.0-SNAPSHOT.jar
+java -jar target/restprj-1.1-SNAPSHOT.jar

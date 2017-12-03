@@ -34,7 +34,7 @@ public class AlarmObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected void specializedParseGetAnswer(final char attribute, final String msg) {
+    protected boolean specializedParseGetAnswer(final char attribute, final String msg) {
 	switch (attribute) {
 	// M mode = (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
 	case 'M':
@@ -82,17 +82,20 @@ public class AlarmObjAgent extends HalObjAgent {
 	    break;
 	default:
 	    wrongAttribute();
+	    return false;
 	}
+	return true;
     }
 
     @Override
-    protected void specializedParseEvent(final char event, final String msg) {
+    protected boolean specializedParseEvent(final char event, final String msg) {
 	switch (event) {
 	// M Mode (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
 	case 'M':
 	    int m = Integer.parseInt(msg);
 	    if ((m > 111) || (m < 0)) {
 		wrongValue(m);
+		return false;
 	    } else {
 		expAttr.setKeyProgramming(m & 1);
 		m /= 10;
@@ -108,18 +111,20 @@ public class AlarmObjAgent extends HalObjAgent {
 	case 'K':
 	    sendMsgToHal("GAK");
 	    sendMsgToHal("GAP");
-	    break;
+	    return false;
 	// R Key read (value 8 chars)
 	// P Pin read (value 8 chars)
 	case 'R':
 	    log.info("ALARM: read key {}", msg);
-	    break;
+	    return false;
 	case 'P':
 	    log.info("ALARM: read pin {}", msg);
-	    break;
+	    return false;
 	default:
 	    wrongEvent();
+	    return false;
 	}
+	return true;
     }
 
     @Override

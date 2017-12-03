@@ -1,7 +1,11 @@
 package com.rest.hal9000;
 
+import java.util.Calendar;
 import java.util.concurrent.Callable;
-import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
@@ -23,15 +27,24 @@ public abstract class HalObjAgent {
 
     private final String pathName; // name used to identify obj in the REST call
 
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final Consumer<String> sendMsgCallBack;
+
+    private volatile long lastUpdateTime = 0;
+
+    private Lock updateLock = new ReentrantLock();
+    private final Condition isUpdated = updateLock.newCondition();
+
+    private static final long OBJ_REFRESH_TIMEOUT = (1000 * 10); // in milliseconds
+    private static final long OBJ_WAIT_REFRESH_TIMEOUT = (1000 * 5); // in milliseconds
 
     public HalObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super();
 	this.id = Character.toUpperCase(pathName.charAt(0));
 	this.pathName = pathName;
 	this.sendMsgCallBack = sendMsgCallBack;
+
     }
 
     public char getId() {
@@ -46,16 +59,18 @@ public abstract class HalObjAgent {
 
     protected abstract String getExposedAttribute(final String attr) throws Exception;
 
-    protected abstract void specializedParseGetAnswer(final char attribute, final String msg);
+    protected abstract boolean specializedParseGetAnswer(final char attribute, final String msg);
 
-    protected abstract void specializedParseEvent(final char event, final String msg);
+    protected abstract boolean specializedParseEvent(final char event, final String msg);
 
     public abstract void alignAll();
 
     public void parseGetAnswer(final char attribute, final String msg) {
 	synchWrite(new Callable<Boolean>() {
 	    public Boolean call() throws Exception {
-		specializedParseGetAnswer(attribute, msg);
+		if (specializedParseGetAnswer(attribute, msg)) {
+		    updateLastUpdTime();
+		}
 		return true;
 	    }
 	});
@@ -64,7 +79,9 @@ public abstract class HalObjAgent {
     public void parseEvent(final char event, final String msg) {
 	synchWrite(new Callable<Boolean>() {
 	    public Boolean call() throws Exception {
-		specializedParseEvent(event, msg);
+		if (specializedParseEvent(event, msg)) {
+		    updateLastUpdTime();
+		}
 		return true;
 	    }
 	});
@@ -75,6 +92,7 @@ public abstract class HalObjAgent {
 	mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
 	mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
+	tryToUpdateIfRequired();
 	String jsonInString = synchRead(new Callable<String>() {
 	    public String call() throws Exception {
 		return mapper.writeValueAsString(getExposedData());
@@ -87,6 +105,7 @@ public abstract class HalObjAgent {
 
     public Response exposeJsonAttribute(final String attr) throws Exception {
 
+	tryToUpdateIfRequired();
 	String value = synchRead(new Callable<String>() {
 	    public String call() throws Exception {
 		return getExposedAttribute(attr);
@@ -161,5 +180,31 @@ public abstract class HalObjAgent {
 	    lock.readLock().unlock();
 	    return retVal;
 	}
+    }
+
+    protected void updateLastUpdTime() {
+	updateLock.lock();
+	lastUpdateTime = Calendar.getInstance().getTimeInMillis();
+	isUpdated.signalAll();
+	updateLock.unlock();
+    }
+
+    protected void tryToUpdateIfRequired() {
+	final long actualTime = Calendar.getInstance().getTimeInMillis();
+	updateLock.lock();
+	if ((actualTime - lastUpdateTime) > OBJ_REFRESH_TIMEOUT) {
+	    log.debug("Force realignment for {}", pathName);
+	    alignAll();
+	    try {
+		if (!isUpdated.await(OBJ_WAIT_REFRESH_TIMEOUT, TimeUnit.MILLISECONDS)) {
+		    log.error("tryToUpdateIfRequired: object {} not refreshed", pathName);
+		}
+	    } catch (InterruptedException e) {
+		log.error("tryToUpdateIfRequired: interrupted!");
+		e.printStackTrace();
+	    }
+	}
+	updateLock.unlock();
+
     }
 }

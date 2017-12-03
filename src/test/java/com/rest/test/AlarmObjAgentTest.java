@@ -103,7 +103,8 @@ public class AlarmObjAgentTest {
 	Assert.assertEquals("ERROR:", 15, extractAttributeValue().getSensGreen());
 	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getSensRed());
 	Assert.assertEquals("ERROR:", 2, extractAttributeValue().getSensAlm());
-	Assert.assertTrue("ERROR:", noMsgSent());
+	// Assert.assertTrue("ERROR:", noMsgSent()); refresh mechanism force further
+	// messages
     }
 
     @Test
@@ -340,7 +341,8 @@ public class AlarmObjAgentTest {
 	Assert.assertEquals("ERROR:", "GAS", getSentMsg());
 	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getValidSensValue());
 	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
-	Assert.assertTrue("ERROR:", noMsgSent());
+	// Assert.assertTrue("ERROR:", noMsgSent()); refresh mechanism force further
+	// messages
     }
 
     @Test

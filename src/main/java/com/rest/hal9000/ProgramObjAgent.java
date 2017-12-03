@@ -175,7 +175,7 @@ public class ProgramObjAgent extends HalObjAgent {
     // C Countdown changed timeout in hours
     // Program datas changed
     @Override
-    protected void specializedParseEvent(final char event, final String msg) {
+    protected boolean specializedParseEvent(final char event, final String msg) {
 	switch (event) {
 	case 'M':
 	    setMode(msg.charAt(0));
@@ -185,10 +185,12 @@ public class ProgramObjAgent extends HalObjAgent {
 	    break;
 	case 'P':
 	    askProgramItems();
-	    break;
+	    return false;
 	default:
 	    wrongEvent();
+	    return false;
 	}
+	return true;
     }
 
     // Attr________Req____answer_______________Set___________________Reset
@@ -198,7 +200,7 @@ public class ProgramObjAgent extends HalObjAgent {
     // (D)Day Temp 0-7;min_temp in 10ofCelsius degrees
     // T Prgr Temp_*_____(T1;T2;T3;Moff;Mon in 10ofCelsius degrees
     @Override
-    protected void specializedParseGetAnswer(final char attribute, final String msg) {
+    protected boolean specializedParseGetAnswer(final char attribute, final String msg) {
 	switch (attribute) {
 	case 'M':
 	    setMode(msg.charAt(0));
@@ -219,7 +221,9 @@ public class ProgramObjAgent extends HalObjAgent {
 	    break;
 	default:
 	    wrongAttribute();
+	    return false;
 	}
+	return true;
     }
 
     @Override

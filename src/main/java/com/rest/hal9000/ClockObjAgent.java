@@ -30,7 +30,7 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    protected void specializedParseGetAnswer(final char attribute, final String msg) {
+    protected boolean specializedParseGetAnswer(final char attribute, final String msg) {
 	switch (attribute) {
 	case 'D':
 	    expAttr.setDate(msg);
@@ -46,11 +46,13 @@ public class ClockObjAgent extends HalObjAgent {
 	    break;
 	default:
 	    wrongAttribute();
+	    return false;
 	}
+	return true;
     }
 
     @Override
-    protected void specializedParseEvent(final char event, final String msg) {
+    protected boolean specializedParseEvent(final char event, final String msg) {
 	switch (event) {
 	case 'D':
 	    alignAll();
@@ -58,6 +60,7 @@ public class ClockObjAgent extends HalObjAgent {
 	default:
 	    wrongEvent();
 	}
+	return false;
     }
 
     @Override

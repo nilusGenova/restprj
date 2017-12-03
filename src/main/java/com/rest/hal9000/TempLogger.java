@@ -30,13 +30,13 @@ public class TempLogger extends HalObjAgent {
     }
 
     @Override
-    protected void specializedParseGetAnswer(final char attribute, final String msg) {
-	return;
+    protected boolean specializedParseGetAnswer(final char attribute, final String msg) {
+	return false;
     }
 
     @Override
-    protected void specializedParseEvent(final char event, final String msg) {
-	return;
+    protected boolean specializedParseEvent(final char event, final String msg) {
+	return false;
     }
 
     @Override
