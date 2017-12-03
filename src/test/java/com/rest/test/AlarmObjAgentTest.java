@@ -110,8 +110,8 @@ public class AlarmObjAgentTest {
     @Test
     public void testParseGetAnswerKeysPinsDelete() {
 	emptySentMsg();
-	// K key = (idxKey 0:master)(value 8 chars);(......)
-	alarm.parseGetAnswer('K', "0:07345196;1:91234567;5:00001234;7:36");
+	// K key = (idxKey 0:master)(value 8 chars).(......).
+	alarm.parseGetAnswer('K', "0:07345196.1:91234567.5:00001234.7:36.");
 	Assert.assertEquals("ERROR:", 7345196, extractAttributeValue().getMasterKey());
 	Assert.assertFalse("ERROR:", extractAttributeValue().keyExists(42));
 	Assert.assertTrue("ERROR:", extractAttributeValue().keyExists(91234567));
@@ -122,7 +122,7 @@ public class AlarmObjAgentTest {
 	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getPin(7 - 1));
 	Assert.assertEquals("ERROR:", -1, extractAttributeValue().getPin(2 - 1));
 	// P pin = (idxKey 1:)(value 8 chars);(......)
-	alarm.parseGetAnswer('P', "1:00087892;3:8475;7:99811022");
+	alarm.parseGetAnswer('P', "1:00087892.3:8475.7:99811022.");
 	Assert.assertEquals("ERROR:", 87892, extractAttributeValue().getPin(1 - 1));
 	Assert.assertEquals("ERROR:", 8475, extractAttributeValue().getPin(3 - 1));
 	Assert.assertEquals("ERROR:", 99811022, extractAttributeValue().getPin(7 - 1));

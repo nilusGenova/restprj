@@ -50,10 +50,10 @@ public class AlarmObjAgent extends HalObjAgent {
 		expAttr.setArmed(m & 1);
 	    }
 	    break;
-	// K key = (idxKey 0:master)(value 8 chars);(......)
+	// K key = (idxKey 0:master)(value 8 chars).(......)
 	case 'K':
 	    expAttr.flushKeys();
-	    String[] key = msg.split(";");
+	    String[] key = msg.split("\\.");
 	    for (String k : key) {
 		String[] rec = k.split(":");
 		int idx = Integer.parseInt(rec[0]);
@@ -64,9 +64,9 @@ public class AlarmObjAgent extends HalObjAgent {
 		}
 	    }
 	    break;
-	// P pin = (idxKey 1:)(value 8 chars);(......)
+	// P pin = (idxKey 1:)(value 8 chars).(......).
 	case 'P':
-	    String[] pin = msg.split(";");
+	    String[] pin = msg.split("\\.");
 	    for (String p : pin) {
 		String[] rec = p.split(":");
 		expAttr.storePin(Integer.parseInt(rec[0]) - 1, Integer.parseInt(rec[1]));

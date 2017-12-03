@@ -18,7 +18,7 @@ import gnu.io.SerialPort;
 
 public class TwoWaysSerialComms {
 
-    private static final int RCV_BUFFER_SIZE = 100;
+    private static final int RCV_BUFFER_SIZE = 250;
     private static final int CONN_RETRY_TIMEOUT = 5000; // in mSec
     private static final Logger log = LoggerFactory.getLogger(TwoWaysSerialComms.class);
     private final static String usbDevicePrefix = "/dev/ttyUSB";
