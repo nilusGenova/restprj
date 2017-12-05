@@ -6,7 +6,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 public final class App {
 
-    private final static String usbDevice = "/dev/ttyUSB0";
+    private final static int REST_SERVER_PORT = 8080;
     private final static String DEBUG_FILE_NAME = "/tmp/hal9000debug";
     public final static Registry registry = new Registry();
     private final static Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
@@ -37,7 +37,7 @@ public final class App {
 	ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 	context.setContextPath("/");
 
-	Server jettyServer = new Server(8080);
+	Server jettyServer = new Server(REST_SERVER_PORT);
 	jettyServer.setHandler(context);
 
 	ServletHolder jerseyServlet = context.addServlet(org.glassfish.jersey.servlet.ServletContainer.class, "/*");
@@ -48,10 +48,7 @@ public final class App {
 
 	// Inizializza gestione porta seriale
 	try {
-	    // serial.connect(usbDevice, (str) -> System.out.println("*" + str + "*"));
-	    // TODO: should retry and manage connection
-	    serial.startConnectionManager(usbDevice, (str) -> parser.msgToBeParsed(str));
-
+	    serial.startConnectionManager((str) -> parser.msgToBeParsed(str));
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}

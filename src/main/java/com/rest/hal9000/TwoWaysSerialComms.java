@@ -26,17 +26,15 @@ public class TwoWaysSerialComms {
     ConnectionManager connectionManager = null;
     private volatile boolean connectedStatus = false;
     private final static BlockingQueue<String> outMsgQueue = new LinkedBlockingQueue<>(5);
-    String portName = null;
     Consumer<String> rcvCallBack;
 
     public boolean isConnected() {
 	return connectedStatus;
     }
 
-    public void startConnectionManager(final String portName, final Consumer<String> rcvCallBack) throws Exception {
-	this.portName = portName;
+    public void startConnectionManager(final Consumer<String> rcvCallBack) throws Exception {
 	this.rcvCallBack = rcvCallBack;
-	log.debug("Starting connection manager for: {}", portName);
+	log.debug("Starting connection manager");
 	connectionManager = new ConnectionManager();
 	(new Thread(connectionManager)).start();
     }

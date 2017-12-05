@@ -103,7 +103,7 @@ public class TwoWaysSerialCommsTest {
 	};
 	when(input.read(anyObject(), anyInt(), anyInt())).thenAnswer(answer);
 
-	objectUnderTest.startConnectionManager("device", (str) -> replies.add(str));
+	objectUnderTest.startConnectionManager((str) -> replies.add(str));
 
 	while (readMsgIdx < toUseInRead.length)
 	    ;
