@@ -37,7 +37,14 @@ public class EntryPoint {
     public String checkConnection() {
 	return App.isSerialConnected() ? "YES" : "NO";
     }
-    
+
+    @GET
+    @Path("logger")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String dumpTempLog() {
+	return App.tempLogger.getLog();
+    }
+
     @GET
     @Path("{object}")
     @Produces(MediaType.APPLICATION_JSON)

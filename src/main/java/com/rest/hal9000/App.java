@@ -8,9 +8,10 @@ public final class App {
 
     private final static int REST_SERVER_PORT = 8080;
     private final static String DEBUG_FILE_NAME = "/tmp/hal9000debug";
+    private final static TwoWaysSerialComms serial = new TwoWaysSerialComms();
     public final static Registry registry = new Registry();
     private final static Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
-    private final static TwoWaysSerialComms serial = new TwoWaysSerialComms();
+    public final static TempLogger tempLogger = new TempLogger();
 
     public static boolean isSerialConnected() {
 	return serial.isConnected();
@@ -19,7 +20,6 @@ public final class App {
     public static void main(String[] args) throws Exception {
 	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
 
-	final TempLogger tempLogger = new TempLogger("logger", (msg) -> serial.sendMsg(msg));
 	final ClockObjAgent clockAgent = new ClockObjAgent("clock", (msg) -> serial.sendMsg(msg));
 	final ThermoObjAgent thermoAgent = new ThermoObjAgent("thermo", (msg) -> serial.sendMsg(msg),
 		(msg) -> tempLogger.logTemperature(msg));
@@ -30,7 +30,6 @@ public final class App {
 	registry.registerObj(thermoAgent);
 	registry.registerObj(alarmObjAgent);
 	registry.registerObj(programObjAgent);
-	registry.registerObj(tempLogger);
 
 	parser.start();
 

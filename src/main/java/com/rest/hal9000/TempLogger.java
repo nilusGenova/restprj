@@ -1,47 +1,35 @@
 package com.rest.hal9000;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.function.Consumer;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
-public class TempLogger extends HalObjAgent {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    public TempLogger(final String pathName, final Consumer<String> sendMsgCallBack) {
-	super(pathName, sendMsgCallBack);
-	// TODO Auto-generated constructor stub
+public class TempLogger {
+
+    private static final Logger tempLog = LoggerFactory.getLogger(TempLogger.class);
+
+    public TempLogger() {
     }
 
-    @Override
-    protected Object getExposedData() {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    @Override
-    protected String getExposedAttribute(final String attr) throws Exception {
-	// TODO Auto-generated method stub
-	return null;
+    public String getLog() {
+	final StringBuilder ret = new StringBuilder();
+	try (BufferedReader br = new BufferedReader(new FileReader("/tmp/temperatures.log"))) {
+	    String line = null;
+	    while ((line = br.readLine()) != null) {
+		ret.append(line);
+		ret.append("\n");
+	    }
+	} catch (Exception e) {
+	    ret.append("ERROR READING THE TEMP-LOG");
+	    e.printStackTrace();
+	}
+	return ret.toString();
     }
 
     public void logTemperature(final String val) {
-	Calendar cal = Calendar.getInstance();
-	SimpleDateFormat date_format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-	log.info("LOG_TEMP [{}]{}", date_format.format(cal.getTime()), val);
-    }
-
-    @Override
-    protected boolean specializedParseGetAnswer(final char attribute, final String msg) {
-	return false;
-    }
-
-    @Override
-    protected boolean specializedParseEvent(final char event, final String msg) {
-	return false;
-    }
-
-    @Override
-    public void alignAll() {
-	return;
+	tempLog.info("{}", val);
     }
 
 }

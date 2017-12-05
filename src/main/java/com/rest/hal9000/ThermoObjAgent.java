@@ -72,13 +72,16 @@ public class ThermoObjAgent extends HalObjAgent {
 
     @Override
     protected boolean specializedParseEvent(final char event, final String msg) {
+	// Format of message:
+	// type(temp,warm,required,error),value
 	switch (event) {
 	case 'W':
 	    expAttr.warming = "0".equals(msg) ? 0 : 1;
+	    tempLoggerCallBack.accept("W," + expAttr.warming);
 	    break;
 	case 'T':
 	    expAttr.temperature = Integer.parseInt(msg) / 10.0;
-	    tempLoggerCallBack.accept(msg);
+	    tempLoggerCallBack.accept("T," + msg);
 	    break;
 	case 'R':
 	    expAttr.required = Integer.parseInt(msg) / 10.0;
@@ -86,9 +89,11 @@ public class ThermoObjAgent extends HalObjAgent {
 	    if (expAttr.manuallyForced == 1) {
 		expAttr.required -= 1000;
 	    }
+	    tempLoggerCallBack.accept("R," + msg);
 	    break;
 	case 'E':
 	    log.error("Sensor [{}] reading error (at least 1 min)", msg);
+	    tempLoggerCallBack.accept("E," + msg);
 	    return false;
 	default:
 	    wrongEvent();

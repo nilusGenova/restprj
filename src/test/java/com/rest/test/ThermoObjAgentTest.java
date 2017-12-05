@@ -118,22 +118,24 @@ public class ThermoObjAgentTest {
 	logMsg = "";
 	thermo.parseEvent('W', "0");
 	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("warming"));
+	Assert.assertEquals("LOG ERROR", "W,0", logMsg);
 	thermo.parseEvent('W', "1");
 	Assert.assertEquals("ERROR:", 1, extractAttributeValueAsInt("warming"));
-	Assert.assertEquals("LOG ERROR", "", logMsg);
+	Assert.assertEquals("LOG ERROR", "W,1", logMsg);
 	thermo.parseEvent('T', "324");
 	Assert.assertEquals("ERROR:", 32.4, extractAttributeValueAsDouble("temperature"), 0);
-	Assert.assertEquals("LOG ERROR", "324", logMsg);
+	Assert.assertEquals("LOG ERROR", "T,324", logMsg);
 	thermo.parseEvent('T', "80");
-	Assert.assertEquals("LOG ERROR", "80", logMsg);
+	Assert.assertEquals("LOG ERROR", "T,80", logMsg);
 	logMsg = "";
 	Assert.assertEquals("ERROR:", 8, extractAttributeValueAsDouble("temperature"), 0);
 	thermo.parseEvent('R', "215");
 	Assert.assertEquals("ERROR:", 21.5, extractAttributeValueAsDouble("required"), 0);
+	Assert.assertEquals("LOG ERROR", "R,215", logMsg);
 	thermo.parseEvent('R', "60");
 	Assert.assertEquals("ERROR:", 6, extractAttributeValueAsDouble("required"), 0);
+	Assert.assertEquals("LOG ERROR", "R,60", logMsg);
 	Assert.assertTrue("ERROR:", noMsgSent());
-	Assert.assertEquals("LOG ERROR", "", logMsg);
     }
 
     @Test
