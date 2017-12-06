@@ -100,10 +100,18 @@ public class ThermoObjAgentTest {
 	thermo.parseGetAnswer('T', "80;9");
 	Assert.assertEquals("ERROR:", 8, extractAttributeValueAsDouble("temperature"), 0);
 	Assert.assertEquals("ERROR:", 9, extractAttributeValueAsInt("humidity"));
+	thermo.parseGetAnswer('T', "179;71");
+	Assert.assertEquals("ERROR:", 17.9, extractAttributeValueAsDouble("temperature"), 0);
+	Assert.assertEquals("ERROR:", 71, extractAttributeValueAsInt("humidity"));
 	thermo.parseGetAnswer('R', "215");
 	Assert.assertEquals("ERROR:", 21.5, extractAttributeValueAsDouble("required"), 0);
+	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("manuallyForced"));
 	thermo.parseGetAnswer('R', "60");
 	Assert.assertEquals("ERROR:", 6, extractAttributeValueAsDouble("required"), 0);
+	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("manuallyForced"));
+	thermo.parseGetAnswer('R', "1299");
+	Assert.assertEquals("ERROR:", 29.9, extractAttributeValueAsDouble("required"), 0);
+	Assert.assertEquals("ERROR:", 1, extractAttributeValueAsInt("manuallyForced"));
 	thermo.parseGetAnswer('H', "52");
 	Assert.assertEquals("ERROR:", 5.2, extractAttributeValueAsDouble("hysteresis"), 0);
 	thermo.parseGetAnswer('H', "30");
@@ -124,17 +132,23 @@ public class ThermoObjAgentTest {
 	Assert.assertEquals("LOG ERROR", "W,1", logMsg);
 	thermo.parseEvent('T', "324");
 	Assert.assertEquals("ERROR:", 32.4, extractAttributeValueAsDouble("temperature"), 0);
-	Assert.assertEquals("LOG ERROR", "T,324", logMsg);
+	Assert.assertEquals("LOG ERROR", "T,32.4", logMsg);
 	thermo.parseEvent('T', "80");
-	Assert.assertEquals("LOG ERROR", "T,80", logMsg);
-	logMsg = "";
+	Assert.assertEquals("LOG ERROR", "T,8.0", logMsg);
 	Assert.assertEquals("ERROR:", 8, extractAttributeValueAsDouble("temperature"), 0);
+	logMsg = "";
 	thermo.parseEvent('R', "215");
 	Assert.assertEquals("ERROR:", 21.5, extractAttributeValueAsDouble("required"), 0);
-	Assert.assertEquals("LOG ERROR", "R,215", logMsg);
+	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("manuallyForced"));
+	Assert.assertEquals("LOG ERROR", "P,21.5", logMsg);
 	thermo.parseEvent('R', "60");
 	Assert.assertEquals("ERROR:", 6, extractAttributeValueAsDouble("required"), 0);
-	Assert.assertEquals("LOG ERROR", "R,60", logMsg);
+	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("manuallyForced"));
+	Assert.assertEquals("LOG ERROR", "P,6.0", logMsg);
+	thermo.parseEvent('R', "1302");
+	Assert.assertEquals("ERROR:", 30.2, extractAttributeValueAsDouble("required"), 0);
+	Assert.assertEquals("ERROR:", 1, extractAttributeValueAsInt("manuallyForced"));
+	Assert.assertEquals("LOG ERROR", "M,30.2", logMsg);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 

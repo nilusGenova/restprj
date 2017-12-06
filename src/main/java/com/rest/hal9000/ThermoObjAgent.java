@@ -16,6 +16,14 @@ public class ThermoObjAgent extends HalObjAgent {
 	private double hysteresis = 0;
     }
 
+    private double roundTemp(final String val) {
+	Integer intVal = Integer.parseInt(val);
+	if (intVal >= 1000) {
+	    intVal -= 1000;
+	}
+	return intVal / 10.0;
+    }
+
     private ExposedAttributes expAttr = new ExposedAttributes();
 
     private final Consumer<String> tempLoggerCallBack;
@@ -49,19 +57,16 @@ public class ThermoObjAgent extends HalObjAgent {
 	    break;
 	case 'T': {
 	    String[] list = msg.split(";");
-	    expAttr.temperature = Integer.parseInt(list[0]) / 10.0;
+	    expAttr.temperature = roundTemp(list[0]);
 	    expAttr.humidity = Integer.parseInt(list[1]);
 	}
 	    break;
 	case 'R':
-	    expAttr.required = Integer.parseInt(msg) / 10.0;
-	    expAttr.manuallyForced = (expAttr.required > 1000) ? 1 : 0;
-	    if (expAttr.manuallyForced == 1) {
-		expAttr.required -= 1000;
-	    }
+	    expAttr.required = roundTemp(msg);
+	    expAttr.manuallyForced = (Integer.parseInt(msg) > 1000) ? 1 : 0;
 	    break;
 	case 'H':
-	    expAttr.hysteresis = Integer.parseInt(msg) / 10.0;
+	    expAttr.hysteresis = roundTemp(msg);
 	    break;
 	default:
 	    wrongAttribute();
@@ -80,20 +85,17 @@ public class ThermoObjAgent extends HalObjAgent {
 	    tempLoggerCallBack.accept("W," + expAttr.warming);
 	    break;
 	case 'T':
-	    expAttr.temperature = Integer.parseInt(msg) / 10.0;
-	    tempLoggerCallBack.accept("T," + msg);
+	    expAttr.temperature = roundTemp(msg);
+	    tempLoggerCallBack.accept("T," + Double.toString(expAttr.temperature));
 	    break;
 	case 'R':
-	    expAttr.required = Integer.parseInt(msg) / 10.0;
-	    expAttr.manuallyForced = (expAttr.required > 1000) ? 1 : 0;
-	    if (expAttr.manuallyForced == 1) {
-		expAttr.required -= 1000;
-	    }
-	    tempLoggerCallBack.accept("R," + msg);
+	    expAttr.required = roundTemp(msg);
+	    expAttr.manuallyForced = (Integer.parseInt(msg) > 1000) ? 1 : 0;
+	    tempLoggerCallBack
+		    .accept(((expAttr.manuallyForced == 1) ? "M," : "P,") + Double.toString(expAttr.required));
 	    break;
 	case 'E':
 	    log.error("Sensor [{}] reading error (at least 1 min)", msg);
-	    tempLoggerCallBack.accept("E," + msg);
 	    return false;
 	default:
 	    wrongEvent();
