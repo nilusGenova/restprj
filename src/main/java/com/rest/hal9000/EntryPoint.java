@@ -1,5 +1,6 @@
 package com.rest.hal9000;
 
+import java.io.File;
 import java.util.NoSuchElementException;
 
 import javax.ws.rs.DELETE;
@@ -12,12 +13,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/hal9000")
 public class EntryPoint {
+
+    private static final String LOGGER_FILE = "/tmp/temperatures.log";
+    private static final String DWNLD_LOGGER_FILE = "temperatures.csv";
 
     private static final Logger log = LoggerFactory.getLogger(EntryPoint.class);
 
@@ -40,9 +45,12 @@ public class EntryPoint {
 
     @GET
     @Path("logger")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String dumpTempLog() {
-	return App.tempLogger.getLog();
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getFile() {
+	File file = new File(LOGGER_FILE);
+	ResponseBuilder response = Response.ok((Object) file);
+	response.header("Content-Disposition", "attachment; filename=" + DWNLD_LOGGER_FILE);
+	return response.build();
     }
 
     @GET
