@@ -16,6 +16,8 @@ public class ThermoObjAgent extends HalObjAgent {
 	private double hysteresis = 0;
     }
 
+    private final static TempLogger tempLogger = new TempLogger();
+
     private double roundTemp(final String val) {
 	Integer intVal = Integer.parseInt(val);
 	if (intVal >= 1000) {
@@ -26,11 +28,8 @@ public class ThermoObjAgent extends HalObjAgent {
 
     private ExposedAttributes expAttr = new ExposedAttributes();
 
-    private final Consumer<String> tempLoggerCallBack;
-
-    public ThermoObjAgent(String pathName, Consumer<String> sendMsgCallBack, Consumer<String> tempLoggerCallBack) {
+    public ThermoObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
-	this.tempLoggerCallBack = tempLoggerCallBack;
     }
 
     @Override
@@ -82,17 +81,16 @@ public class ThermoObjAgent extends HalObjAgent {
 	switch (event) {
 	case 'W':
 	    expAttr.warming = "0".equals(msg) ? 0 : 1;
-	    tempLoggerCallBack.accept("W," + expAttr.warming);
+	    tempLogger.logWarming(expAttr.warming);
 	    break;
 	case 'T':
 	    expAttr.temperature = roundTemp(msg);
-	    tempLoggerCallBack.accept("T," + Double.toString(expAttr.temperature));
+	    tempLogger.logTemp(expAttr.temperature);
 	    break;
 	case 'R':
 	    expAttr.required = roundTemp(msg);
 	    expAttr.manuallyForced = (Integer.parseInt(msg) > 1000) ? 1 : 0;
-	    tempLoggerCallBack
-		    .accept(((expAttr.manuallyForced == 1) ? "M," : "P,") + Double.toString(expAttr.required));
+	    tempLogger.logReqTemp(expAttr.manuallyForced, expAttr.required);
 	    break;
 	case 'E':
 	    log.error("Sensor [{}] reading error (at least 1 min)", msg);

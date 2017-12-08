@@ -11,7 +11,6 @@ public final class App {
     private final static TwoWaysSerialComms serial = new TwoWaysSerialComms();
     public final static Registry registry = new Registry();
     private final static Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
-    public final static TempLogger tempLogger = new TempLogger();
 
     public static boolean isSerialConnected() {
 	return serial.isConnected();
@@ -21,8 +20,7 @@ public final class App {
 	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
 
 	final ClockObjAgent clockAgent = new ClockObjAgent("clock", (msg) -> serial.sendMsg(msg));
-	final ThermoObjAgent thermoAgent = new ThermoObjAgent("thermo", (msg) -> serial.sendMsg(msg),
-		(msg) -> tempLogger.logTemperature(msg));
+	final ThermoObjAgent thermoAgent = new ThermoObjAgent("thermo", (msg) -> serial.sendMsg(msg));
 	final AlarmObjAgent alarmObjAgent = new AlarmObjAgent("alarm", (msg) -> serial.sendMsg(msg));
 	final ProgramObjAgent programObjAgent = new ProgramObjAgent("program", (msg) -> serial.sendMsg(msg));
 

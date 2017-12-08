@@ -1,7 +1,9 @@
 package com.rest.test;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,20 +15,22 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rest.hal9000.TempLogger;
 import com.rest.hal9000.ThermoObjAgent;
 
-@RunWith(MockitoJUnitRunner.class)
-@PrepareForTest({ ThermoObjAgent.class })
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ ThermoObjAgent.class, TempLogger.class })
 public class ThermoObjAgentTest {
 
     ArrayList<String> msgSent = new ArrayList<>();
-    String logMsg = "";
 
     void sendMsg(String msg) {
 	msgSent.add(msg);
@@ -47,16 +51,15 @@ public class ThermoObjAgentTest {
 	return msgSent.size() == 0;
     }
 
-    void logger(String msg) {
-	logMsg = msg;
-    }
-
     void emptySentMsg() {
 	msgSent.clear();
     }
 
     @InjectMocks
-    private final ThermoObjAgent thermo = new ThermoObjAgent("thermo", (s) -> sendMsg(s), (s) -> logger(s));
+    private final ThermoObjAgent thermo = new ThermoObjAgent("thermo", (s) -> sendMsg(s));
+
+    @Mock
+    private TempLogger tempLog;
 
     @Before
     public void setUp() throws Exception {
@@ -121,34 +124,41 @@ public class ThermoObjAgentTest {
 
     @Test
     public void testParseEvent() {
+	PowerMockito.mockStatic(ThermoObjAgent.class);
+	Field field = PowerMockito.field(ThermoObjAgent.class, "tempLogger");
+	try {
+	    field.set(ThermoObjAgent.class, tempLog);
+	} catch (IllegalArgumentException e1) {
+	    e1.printStackTrace();
+	} catch (IllegalAccessException e1) {
+	    e1.printStackTrace();
+	}
 	// W T R (E)
 	emptySentMsg();
-	logMsg = "";
 	thermo.parseEvent('W', "0");
 	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("warming"));
-	Assert.assertEquals("LOG ERROR", "W,0", logMsg);
+	verify(tempLog).logWarming(0);
 	thermo.parseEvent('W', "1");
 	Assert.assertEquals("ERROR:", 1, extractAttributeValueAsInt("warming"));
-	Assert.assertEquals("LOG ERROR", "W,1", logMsg);
+	verify(tempLog).logWarming(1);
 	thermo.parseEvent('T', "324");
 	Assert.assertEquals("ERROR:", 32.4, extractAttributeValueAsDouble("temperature"), 0);
-	Assert.assertEquals("LOG ERROR", "T,32.4", logMsg);
+	verify(tempLog).logTemp(32.4);
 	thermo.parseEvent('T', "80");
-	Assert.assertEquals("LOG ERROR", "T,8.0", logMsg);
+	verify(tempLog).logTemp(8.0);
 	Assert.assertEquals("ERROR:", 8, extractAttributeValueAsDouble("temperature"), 0);
-	logMsg = "";
 	thermo.parseEvent('R', "215");
 	Assert.assertEquals("ERROR:", 21.5, extractAttributeValueAsDouble("required"), 0);
 	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("manuallyForced"));
-	Assert.assertEquals("LOG ERROR", "P,21.5", logMsg);
+	verify(tempLog).logReqTemp(0, 21.5);
 	thermo.parseEvent('R', "60");
 	Assert.assertEquals("ERROR:", 6, extractAttributeValueAsDouble("required"), 0);
 	Assert.assertEquals("ERROR:", 0, extractAttributeValueAsInt("manuallyForced"));
-	Assert.assertEquals("LOG ERROR", "P,6.0", logMsg);
+	verify(tempLog).logReqTemp(0, 6.0);
 	thermo.parseEvent('R', "1302");
 	Assert.assertEquals("ERROR:", 30.2, extractAttributeValueAsDouble("required"), 0);
 	Assert.assertEquals("ERROR:", 1, extractAttributeValueAsInt("manuallyForced"));
-	Assert.assertEquals("LOG ERROR", "M,30.2", logMsg);
+	verify(tempLog).logReqTemp(1, 30.2);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
