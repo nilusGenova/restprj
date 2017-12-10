@@ -56,3 +56,8 @@ http://localhost:8080/hal9000/alarm?c=allpins
 http://localhost:8080/hal9000/program?c=allprograms
 http://localhost:8080/hal9000/program?c=entry&p=h:<hour>-m:<min>-d:<day>-t:<temp>-i:<0|1 interp>
 
+
+curl -X POST http://localhost:8080/hal9000/debug?enable=true
+curl -X PUT -HContent-type:text/plain --data 
+			"Something is rotten in the state of Denmark"  
+			http://localhost:8080/hal9000/containers/quotes/1

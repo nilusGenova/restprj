@@ -10,6 +10,10 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +31,7 @@ import com.rest.hal9000.Registry;
 
 //@RunWith(MockitoJUnitRunner.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ EntryPoint.class, App.class, Registry.class })
+@PrepareForTest({ EntryPoint.class, App.class, Registry.class, HttpServletRequest.class })
 public class EntryPointTest {
 
     @Mock
@@ -35,6 +39,9 @@ public class EntryPointTest {
 
     @Mock
     private Registry reg;
+
+    @Mock
+    private HttpServletRequest httpReq;
 
     @Mock
     private HalObjAgent objA;
@@ -51,19 +58,34 @@ public class EntryPointTest {
     @Before
     public void setUp() throws Exception {
 	MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    public void testGetOnObject() {
 	PowerMockito.mockStatic(App.class);
-	Field field = PowerMockito.field(App.class, "registry");
+	Field fieldReg = PowerMockito.field(App.class, "registry");
+	Field fieldHttpReq = PowerMockito.field(EntryPoint.class, "request");
 	try {
-	    field.set(App.class, reg);
+	    fieldReg.set(App.class, reg);
+	    fieldHttpReq.set(EntryPoint.class, httpReq);
 	} catch (IllegalArgumentException e1) {
 	    e1.printStackTrace();
 	} catch (IllegalAccessException e1) {
 	    e1.printStackTrace();
 	}
+    }
+
+    @Test
+    public void testInvalidAccess() {
+	when(httpReq.getRemoteAddr()).thenReturn("192.168.0.255");
+	Response resp;
+	resp = server.getOnObject("mypath", null);
+	Assert.assertEquals("ERROR:wrong get access test", Response.Status.FORBIDDEN, resp.getStatusInfo());
+	resp = server.postOnObject("postpath", null, null);
+	Assert.assertEquals("ERROR:wrong post access test", Response.Status.FORBIDDEN, resp.getStatusInfo());
+	resp = server.deleteOnObject("delpath", null, null);
+	Assert.assertEquals("ERROR:wrong delete access test", Response.Status.FORBIDDEN, resp.getStatusInfo());
+    }
+
+    @Test
+    public void testGetOnObject() {
+	when(httpReq.getRemoteAddr()).thenReturn("127.0.0.1");
 	when(reg.getRegisteredObj(anyChar())).thenReturn(objA);
 	when(objA.getPathName()).thenReturn("mypath");
 
@@ -74,7 +96,7 @@ public class EntryPointTest {
 	    e.printStackTrace();
 	    fail("Exception");
 	}
-	
+
 	server.getOnObject("mypath", null);
 	try {
 	    verify(objA, times(1)).exposeJsonData();
@@ -102,15 +124,7 @@ public class EntryPointTest {
 
     @Test
     public void testPostOnObject() {
-	PowerMockito.mockStatic(App.class);
-	Field field = PowerMockito.field(App.class, "registry");
-	try {
-	    field.set(App.class, reg);
-	} catch (IllegalArgumentException e1) {
-	    e1.printStackTrace();
-	} catch (IllegalAccessException e1) {
-	    e1.printStackTrace();
-	}
+	when(httpReq.getRemoteAddr()).thenReturn("127.0.0.1");
 	when(reg.getRegisteredObj(anyChar())).thenReturn(objB);
 	when(objB.getPathName()).thenReturn("postpath");
 
@@ -150,15 +164,7 @@ public class EntryPointTest {
 
     @Test
     public void testDeleteOnObject() {
-	PowerMockito.mockStatic(App.class);
-	Field field = PowerMockito.field(App.class, "registry");
-	try {
-	    field.set(App.class, reg);
-	} catch (IllegalArgumentException e1) {
-	    e1.printStackTrace();
-	} catch (IllegalAccessException e1) {
-	    e1.printStackTrace();
-	}
+	when(httpReq.getRemoteAddr()).thenReturn("127.0.0.1");
 	when(reg.getRegisteredObj(anyChar())).thenReturn(objC);
 	when(objC.getPathName()).thenReturn("delpath");
 
