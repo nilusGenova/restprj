@@ -23,9 +23,6 @@ import org.slf4j.LoggerFactory;
 @Path("/hal9000")
 public class EntryPoint {
 
-    private static final String LOGGER_FILE = "/tmp/temperatures.log";
-    private static final String DWNLD_LOGGER_FILE = "temperatures.csv";
-
     private static final String ACCESS_NOT_ALLOWED = "Access Not Allowed";
 
     private static final Logger log = LoggerFactory.getLogger(EntryPoint.class);
@@ -41,6 +38,12 @@ public class EntryPoint {
 	    return obj;
 	}
 	throw new NoSuchElementException();
+    }
+
+    private static String getLoggerFilePath() {
+	org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TempLogger.class);
+	org.apache.log4j.FileAppender appender = (org.apache.log4j.FileAppender) logger.getAppender("tempappender");
+	return appender.getFile();
     }
 
     private boolean isAccessAllowed() {
@@ -74,9 +77,9 @@ public class EntryPoint {
 	if (!isAccessAllowed()) {
 	    return Response.status(Response.Status.FORBIDDEN).build();
 	}
-	File file = new File(LOGGER_FILE);
+	File file = new File(getLoggerFilePath());
 	ResponseBuilder response = Response.ok((Object) file);
-	response.header("Content-Disposition", "attachment; filename=" + DWNLD_LOGGER_FILE);
+	response.header("Content-Disposition", "attachment; filename=temperatures.csv");
 	return response.build();
     }
 
