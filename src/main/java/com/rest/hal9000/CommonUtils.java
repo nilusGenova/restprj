@@ -45,9 +45,16 @@ public final class CommonUtils {
     }
 
     public static String getLoggerFilePath() {
-	org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TempLogger.class);
-	org.apache.log4j.FileAppender appender = (org.apache.log4j.FileAppender) logger.getAppender("tempappender");
-	return appender.getFile();
+
+	Enumeration<org.apache.log4j.Appender> e = org.apache.log4j.Logger.getLogger(TempLogger.class)
+		.getAllAppenders();
+	while (e.hasMoreElements()) {
+	    org.apache.log4j.Appender app = e.nextElement();
+	    if (app instanceof org.apache.log4j.FileAppender) {
+		return ((org.apache.log4j.FileAppender) app).getFile();
+	    }
+	}
+	return "";
     }
 
 }
