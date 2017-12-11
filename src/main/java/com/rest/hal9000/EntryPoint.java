@@ -40,12 +40,6 @@ public class EntryPoint {
 	throw new NoSuchElementException();
     }
 
-    private static String getLoggerFilePath() {
-	org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TempLogger.class);
-	org.apache.log4j.FileAppender appender = (org.apache.log4j.FileAppender) logger.getAppender("tempappender");
-	return appender.getFile();
-    }
-
     private boolean isAccessAllowed() {
 	if (request != null) {
 	    final String remoteAddr = request.getRemoteAddr();
@@ -77,7 +71,9 @@ public class EntryPoint {
 	if (!isAccessAllowed()) {
 	    return Response.status(Response.Status.FORBIDDEN).build();
 	}
-	File file = new File(getLoggerFilePath());
+	final String fileName = CommonUtils.getLoggerFilePath();
+	log.info("Temperature log file {} dowloaded", fileName);
+	File file = new File(fileName);
 	ResponseBuilder response = Response.ok((Object) file);
 	response.header("Content-Disposition", "attachment; filename=temperatures.csv");
 	return response.build();

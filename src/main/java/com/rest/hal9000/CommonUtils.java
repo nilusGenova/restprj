@@ -1,7 +1,10 @@
 package com.rest.hal9000;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Enumeration;
 
 public final class CommonUtils {
 
@@ -21,4 +24,30 @@ public final class CommonUtils {
 	org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getLogger(pkgName);
 	logger4j.setLevel(org.apache.log4j.Level.toLevel(level));
     }
+
+    public static String getMyIpAddress() throws Exception {
+	Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+	int ctr = 0;
+	while (e.hasMoreElements()) {
+	    NetworkInterface n = (NetworkInterface) e.nextElement();
+	    Enumeration<InetAddress> ee = n.getInetAddresses();
+	    while (ee.hasMoreElements() && ctr < 3) {
+		ctr++;
+		if (ctr == 3)
+		    break;
+		InetAddress i = ee.nextElement();
+		if (ctr == 2)
+		    return i.getHostAddress();
+
+	    }
+	}
+	return "127.0.0.1";
+    }
+
+    public static String getLoggerFilePath() {
+	org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TempLogger.class);
+	org.apache.log4j.FileAppender appender = (org.apache.log4j.FileAppender) logger.getAppender("tempappender");
+	return appender.getFile();
+    }
+
 }

@@ -50,6 +50,8 @@ public final class App {
 	    e.printStackTrace();
 	}
 
+	System.out.println("Ip Address:" + CommonUtils.getMyIpAddress());
+	System.out.println("Temperature log:" + CommonUtils.getLoggerFilePath());
 	// Inizializza il rest-server
 	try {
 	    jettyServer.start();
