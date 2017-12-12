@@ -1,6 +1,7 @@
 package com.rest.hal9000;
 
 import java.io.File;
+import java.net.SocketException;
 import java.util.NoSuchElementException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,11 +44,16 @@ public class EntryPoint {
     private boolean isAccessAllowed() {
 	if (request != null) {
 	    final String remoteAddr = request.getRemoteAddr();
-	    if ("127.0.0.1".equals(remoteAddr)) {
-		log.debug("Http request from:{}", remoteAddr);
-		return true;
-	    } else {
-		log.info("Not allowed access from:{}", remoteAddr);
+	    log.debug("Http request from:{}", remoteAddr);
+	    try {
+		if (("127.0.0.1".equals(remoteAddr)) || (CommonUtils.isInLocalSubnet(remoteAddr))) {
+		    return true;
+		} else {
+		    log.info("Not allowed access from:{}", remoteAddr);
+		}
+	    } catch (SocketException e) {
+		log.error("Error checking if is Local Subnet");
+		e.printStackTrace();
 	    }
 	}
 	return false;

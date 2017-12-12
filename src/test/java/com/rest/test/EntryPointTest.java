@@ -72,8 +72,8 @@ public class EntryPointTest {
     }
 
     @Test
-    public void testInvalidAccess() {
-	when(httpReq.getRemoteAddr()).thenReturn("192.168.0.255");
+    public void testInvalidAccessWith() {
+	when(httpReq.getRemoteAddr()).thenReturn("192.168.0.14");
 	Response resp;
 	resp = server.getOnObject("mypath", null);
 	Assert.assertEquals("ERROR:wrong get access test", Response.Status.FORBIDDEN, resp.getStatusInfo());

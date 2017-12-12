@@ -2,10 +2,12 @@ package com.rest.hal9000;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 
+import org.apache.commons.net.util.SubnetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +54,17 @@ public final class CommonUtils {
 	return "127.0.0.1";
     }
 
+    public static boolean isInLocalSubnet(String ip) throws SocketException {
+	Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+	while (e.hasMoreElements()) {
+	    NetworkInterface n = (NetworkInterface) e.nextElement();
+	    final String ipAddr = n.getInterfaceAddresses().get(1).getAddress().getHostAddress();
+	    final int mask = n.getInterfaceAddresses().get(1).getNetworkPrefixLength();
+	    return new SubnetUtils(ipAddr + "/" + mask).getInfo().isInRange(ip);
+	}
+	return false;
+    }
+
     public static String getTempLoggerFilePath() {
 
 	Enumeration<org.apache.log4j.Appender> e = org.apache.log4j.Logger.getLogger(TempLogger.class)
@@ -65,5 +78,4 @@ public final class CommonUtils {
 	log.error("Temp Logger file not found");
 	return "";
     }
-
 }
