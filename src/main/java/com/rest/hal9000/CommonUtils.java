@@ -6,7 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class CommonUtils {
+
+    protected static final Logger log = LoggerFactory.getLogger(CommonUtils.class);
 
     private CommonUtils() {
     }
@@ -33,18 +38,21 @@ public final class CommonUtils {
 	    Enumeration<InetAddress> ee = n.getInetAddresses();
 	    while (ee.hasMoreElements() && ctr < 3) {
 		ctr++;
-		if (ctr == 3)
+		if (ctr == 3) {
 		    break;
+		}
 		InetAddress i = ee.nextElement();
-		if (ctr == 2)
+		if (ctr == 2) {
 		    return i.getHostAddress();
+		}
 
 	    }
 	}
+	log.error("Local IpAddress not found");
 	return "127.0.0.1";
     }
 
-    public static String getLoggerFilePath() {
+    public static String getTempLoggerFilePath() {
 
 	Enumeration<org.apache.log4j.Appender> e = org.apache.log4j.Logger.getLogger(TempLogger.class)
 		.getAllAppenders();
@@ -54,6 +62,7 @@ public final class CommonUtils {
 		return ((org.apache.log4j.FileAppender) app).getFile();
 	    }
 	}
+	log.error("Temp Logger file not found");
 	return "";
     }
 

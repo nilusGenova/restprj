@@ -71,7 +71,7 @@ public class EntryPoint {
 	if (!isAccessAllowed()) {
 	    return Response.status(Response.Status.FORBIDDEN).build();
 	}
-	final String fileName = CommonUtils.getLoggerFilePath();
+	final String fileName = CommonUtils.getTempLoggerFilePath();
 	log.info("Temperature log file {} dowloaded", fileName);
 	File file = new File(fileName);
 	ResponseBuilder response = Response.ok((Object) file);
