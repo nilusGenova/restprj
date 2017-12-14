@@ -50,7 +50,7 @@ public final class App {
 	    e.printStackTrace();
 	}
 
-	System.out.println("Ip Address:" + CommonUtils.getMyIpAddress());
+	System.out.println("Ip Address:" + CommonUtils.getMy_CIDR_IpAddress());
 	System.out.println("Temperature log:" + CommonUtils.getTempLoggerFilePath());
 	// Inizializza il rest-server
 	try {
