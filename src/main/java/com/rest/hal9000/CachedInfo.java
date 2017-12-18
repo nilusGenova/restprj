@@ -1,65 +1,38 @@
 package com.rest.hal9000;
 
-import java.util.Calendar;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CachedInfo<T> {
+public class CachedInfo<T> extends CacheRefreshBlockingManager {
+    private final static long WAIT_TIMEOUT_MS = 100;
     private T info = null;
 
-    protected static final Logger log = LoggerFactory.getLogger(CachedInfo.class);
-
-    private final Supplier<T> updateCallBack;
-    private final long refresh_period_ms;
-
-    private volatile long lastUpdateTime = 0;
-
-    private Lock updateLock = new ReentrantLock();
-
+    private final Supplier<T> updCallBck;
+   
     public CachedInfo(T initial_info, Supplier<T> updateCallBack, long refresh_period_ms) {
-	this.updateCallBack = updateCallBack;
-	this.refresh_period_ms = refresh_period_ms;
+	super(refresh_period_ms, WAIT_TIMEOUT_MS);
+	this.updCallBck = updateCallBack;
+	assignCallBack(()->updateInfo(updCallBck.get()));
 	updateInfo(initial_info);
     }
 
     public CachedInfo(Supplier<T> updateCallBack, long refresh_period_ms) {
-	this.updateCallBack = updateCallBack;
-	this.refresh_period_ms = refresh_period_ms;
-	refreshInfoIfRequired();
-    }
-
-    public void update_info(T val) {
-	updateLock.lock();
-	updateInfo(val);
-	updateLock.unlock();
+	super(refresh_period_ms, WAIT_TIMEOUT_MS);
+	this.updCallBck = updateCallBack;
+	assignCallBack(()->updateInfo(updCallBck.get()));
+	requestForUpdate();
     }
 
     public T getInfo() {
-	refreshInfoIfRequired();
+	requestForUpdate();
 	return info;
     }
 
-    private void updateInfo(T val) {
+    public void updateInfo(T val) {
 	info = val;
-	lastUpdateTime = Calendar.getInstance().getTimeInMillis();
+	updateCompleted();
     }
 
-    private void refreshInfoIfRequired() {
-	final long actualTime = Calendar.getInstance().getTimeInMillis();
-	updateLock.lock();
-	if ((info == null) || ((actualTime - lastUpdateTime) > refresh_period_ms)) {
-	    log.debug("Force realignment");
-	    try {
-		updateInfo(updateCallBack.get());
-	    } catch (Exception e) {
-		log.error("refreshInfoIfRequired: interrupted!");
-		e.printStackTrace();
-	    }
-	}
-	updateLock.unlock();
-    }
 }

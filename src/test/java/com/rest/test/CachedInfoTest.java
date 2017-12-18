@@ -45,8 +45,8 @@ public class CachedInfoTest {
 	} catch (InterruptedException e) {
 	}
 	Assert.assertEquals("ERROR:", (Integer) 2, inf2.getInfo());
-	inf2.update_info(3);
-	inf1.update_info(4);
+	inf2.updateInfo(3);
+	inf1.updateInfo(4);
 	Assert.assertEquals("ERROR:", (Integer) 3, inf2.getInfo());
 	Assert.assertEquals("ERROR:", (Integer) 1, inf1.getInfo());
     }

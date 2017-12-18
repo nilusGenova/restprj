@@ -13,7 +13,7 @@ public class CacheRefreshBlockingManager {
 
     protected static final Logger log = LoggerFactory.getLogger(CacheRefreshBlockingManager.class);
 
-    private final Runnable updateCallBack;
+    private Runnable updateCallBack;
     private final long refresh_period_ms;
     private final long wait_timeout;
 
@@ -26,6 +26,15 @@ public class CacheRefreshBlockingManager {
 	this.updateCallBack = updateCallBack;
 	this.refresh_period_ms = refresh_period_ms;
 	this.wait_timeout = wait_timeout;
+    }
+    
+    public CacheRefreshBlockingManager(long refresh_period_ms, long wait_timeout) {
+	this.refresh_period_ms = refresh_period_ms;
+	this.wait_timeout = wait_timeout;
+    }
+    
+    public void assignCallBack(Runnable updateCallBack) {
+	this.updateCallBack = updateCallBack;
     }
 
     public void updateCompleted() {
