@@ -173,9 +173,4 @@ public abstract class HalObjAgent {
 	    return retVal;
 	}
     }
-
-    // protected void updateLastUpdTime() {
-
-    // protected void tryToUpdateIfRequired() {
-
 }
