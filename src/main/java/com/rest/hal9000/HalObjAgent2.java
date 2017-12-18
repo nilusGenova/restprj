@@ -1,6 +1,11 @@
 package com.rest.hal9000;
 
+import java.util.Calendar;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
@@ -14,12 +19,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public abstract class HalObjAgent {
+public abstract class HalObjAgent2 {
 
-    private static final long REFRESH_TIME = (1000 * 10); // in milliseconds
-    private static final long WAIT_REFRESH_TIMEOUT = (1000 * 5); // in milliseconds
-
-    protected static final Logger log = LoggerFactory.getLogger(HalObjAgent.class);
+    protected static final Logger log = LoggerFactory.getLogger(HalObjAgent2.class);
 
     private final char id; // id used on hal9000 MUST be the first letter of pathName
 
@@ -29,14 +31,20 @@ public abstract class HalObjAgent {
 
     private final Consumer<String> sendMsgCallBack;
 
-    private CacheRefreshBlockingManager cacheRefreshManager = new CacheRefreshBlockingManager(() -> alignAll(),
-	    REFRESH_TIME, WAIT_REFRESH_TIMEOUT);
+    private volatile long lastUpdateTime = 0;
 
-    public HalObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
+    private Lock updateLock = new ReentrantLock();
+    private final Condition isUpdated = updateLock.newCondition();
+
+    private static final long OBJ_REFRESH_TIMEOUT = (1000 * 10); // in milliseconds
+    private static final long OBJ_WAIT_REFRESH_TIMEOUT = (1000 * 5); // in milliseconds
+
+    public HalObjAgent2(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super();
 	this.id = Character.toUpperCase(pathName.charAt(0));
 	this.pathName = pathName;
 	this.sendMsgCallBack = sendMsgCallBack;
+
     }
 
     public char getId() {
@@ -61,7 +69,7 @@ public abstract class HalObjAgent {
 	synchWrite(new Callable<Boolean>() {
 	    public Boolean call() throws Exception {
 		if (specializedParseGetAnswer(attribute, msg)) {
-		    cacheRefreshManager.updateCompleted();
+		    updateLastUpdTime();
 		}
 		return true;
 	    }
@@ -72,7 +80,7 @@ public abstract class HalObjAgent {
 	synchWrite(new Callable<Boolean>() {
 	    public Boolean call() throws Exception {
 		if (specializedParseEvent(event, msg)) {
-		    cacheRefreshManager.updateCompleted();
+		    updateLastUpdTime();
 		}
 		return true;
 	    }
@@ -84,7 +92,7 @@ public abstract class HalObjAgent {
 	mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
 	mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
-	cacheRefreshManager.requestForUpdate();
+	tryToUpdateIfRequired();
 	String jsonInString = synchRead(new Callable<String>() {
 	    public String call() throws Exception {
 		return mapper.writeValueAsString(getExposedData());
@@ -97,7 +105,7 @@ public abstract class HalObjAgent {
 
     public Response exposeJsonAttribute(final String attr) throws Exception {
 
-	cacheRefreshManager.requestForUpdate();
+	tryToUpdateIfRequired();
 	String value = synchRead(new Callable<String>() {
 	    public String call() throws Exception {
 		return getExposedAttribute(attr);
@@ -174,8 +182,29 @@ public abstract class HalObjAgent {
 	}
     }
 
-    // protected void updateLastUpdTime() {
+    protected void updateLastUpdTime() {
+	updateLock.lock();
+	lastUpdateTime = Calendar.getInstance().getTimeInMillis();
+	isUpdated.signalAll();
+	updateLock.unlock();
+    }
 
-    // protected void tryToUpdateIfRequired() {
+    protected void tryToUpdateIfRequired() {
+	final long actualTime = Calendar.getInstance().getTimeInMillis();
+	updateLock.lock();
+	if ((actualTime - lastUpdateTime) > OBJ_REFRESH_TIMEOUT) {
+	    log.debug("Force realignment for {}", pathName);
+	    alignAll();
+	    try {
+		if (!isUpdated.await(OBJ_WAIT_REFRESH_TIMEOUT, TimeUnit.MILLISECONDS)) {
+		    log.error("tryToUpdateIfRequired: object {} not refreshed", pathName);
+		}
+	    } catch (InterruptedException e) {
+		log.error("tryToUpdateIfRequired: interrupted!");
+		e.printStackTrace();
+	    }
+	}
+	updateLock.unlock();
 
+    }
 }

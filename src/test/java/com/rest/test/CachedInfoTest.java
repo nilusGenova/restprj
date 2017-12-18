@@ -46,8 +46,8 @@ public class CachedInfoTest {
 	}
 	Assert.assertEquals("ERROR:", (Integer) 2, inf2.getInfo());
 	inf2.update_info(3);
-	Assert.assertEquals("ERROR:", (Integer) 3, inf2.getInfo());
 	inf1.update_info(4);
+	Assert.assertEquals("ERROR:", (Integer) 3, inf2.getInfo());
 	Assert.assertEquals("ERROR:", (Integer) 1, inf1.getInfo());
     }
 }
