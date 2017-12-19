@@ -34,7 +34,7 @@ public class TwoWaysSerialComms {
 
     public void startConnectionManager(final Consumer<String> rcvCallBack) throws Exception {
 	this.rcvCallBack = rcvCallBack;
-	log.debug("Starting connection manager");
+	log.info("Starting connection manager");
 	connectionManager = new ConnectionManager();
 	(new Thread(connectionManager)).start();
     }
@@ -75,10 +75,10 @@ public class TwoWaysSerialComms {
 	    CommPort commPort = null;
 	    for (String portName : usbPortList) {
 		try {
-		    log.debug("Connecting to: {}", portName);
+		    log.info("Connecting to: {}", portName);
 		    portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 		    if (portIdentifier.isCurrentlyOwned()) {
-			log.error("Port is currently in use");
+			log.info("Port is currently in use");
 		    } else {
 			int timeout = 2000;
 			commPort = portIdentifier.open(this.getClass().getName(), timeout);
@@ -87,7 +87,7 @@ public class TwoWaysSerialComms {
 			    SerialPort serialPort = (SerialPort) commPort;
 			    serialPort.setSerialPortParams(115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
 				    SerialPort.PARITY_NONE);
-			    log.debug("Connected");
+			    log.info("Connected");
 			    return serialPort;
 			}
 		    }

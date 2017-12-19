@@ -37,7 +37,6 @@ public class CacheRefBlk_MngTest {
 
     private void quickUpdater() {
 	cnt++;
-	objUTQuick.updateCompleted();
     }
 
     private void updater() {
@@ -47,7 +46,6 @@ public class CacheRefBlk_MngTest {
 	    } catch (InterruptedException e) {
 	    }
 	    cnt++;
-	    objUT.updateCompleted();
 	});
 	testThread.start();
     }
@@ -59,7 +57,6 @@ public class CacheRefBlk_MngTest {
 	    } catch (InterruptedException e) {
 	    }
 	    cnt++;
-	    objUTTooSlow.updateCompleted();
 	});
 	testThread.start();
     }
@@ -80,10 +77,18 @@ public class CacheRefBlk_MngTest {
 	Assert.assertEquals("ERROR:", 0, cnt);
 	objUTQuick.requestForUpdate();
 	Assert.assertEquals("ERROR:", 1, cnt);
+	objUTQuick.updateCache();
+	Assert.assertEquals("ERROR:", 2, cnt);
 	// Normal case
 	cnt = 0;
 	Assert.assertEquals("ERROR:", 0, cnt);
 	objUT.requestForUpdate();
+	Assert.assertEquals("ERROR:", 1, cnt);
+	try {
+	    Thread.sleep(REFRESH_TIME * 2);
+	} catch (InterruptedException e) {
+	}
+	objUT.updateCompleted();
 	Assert.assertEquals("ERROR:", 1, cnt);
 	// Fail case
 	cnt = 0;
