@@ -61,7 +61,7 @@ public abstract class HalObjAgent {
 	synchWrite(new Callable<Boolean>() {
 	    public Boolean call() throws Exception {
 		if (specializedParseGetAnswer(attribute, msg)) {
-		    cacheRefreshManager.updateCompleted();
+		    cacheRefreshManager.refreshCompleted();
 		}
 		return true;
 	    }
@@ -72,7 +72,7 @@ public abstract class HalObjAgent {
 	synchWrite(new Callable<Boolean>() {
 	    public Boolean call() throws Exception {
 		if (specializedParseEvent(event, msg)) {
-		    cacheRefreshManager.updateCompleted();
+		    cacheRefreshManager.refreshCompleted();
 		}
 		return true;
 	    }
@@ -84,7 +84,7 @@ public abstract class HalObjAgent {
 	mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
 	mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
-	cacheRefreshManager.requestForUpdate();
+	cacheRefreshManager.refreshIfRequired();
 	String jsonInString = synchRead(new Callable<String>() {
 	    public String call() throws Exception {
 		return mapper.writeValueAsString(getExposedData());
@@ -97,7 +97,7 @@ public abstract class HalObjAgent {
 
     public Response exposeJsonAttribute(final String attr) throws Exception {
 
-	cacheRefreshManager.requestForUpdate();
+	cacheRefreshManager.refreshIfRequired();
 	String value = synchRead(new Callable<String>() {
 	    public String call() throws Exception {
 		return getExposedAttribute(attr);

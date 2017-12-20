@@ -21,14 +21,14 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
     }
 
     @Override
-    public void updateCache() {
+    public void forceRefresh() {
 	updateLock.lock();
 	updateWithCallBack();
 	isUpdated.signalAll();
 	updateLock.unlock();
     }
 
-    public void updateCompleted() {
+    public void refreshCompleted() {
 	updateLock.lock();
 	update();
 	isUpdated.signalAll();
@@ -36,7 +36,7 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
     }
 
     @Override
-    public void requestForUpdate() {
+    public void refreshIfRequired() {
 	final long actualTime = Calendar.getInstance().getTimeInMillis();
 	updateLock.lock();
 	if ((actualTime - lastUpdateTime) > refresh_period_ms) {

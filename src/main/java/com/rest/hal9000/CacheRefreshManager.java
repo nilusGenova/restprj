@@ -31,13 +31,13 @@ public class CacheRefreshManager {
 	this.updateCallBack = updateCallBack;
     }
 
-    public void updateCache() {
+    public void forceRefresh() {
 	updateLock.lock();
 	updateWithCallBack();
 	updateLock.unlock();
     }
 
-    public void requestForUpdate() {
+    public void refreshIfRequired() {
 	final long actualTime = Calendar.getInstance().getTimeInMillis();
 	updateLock.lock();
 	if ((actualTime - lastUpdateTime) > refresh_period_ms) {

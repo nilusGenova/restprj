@@ -44,27 +44,27 @@ public class CacheRef_MngTest {
 	// Quick case
 	cntLong = 0;
 	Assert.assertEquals("ERROR:", 0, cntLong);
-	objUTLong.requestForUpdate();
+	objUTLong.refreshIfRequired();
 	Assert.assertEquals("ERROR:", 1, cntLong);
 	try {
 	    Thread.sleep(REFRESH_TIME_LONG / 2);
 	} catch (InterruptedException e) {
 	}
-	objUTLong.requestForUpdate();
+	objUTLong.refreshIfRequired();
 	Assert.assertEquals("ERROR:", 1, cntLong);
-	objUTLong.updateCache();
+	objUTLong.forceRefresh();
 	Assert.assertEquals("ERROR:", 2, cntLong);
 	cntShort = 0;
 	Assert.assertEquals("ERROR:", 0, cntShort);
-	objUTShort.requestForUpdate();
+	objUTShort.refreshIfRequired();
 	Assert.assertEquals("ERROR:", 1, cntShort);
 	try {
 	    Thread.sleep(REFRESH_TIME_LONG / 2);
 	} catch (InterruptedException e) {
 	}
-	objUTShort.requestForUpdate();
+	objUTShort.refreshIfRequired();
 	Assert.assertEquals("ERROR:", 2, cntShort);
-	objUTShort.updateCache();
+	objUTShort.forceRefresh();
 	Assert.assertEquals("ERROR:", 3, cntShort);
     }
 }

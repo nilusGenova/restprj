@@ -7,30 +7,30 @@ public class CachedInfo<T> extends CacheRefreshManager {
 
     private final Supplier<T> updCallBck;
 
-    public CachedInfo(T initial_info, Supplier<T> updateCallBack, long refresh_period_ms) {
-	super(refresh_period_ms);
-	this.updCallBck = updateCallBack;
-	assignCallBack(() -> info = updCallBck.get());
-	updateInfo(initial_info);
+    public CachedInfo(final T initial_info, final Supplier<T> updateCallBack, final long refresh_period_ms) {
+        super(refresh_period_ms);
+        this.updCallBck = updateCallBack;
+        assignCallBack(() -> info = updCallBck.get());
+        updateInfo(initial_info);
     }
 
-    public CachedInfo(Supplier<T> updateCallBack, long refresh_period_ms) {
-	super(refresh_period_ms);
-	this.updCallBck = updateCallBack;
-	assignCallBack(() -> info = updCallBck.get());
-	// requestForUpdate();
+    public CachedInfo(final Supplier<T> updateCallBack, final long refresh_period_ms) {
+        super(refresh_period_ms);
+        this.updCallBck = updateCallBack;
+        assignCallBack(() -> info = updCallBck.get());
+        // refreshIfRequired();
     }
 
     public T getInfo() {
-	requestForUpdate();
-	return info;
+        refreshIfRequired();
+        return info;
     }
 
-    public void updateInfo(T val) {
-	updateLock.lock();
-	info = val;
-	update();
-	updateLock.unlock();
+    public void updateInfo(final T val) {
+        updateLock.lock();
+        info = val;
+        update();
+        updateLock.unlock();
     }
 
 }
