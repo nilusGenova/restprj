@@ -12,7 +12,7 @@ public class CacheRefreshManager {
     protected static final Logger log = LoggerFactory.getLogger(CacheRefreshManager.class);
 
     protected Runnable updateCallBack;
-    protected final long refresh_period_ms;
+    protected long refresh_period_ms;
 
     protected volatile long lastUpdateTime = 0;
 
@@ -27,13 +27,21 @@ public class CacheRefreshManager {
 	this.refresh_period_ms = refresh_period_ms;
     }
 
-    protected void assignCallBack(Runnable updateCallBack) {
+    protected void setCallBack(Runnable updateCallBack) {
+	updateLock.lock();
 	this.updateCallBack = updateCallBack;
+	updateLock.unlock();
+    }
+
+    public void doRefresh() {
+	updateLock.lock();
+	updateWithCallBack();
+	updateLock.unlock();
     }
 
     public void forceRefresh() {
 	updateLock.lock();
-	updateWithCallBack();
+	lastUpdateTime = 0;
 	updateLock.unlock();
     }
 
@@ -49,6 +57,16 @@ public class CacheRefreshManager {
 		e.printStackTrace();
 	    }
 	}
+	updateLock.unlock();
+    }
+
+    public boolean needsRefresh() {
+	return ((Calendar.getInstance().getTimeInMillis() - lastUpdateTime) > refresh_period_ms);
+    }
+
+    public void setRefreshPeriod(long refresh_period_ms) {
+	updateLock.lock();
+	this.refresh_period_ms = refresh_period_ms;
 	updateLock.unlock();
     }
 

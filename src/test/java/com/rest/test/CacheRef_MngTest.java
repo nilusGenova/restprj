@@ -52,8 +52,13 @@ public class CacheRef_MngTest {
 	}
 	objUTLong.refreshIfRequired();
 	Assert.assertEquals("ERROR:", 1, cntLong);
+	objUTLong.doRefresh();
+	Assert.assertEquals("ERROR:", 2, cntLong);
 	objUTLong.forceRefresh();
 	Assert.assertEquals("ERROR:", 2, cntLong);
+	objUTLong.refreshIfRequired();
+	Assert.assertEquals("ERROR:", 3, cntLong);
+
 	cntShort = 0;
 	Assert.assertEquals("ERROR:", 0, cntShort);
 	objUTShort.refreshIfRequired();
@@ -64,7 +69,7 @@ public class CacheRef_MngTest {
 	}
 	objUTShort.refreshIfRequired();
 	Assert.assertEquals("ERROR:", 2, cntShort);
-	objUTShort.forceRefresh();
+	objUTShort.doRefresh();
 	Assert.assertEquals("ERROR:", 3, cntShort);
     }
 }

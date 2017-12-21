@@ -21,7 +21,7 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
     }
 
     @Override
-    public void forceRefresh() {
+    public void doRefresh() {
 	updateLock.lock();
 	updateWithCallBack();
 	isUpdated.signalAll();

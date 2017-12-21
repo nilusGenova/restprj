@@ -65,7 +65,7 @@ public class CacheRefBlk_MngTest {
         Assert.assertEquals("ERROR:", 0, cnt);
         objUTQuick.refreshIfRequired();
         Assert.assertEquals("ERROR:", 1, cnt);
-        objUTQuick.forceRefresh();
+        objUTQuick.doRefresh();
         Assert.assertEquals("ERROR:", 2, cnt);
         // Normal case
         cnt = 0;

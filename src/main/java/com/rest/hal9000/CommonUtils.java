@@ -53,16 +53,19 @@ public final class CommonUtils {
     private static String get_CIDR_IpAddress() {
 	Enumeration<NetworkInterface> e;
 	try {
+	    log.debug("Getting local IP address");
 	    e = NetworkInterface.getNetworkInterfaces();
 	    while (e.hasMoreElements()) {
 		NetworkInterface n = (NetworkInterface) e.nextElement();
 		String ipAddrCache = n.getInterfaceAddresses().get(1).getAddress().getHostAddress();
 		Short ipMaskCache = n.getInterfaceAddresses().get(1).getNetworkPrefixLength();
+		log.debug("Local IP address:{}/{}", ipAddrCache, ipMaskCache);
 		return ipAddrCache + "/" + ipMaskCache;
 	    }
 	} catch (SocketException e1) {
 	    log.error("Local IpAddress not found");
 	}
+	log.debug("Local IP address:127.0.0.1/24(default)");
 	return "127.0.0.1/24";
     }
 
