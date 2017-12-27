@@ -2,6 +2,7 @@ This is a git repo
 
 library to install:
 sudo apt-get install librxtx-java
+and allow dialout privileges
 
 to execute:
 java -jar target/restprj-1.0-SNAPSHOT.jar
