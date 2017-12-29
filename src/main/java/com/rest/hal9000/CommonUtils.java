@@ -25,10 +25,10 @@ public final class CommonUtils {
     private CommonUtils() {
     }
 
-    public static void initialDebugStatus(final String debugFileNamePath) {
-	if (Files.exists(Paths.get(debugFileNamePath))) {
-	    setLogLevel("DEBUG");
-	}
+    public static void initialDebugStatus(final boolean setDebugLogLevel) {
+    	if (setDebugLogLevel) {
+    		setLogLevel("DEBUG");
+    	}
     }
 
     public static void setLogLevel(final String level) {

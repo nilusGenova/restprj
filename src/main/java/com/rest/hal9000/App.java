@@ -7,8 +7,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 public final class App {
 
     private final static int REST_SERVER_PORT = 8080;
-    private final static String DEBUG_FILE_NAME = "/tmp/hal9000debug";
     private final static String LOG_PATH_SYS_PROP = "LogPath";
+    private final static String DEBUG_LEVEL_SYS_PROP = "DebugLogLevel";
     private final static TwoWaysSerialComms serial = new TwoWaysSerialComms();
     public final static Registry registry = new Registry();
     private final static Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
@@ -19,7 +19,7 @@ public final class App {
 
     public static void main(String[] args) throws Exception {
     	CommonUtils.setLogPath(System.getProperty(LOG_PATH_SYS_PROP));
-    	CommonUtils.initialDebugStatus(DEBUG_FILE_NAME);
+    	CommonUtils.initialDebugStatus(System.getProperty(DEBUG_LEVEL_SYS_PROP)!=null);
 
     	final ClockObjAgent clockAgent = new ClockObjAgent("clock", (msg) -> serial.sendMsg(msg));
     	final ThermoObjAgent thermoAgent = new ThermoObjAgent("thermo", (msg) -> serial.sendMsg(msg));
@@ -51,7 +51,8 @@ public final class App {
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
-
+    	System.out.println(LOG_PATH_SYS_PROP+"="+System.getProperty(LOG_PATH_SYS_PROP));
+    	System.out.println(DEBUG_LEVEL_SYS_PROP+"="+System.getProperty(DEBUG_LEVEL_SYS_PROP));
     	System.out.println("Ip Address:" + CommonUtils.getMy_CIDR_IpAddress());
     	System.out.println("Log:" + CommonUtils.getLoggerFilePath());
     	System.out.println("Temperature log:" + CommonUtils.getTempLoggerFilePath());

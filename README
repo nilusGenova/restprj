@@ -8,8 +8,10 @@ to execute:
 java -jar target/restprj-1.0-SNAPSHOT.jar
 
 to enable/disable debug:
-touch /tmp/hal9000debug
-rm /tmp/hal9000debug
+-DDebugLogLevel=anyval
+
+to change log files directory:
+-DLogPath=/tmp/
 
 to browse:
 GET:
