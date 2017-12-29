@@ -5,9 +5,11 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Enumeration;
 
 import org.apache.commons.net.util.SubnetUtils;
+import org.apache.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,36 @@ public final class CommonUtils {
 	org.apache.log4j.Logger logger4j = org.apache.log4j.Logger.getLogger(pkgName);
 	logger4j.setLevel(org.apache.log4j.Level.toLevel(level));
     }
+    
+    public static void setLogPath(final String path) {
+    	if (path == null || "".equals(path)) {
+    		return;
+    	}
+    	Enumeration<org.apache.log4j.Appender> e = org.apache.log4j.Logger.getRootLogger()
+    			.getAllAppenders();
+    		while (e.hasMoreElements()) {
+    		    org.apache.log4j.Appender app = e.nextElement();
+    		    if (app instanceof org.apache.log4j.FileAppender) {
+    		    	// I've to get file name removing the leading path
+    		    	Path origLogFile = Paths.get(((org.apache.log4j.FileAppender) app).getFile());
+    			 ((org.apache.log4j.FileAppender) app).setFile(path+origLogFile.getFileName());
+    			 ((org.apache.log4j.FileAppender) app).activateOptions();
+    		    }
+    		}
+    		
+    		e = org.apache.log4j.Logger.getLogger(TempLogger.class)
+    				.getAllAppenders();
+    		while (e.hasMoreElements()) {
+    			    org.apache.log4j.Appender app = e.nextElement();
+    			    if (app instanceof org.apache.log4j.FileAppender) {
+        		    	// I've to get file name removing the leading path
+        		    	Path origLogFile = Paths.get(((org.apache.log4j.FileAppender) app).getFile());
+        			 ((org.apache.log4j.FileAppender) app).setFile(path+origLogFile.getFileName());
+        			 ((org.apache.log4j.FileAppender) app).activateOptions();
+    			    }
+    		}
+    		log.info("Log path updated to:{}",path);
+    }
 
     public static String getTempLoggerFilePath() {
 	Enumeration<org.apache.log4j.Appender> e = org.apache.log4j.Logger.getLogger(TempLogger.class)
@@ -49,6 +81,19 @@ public final class CommonUtils {
 	log.error("Temp Logger file not found");
 	return "";
     }
+    
+    public static String getLoggerFilePath() {
+    	Enumeration<org.apache.log4j.Appender> e = org.apache.log4j.Logger.getRootLogger()
+    			.getAllAppenders();
+    	while (e.hasMoreElements()) {
+    	    org.apache.log4j.Appender app = e.nextElement();
+    	    if (app instanceof org.apache.log4j.FileAppender) {
+    		return ((org.apache.log4j.FileAppender) app).getFile();
+    	    }
+    	}
+    	log.error("Root Logger file not found");
+    	return "";
+        }
 
     private static String get_CIDR_IpAddress() {
 	Enumeration<NetworkInterface> e;
