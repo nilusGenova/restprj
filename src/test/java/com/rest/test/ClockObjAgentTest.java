@@ -117,6 +117,24 @@ public class ClockObjAgentTest {
     }
 
     @Test
+    public void testSetGetNtpFlag() {
+    	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+    	Response r = null;
+    	try {
+    		//0 (false) is the default value
+    		r = clock.exposeJsonAttribute("ntp_priority");
+        	Assert.assertEquals("ERROR in ntp_priority get", "0", (String) r.getEntity());
+    	    et = Response.Status.fromStatusCode(clock.executeSet("ntp_priority", "1").getStatus());
+    		r = clock.exposeJsonAttribute("ntp_priority");
+        	Assert.assertEquals("ERROR in ntp_priority get/set", "1", (String) r.getEntity());
+        	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+    	} catch (Exception e) {
+    	    e.printStackTrace();
+    	    fail("exception");
+    	}
+    }
+    
+    @Test
     public void testExecuteSetActualtime() {
 	emptySentMsg();
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;

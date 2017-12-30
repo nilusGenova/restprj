@@ -17,6 +17,7 @@ to browse:
 GET:
 http://localhost:8080/hal9000/clock
 http://localhost:8080/hal9000/clock?a=epochtime
+http://localhost:8080/hal9000/clock?a=ntp_priority
 http://localhost:8080/hal9000/thermo
 http://localhost:8080/hal9000/thermo?a=warming
 http://localhost:8080/hal9000/alarm
@@ -33,6 +34,7 @@ POST:
 http://localhost:8080/hal9000/debug?enable=true
 http://localhost:8080/hal9000/clock?a=actualtime
 http://localhost:8080/hal9000/clock?a=time&v=<hour>:<min>-<day>-<month>-<year>
+http://localhost:8080/hal9000/clock?a=ntp_priority&v=0|1
 http://localhost:8080/hal9000/thermo?a=required&v=<Celsius*10>
 http://localhost:8080/hal9000/thermo?a=hysteresis&v=<Celsius*10>
 http://localhost:8080/hal9000/alarm?a=readsensors
