@@ -109,5 +109,14 @@ public class EpocTimeTest {
 	Assert.assertTrue("Error in date part of getEpochOfActualTime", epocTime.isDateValid(day, month, year));
 	Assert.assertTrue("Error in time part of getEpochOfActualTime", epocTime.isTimeValid(hour, min, 0));
     }
+    
+    @Test
+    public void testisEpocTimeNotAccurate() {
+    	String date = epocTime.getEpocTime(1, 4, 2010, 22, 1, 0); // 1-apr-2010
+    	epocTime.setEpocTime(Long.parseLong(date));
+    	Assert.assertTrue("Wrong accuration check",epocTime.isEpocTimeNotAccurate());
+    	epocTime.setEpocTime(Long.parseLong(epocTime.getEpocOfActualTime()));
+    	Assert.assertFalse("Wrong accuration check",epocTime.isEpocTimeNotAccurate());
+    }
 
 }

@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response;
 public class ClockObjAgent extends HalObjAgent {
 
     private EpocTime expAttr = new EpocTime();
-    private boolean ntpPriority = false;
+    private boolean ntpPriority = false;   //works on EpocTimeOnly
 
     public ClockObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
@@ -47,6 +47,11 @@ public class ClockObjAgent extends HalObjAgent {
 	    break;
 	case 'E':
 	    expAttr.setEpocTime(Long.parseLong(msg));
+	    if (ntpPriority) {
+	    	if (expAttr.isEpocTimeNotAccurate()) {
+	    		setActualTime();
+	    	}
+	    }
 	    break;
 	default:
 	    wrongAttribute();
