@@ -135,6 +135,26 @@ public class ClockObjAgentTest {
     }
     
     @Test
+    public void testNtpCorrection() {
+	emptySentMsg();
+    try {
+		Response.Status.fromStatusCode(clock.executeSet("ntp_priority", "1").getStatus());
+	} catch (Exception e1) {
+		e1.printStackTrace();
+		fail("exception");
+	}
+	clock.parseGetAnswer('E', "566353380");
+	Assert.assertEquals("ERROR:", "SCE", getSentMsg().substring(0, 3));
+	Assert.assertTrue("ERROR:", noMsgSent());
+	try {
+		Response.Status.fromStatusCode(clock.executeSet("ntp_priority", "0").getStatus());
+	} catch (Exception e1) {
+		e1.printStackTrace();
+		fail("exception");
+	}
+    }
+    
+    @Test
     public void testExecuteSetActualtime() {
 	emptySentMsg();
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
