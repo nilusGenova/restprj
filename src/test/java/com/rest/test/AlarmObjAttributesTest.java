@@ -54,4 +54,20 @@ public class AlarmObjAttributesTest {
 	Assert.assertEquals("ERROR:", -1, attr.getPin(0));
 	Assert.assertEquals("ERROR:", -1, attr.getPin(3));
     }
+    
+    @Test
+    public void testSetMode() {
+    	Assert.assertFalse("ERROR:",attr.setKeyProgramming(0));
+    	Assert.assertTrue("ERROR:",attr.setKeyProgramming(1));
+    	Assert.assertFalse("ERROR:",attr.setKeyProgramming(1));
+    	Assert.assertTrue("ERROR:",attr.setKeyProgramming(0));
+    	Assert.assertFalse("ERROR:",attr.setArmed(0));
+    	Assert.assertTrue("ERROR:",attr.setArmed(1));
+    	Assert.assertFalse("ERROR:",attr.setArmed(1));
+    	Assert.assertTrue("ERROR:",attr.setArmed(0));
+    	Assert.assertFalse("ERROR:",attr.setAlarmed(0));
+    	Assert.assertTrue("ERROR:",attr.setAlarmed(1));
+    	Assert.assertFalse("ERROR:",attr.setAlarmed(1));
+    	Assert.assertTrue("ERROR:",attr.setAlarmed(0));
+    }
 }

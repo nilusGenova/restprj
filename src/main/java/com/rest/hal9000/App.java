@@ -56,6 +56,8 @@ public final class App {
     	System.out.println("Ip Address:" + CommonUtils.getMy_CIDR_IpAddress());
     	System.out.println("Log:" + CommonUtils.getLoggerFilePath());
     	System.out.println("Temperature log:" + CommonUtils.getTempLoggerFilePath());
+    	System.out.println("Alarm log:" + CommonUtils.getAlarmLoggerFilePath());
+    	
     	// Inizializza il rest-server
     	try {
     		jettyServer.start();

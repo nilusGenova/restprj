@@ -66,6 +66,18 @@ public final class CommonUtils {
         			 ((org.apache.log4j.FileAppender) app).activateOptions();
     			    }
     		}
+    		
+    		e = org.apache.log4j.Logger.getLogger(AlarmLogger.class)
+    				.getAllAppenders();
+    		while (e.hasMoreElements()) {
+    			    org.apache.log4j.Appender app = e.nextElement();
+    			    if (app instanceof org.apache.log4j.FileAppender) {
+        		    	// I've to get file name removing the leading path
+        		    	Path origLogFile = Paths.get(((org.apache.log4j.FileAppender) app).getFile());
+        			 ((org.apache.log4j.FileAppender) app).setFile(path+origLogFile.getFileName());
+        			 ((org.apache.log4j.FileAppender) app).activateOptions();
+    			    }
+    		}
     		log.info("Log path updated to:{}",path);
     }
 
@@ -81,6 +93,19 @@ public final class CommonUtils {
 	log.error("Temp Logger file not found");
 	return "";
     }
+    
+    public static String getAlarmLoggerFilePath() {
+    	Enumeration<org.apache.log4j.Appender> e = org.apache.log4j.Logger.getLogger(AlarmLogger.class)
+    		.getAllAppenders();
+    	while (e.hasMoreElements()) {
+    	    org.apache.log4j.Appender app = e.nextElement();
+    	    if (app instanceof org.apache.log4j.FileAppender) {
+    		return ((org.apache.log4j.FileAppender) app).getFile();
+    	    }
+    	}
+    	log.error("Temp Logger file not found");
+    	return "";
+        }
     
     public static String getLoggerFilePath() {
     	Enumeration<org.apache.log4j.Appender> e = org.apache.log4j.Logger.getRootLogger()

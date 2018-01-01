@@ -8,6 +8,8 @@ import javax.ws.rs.core.Response;
 public class AlarmObjAgent extends HalObjAgent {
 
     private AlarmObjAttributes expAttr = new AlarmObjAttributes();
+    
+    private final static AlarmLogger alarmLogger = new AlarmLogger();
 
     public AlarmObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
@@ -97,17 +99,21 @@ public class AlarmObjAgent extends HalObjAgent {
 		wrongValue(m);
 		return false;
 	    } else {
-		expAttr.setKeyProgramming(m & 1);
-		m /= 10;
-		expAttr.setAlarmed(m & 1);
-		m /= 10;
-		expAttr.setArmed(m & 1);
+	    	boolean changed = expAttr.setKeyProgramming(m & 1);
+	    	alarmLogger.logKeyProgramming(changed, m&1);
+	    	m /= 10;
+	    	changed = expAttr.setAlarmed(m & 1);
+	    	alarmLogger.logAlarm(changed,m&1);
+	    	m /= 10;
+	    	changed = expAttr.setArmed(m & 1);
+	    	alarmLogger.logArmed(changed, m&1);
 	    }
 	    break;
 	// K Key changed
 	// N New Pin set (value 8 chars)
 	case 'N':
 	    log.info("New PIN: {}", msg);
+	    alarmLogger.logNewPin(msg);
 	case 'K':
 	    sendMsgToHal("GAK");
 	    sendMsgToHal("GAP");
@@ -116,9 +122,11 @@ public class AlarmObjAgent extends HalObjAgent {
 	// P Pin read (value 8 chars)
 	case 'R':
 	    log.info("ALARM: read key {}", msg);
+	    alarmLogger.logKeyRead(msg);
 	    return false;
 	case 'P':
 	    log.info("ALARM: read pin {}", msg);
+	    alarmLogger.logPinRead(msg);
 	    return false;
 	default:
 	    wrongEvent();

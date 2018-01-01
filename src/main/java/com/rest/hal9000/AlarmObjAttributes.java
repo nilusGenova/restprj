@@ -98,24 +98,33 @@ public class AlarmObjAttributes {
 
     }
 
-    public void setArmed(final int armed) {
-	this.armed = armed;
+    // return true if changed
+    public boolean setArmed(final int armed) {
+    	final boolean retVal = (this.armed != armed);
+    	this.armed = armed;
+    	return retVal;
     }
 
     public int getAlarmed() {
 	return alarmed;
     }
 
-    public void setAlarmed(final int alarmed) {
-	this.alarmed = alarmed;
+    // return true if changed
+    public boolean setAlarmed(final int alarmed) {
+    	final boolean retVal = (this.alarmed != alarmed);
+    	this.alarmed = alarmed;
+    	return retVal;
     }
 
     public int getKeyProgramming() {
 	return keyProgramming;
     }
 
-    public void setKeyProgramming(final int keyProgramming) {
-	this.keyProgramming = keyProgramming;
+    // return true if changed
+    public boolean setKeyProgramming(final int keyProgramming) {
+    	final boolean retVal = (this.keyProgramming != keyProgramming);
+    	this.keyProgramming = keyProgramming;
+    	return retVal;
     }
 
     public int getMasterKey() {
