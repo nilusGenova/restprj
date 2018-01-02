@@ -2,6 +2,7 @@ package com.rest.hal9000;
 
 import java.io.File;
 import java.net.SocketException;
+import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,19 +71,30 @@ public class EntryPoint {
 
     }
 
-    @GET
-    @Path("logger")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getFile() {
+    private Response getLogFile(final String fileName) {
 	if (!isAccessAllowed()) {
 	    return Response.status(Response.Status.FORBIDDEN).build();
 	}
-	final String fileName = CommonUtils.getTempLoggerFilePath();
-	log.info("Temperature log file {} dowloaded", fileName);
+	log.info("Log file {} dowloaded", fileName);
 	File file = new File(fileName);
+	final String destFileName = Paths.get(fileName).getFileName().toString().replace(".log", ".csv");
 	ResponseBuilder response = Response.ok((Object) file);
-	response.header("Content-Disposition", "attachment; filename=temperatures.csv");
+	response.header("Content-Disposition", "attachment; filename=" + destFileName);
 	return response.build();
+    }
+
+    @GET
+    @Path("templogger")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getTempLogFile() {
+	return getLogFile(CommonUtils.getTempLoggerFilePath());
+    }
+
+    @GET
+    @Path("alarmlogger")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getAlarmLogFile() {
+	return getLogFile(CommonUtils.getAlarmLoggerFilePath());
     }
 
     @GET
