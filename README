@@ -13,6 +13,30 @@ to enable/disable debug:
 to change log files directory:
 -DLogPath=/tmp/
 
+Alarm Log format:
+data,time,source,event,value
+Source:1
+Events:
+KEY,key read key
+PIN,pin read pin
+NEWPIN,newpin read new pin
+PROG,0|1   status change
+ALARM,0|1  status change
+ARMED,0|1  status change
+Example:
+2018-01-07,11:56:00,1,ALARM,1
+
+Temp Log format:
+data,time,source,event,value
+Source:1
+Events:
+W,0|1  warming
+T,temp actual temperature
+M,temp temperature required manually
+P,temp temperature required by program
+Example:
+2018-01-07,11:56:00,1,W,1
+
 to browse:
 GET:
 http://localhost:8080/hal9000/clock
