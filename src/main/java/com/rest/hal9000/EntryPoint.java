@@ -163,6 +163,22 @@ public class EntryPoint {
 	}
     }
 
+    @DELETE
+    @Path("shutdown")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String shutdown() {
+	if (!isAccessAllowed()) {
+	    return ACCESS_NOT_ALLOWED;
+	}
+	try {
+	    System.exit(0);
+	} catch (Exception e) {
+	    log.debug("Failure to shutdown", e);
+	    return "Shutdown failed";
+	}
+	return "Shutdown ongoing";
+    }
+
     @POST
     @Path("debug")
     @Produces(MediaType.TEXT_PLAIN)
