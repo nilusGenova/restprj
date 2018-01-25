@@ -1,6 +1,7 @@
 #!/bin/sh
 
 pathlog="/tmp/"
+echo "Update write rights on following log files:"
 for file in $pathlog*.log
 do 
      echo "File: ${file}"
