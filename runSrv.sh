@@ -6,7 +6,7 @@ for file in $pathlog*.log
 do 
      echo "File: ${file}"
      touch ${file}
-     chmod g+w ${file}
+     chmod a+w ${file}
 done
 
 #java -DLogPath=$pathlog -DDebugLogLevel=defined -jar target/restprj-1.1-SNAPSHOT.jar
