@@ -256,7 +256,7 @@ public class ProgramObjAgent extends HalObjAgent {
     private Response setPrgAttr(final char prgAttr, final int temp) {
 	if (temp >= 0) {
 	    sendMsgToHal("SP" + prgAttr + temp);
-	    return Response.status(Response.Status.OK).build();
+	    return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
 	} else {
 	    return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	}
@@ -333,7 +333,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	default:
 	    throw new NoSuchElementException();
 	}
-	return Response.status(Response.Status.OK).build();
+	return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
     }
 
     @Override
@@ -344,7 +344,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	    // Attr________Req____answer_______________Set___________________Reset
 	    // M Mode______*_____[oFf|oN|-|Auto|Spec]__[oFf|oN|-o|Auto|Spec]_CancAll
 	    sendMsgToHal("RPM");
-	    return Response.status(Response.Status.OK).build();
+	    return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
 	case "entry": {
 	    ProgramItem item = validateFormatItem(prm);
 	    if (item == null) {
@@ -355,7 +355,7 @@ public class ProgramObjAgent extends HalObjAgent {
 		    log.info("Item does'n exist");
 		    return Response.status(Response.Status.BAD_REQUEST).build();
 		} else {
-		    return Response.status(Response.Status.OK).build();
+		    return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
 		}
 	    }
 	}

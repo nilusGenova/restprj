@@ -114,7 +114,7 @@ public class ThermoObjAgent extends HalObjAgent {
     private Response setRequiredTemp(final int temp) {
 	if (temp >= 0) {
 	    sendMsgToHal("STR" + temp);
-	    return Response.status(Response.Status.OK).build();
+	    return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
 	} else {
 	    return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	}
@@ -123,7 +123,7 @@ public class ThermoObjAgent extends HalObjAgent {
     private Response setRequiredHysteresis(final int hyst) {
 	if (hyst >= 0) {
 	    sendMsgToHal("STH" + hyst);
-	    return Response.status(Response.Status.OK).build();
+	    return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
 	} else {
 	    return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	}

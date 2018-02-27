@@ -92,7 +92,7 @@ public abstract class HalObjAgent {
 	});
 
 	log.debug("exposed json:{}", jsonInString);
-	return Response.ok(jsonInString, MediaType.APPLICATION_JSON).build();
+	return Response.ok(jsonInString, MediaType.APPLICATION_JSON).header("Access-Control-Allow-Origin", "*").build();
     }
 
     public Response exposeJsonAttribute(final String attr) throws Exception {
@@ -107,7 +107,7 @@ public abstract class HalObjAgent {
 	    return Response.status(Response.Status.BAD_REQUEST).build();
 	} else {
 	    log.debug("exposed json attribute {}:{}", attr, value);
-	    return Response.ok(value, MediaType.TEXT_PLAIN).build();
+	    return Response.ok(value, MediaType.TEXT_PLAIN).header("Access-Control-Allow-Origin", "*").build();
 	}
     }
 

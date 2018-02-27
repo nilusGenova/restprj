@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response;
 public class AlarmObjAgent extends HalObjAgent {
 
     private AlarmObjAttributes expAttr = new AlarmObjAttributes();
-    
+
     private final static AlarmLogger alarmLogger = new AlarmLogger();
 
     public AlarmObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
@@ -99,14 +99,14 @@ public class AlarmObjAgent extends HalObjAgent {
 		wrongValue(m);
 		return false;
 	    } else {
-	    	boolean changed = expAttr.setKeyProgramming(m & 1);
-	    	alarmLogger.logKeyProgramming(changed, m&1);
-	    	m /= 10;
-	    	changed = expAttr.setAlarmed(m & 1);
-	    	alarmLogger.logAlarm(changed,m&1);
-	    	m /= 10;
-	    	changed = expAttr.setArmed(m & 1);
-	    	alarmLogger.logArmed(changed, m&1);
+		boolean changed = expAttr.setKeyProgramming(m & 1);
+		alarmLogger.logKeyProgramming(changed, m & 1);
+		m /= 10;
+		changed = expAttr.setAlarmed(m & 1);
+		alarmLogger.logAlarm(changed, m & 1);
+		m /= 10;
+		changed = expAttr.setArmed(m & 1);
+		alarmLogger.logArmed(changed, m & 1);
 	    }
 	    break;
 	// K Key changed
@@ -204,7 +204,8 @@ public class AlarmObjAgent extends HalObjAgent {
 	    } else {
 		log.info("Setting pin for key #{}", n);
 		sendMsgToHal("SAP" + val);
-		return Response.ok("Enter PIN from Keyboard", MediaType.TEXT_PLAIN).build();
+		return Response.ok("Enter PIN from Keyboard", MediaType.TEXT_PLAIN)
+			.header("Access-Control-Allow-Origin", "*").build();
 	    }
 	    // K Key value to add
 	case "newkey":
@@ -227,7 +228,7 @@ public class AlarmObjAgent extends HalObjAgent {
 	default:
 	    throw new Exception();
 	}
-	return Response.status(Response.Status.OK).build();
+	return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
     }
 
     // Attr Reset
@@ -252,7 +253,7 @@ public class AlarmObjAgent extends HalObjAgent {
 		if (expAttr.keyExists(m)) {
 		    log.info("Deleting key :{}", prm);
 		    sendMsgToHal("RAK" + prm);
-		    return Response.status(Response.Status.OK).build();
+		    return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
 		} else {
 		    log.error("Key {} doesn't exists", prm);
 		    wrongValue(m);
@@ -263,12 +264,12 @@ public class AlarmObjAgent extends HalObjAgent {
 	case "allkeys":
 	    log.info("Deleting all keys");
 	    sendMsgToHal("RAX");
-	    return Response.status(Response.Status.OK).build();
+	    return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
 	// P Pin of key cancella tutti I PIN
 	case "allpins":
 	    log.info("Deleting all pins");
 	    sendMsgToHal("RAP");
-	    return Response.status(Response.Status.OK).build();
+	    return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
 	default:
 	    throw new Exception();
 	}

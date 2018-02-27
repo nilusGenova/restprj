@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response;
 public class ClockObjAgent extends HalObjAgent {
 
     private EpocTime expAttr = new EpocTime();
-    private boolean ntpPriority = false;   //works on EpocTimeOnly
+    private boolean ntpPriority = false; // works on EpocTimeOnly
 
     public ClockObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
@@ -48,9 +48,9 @@ public class ClockObjAgent extends HalObjAgent {
 	case 'E':
 	    expAttr.setEpocTime(Long.parseLong(msg));
 	    if (ntpPriority) {
-	    	if (expAttr.isEpocTimeNotAccurate()) {
-	    		setActualTime();
-	    	}
+		if (expAttr.isEpocTimeNotAccurate()) {
+		    setActualTime();
+		}
 	    }
 	    break;
 	default:
@@ -106,17 +106,17 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     private void setActualTime() {
-    	log.debug("Sending actual time to hal9000");
-	    final String eat = expAttr.getEpocOfActualTime();
-	    sendMsgToHal("SCE" + eat);
+	log.debug("Sending actual time to hal9000");
+	final String eat = expAttr.getEpocOfActualTime();
+	sendMsgToHal("SCE" + eat);
     }
-    
+
     @Override
     public Response executeSet(final String attr, final String val) throws Exception {
 	String eat;
 	switch (attr) {
 	case "actualtime":
-		setActualTime();
+	    setActualTime();
 	    break;
 	case "time":
 	    log.debug("Sending time to hal9000");
@@ -127,12 +127,12 @@ public class ClockObjAgent extends HalObjAgent {
 	    sendMsgToHal("SCE" + eat);
 	    break;
 	case "ntp_priority":
-		log.debug("Setting ntpPriority to:{}",val);
-		ntpPriority = getBooleanVal(val)==1;
-		break;
+	    log.debug("Setting ntpPriority to:{}", val);
+	    ntpPriority = getBooleanVal(val) == 1;
+	    break;
 	default:
 	    throw new NoSuchElementException();
 	}
-	return Response.status(Response.Status.OK).build();
+	return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
     }
 }

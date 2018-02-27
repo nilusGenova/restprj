@@ -61,13 +61,25 @@ public class EntryPoint {
     }
 
     @GET
-    @Path("connected")
+    @Path("OLDconnected")
     @Produces(MediaType.TEXT_PLAIN)
-    public String checkConnection() {
+    public String oldCheckConnection() {
 	if (!isAccessAllowed()) {
 	    return ACCESS_NOT_ALLOWED;
 	}
 	return App.isSerialConnected() ? "YES" : "NO";
+
+    }
+
+    @GET
+    @Path("connected")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response checkConnection() {
+	if (!isAccessAllowed()) {
+	    return Response.status(Response.Status.FORBIDDEN).build();
+	}
+	return Response.ok(App.isSerialConnected() ? "YES" : "NO", MediaType.TEXT_PLAIN)
+		.header("Access-Control-Allow-Origin", "*").build();
 
     }
 
