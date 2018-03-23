@@ -61,17 +61,6 @@ public class EntryPoint {
     }
 
     @GET
-    @Path("OLDconnected")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String oldCheckConnection() {
-	if (!isAccessAllowed()) {
-	    return ACCESS_NOT_ALLOWED;
-	}
-	return App.isSerialConnected() ? "YES" : "NO";
-
-    }
-
-    @GET
     @Path("connected")
     @Produces(MediaType.TEXT_PLAIN)
     public Response checkConnection() {
