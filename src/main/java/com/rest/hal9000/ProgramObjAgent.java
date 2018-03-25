@@ -233,13 +233,17 @@ public class ProgramObjAgent extends HalObjAgent {
 	    return Integer.toString(expAttr.countdown);
 	}
 	if ("mode".equals(attr)) {
-	    return expAttr.mode.toString();
+	    return getMode();
 	}
 	if ("size".equals(attr)) {
 	    return Integer.toString(expAttr.program.size());
 	}
 	wrongAttribute();
 	return null;
+    }
+
+    public String getMode() {
+	return expAttr.mode.toString();
     }
 
     private int convertVal(String val) {

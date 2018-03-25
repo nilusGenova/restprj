@@ -197,4 +197,25 @@ public class EntryPoint {
 	    return "Debug disabled";
 	}
     }
+
+    @POST
+    @Path("changeTemp")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response changeTemp(@QueryParam("t") String value) {
+	if (!isAccessAllowed()) {
+	    return Response.status(Response.Status.FORBIDDEN).build();
+	}
+	try {
+	    if (value == null) {
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	    }
+	    return App.setTemp(value);
+	} catch (NoSuchElementException e) {
+	    log.debug("Not Found ");
+	    return Response.status(Response.Status.NOT_FOUND).build();
+	} catch (Exception e) {
+	    log.debug("Failure in to set temp:{} with val:{}", value, e);
+	    return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+    }
 }

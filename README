@@ -78,6 +78,7 @@ http://localhost:8080/hal9000/program?a=temp3&v=<Celsius*10>
 http://localhost:8080/hal9000/program?a=temp_off&v=<Celsius*10>
 http://localhost:8080/hal9000/program?a=temp_on&v=<Celsius*10>
 http://localhost:8080/hal9000/program?a=entry&v=h:<hour>-m:<min>-d:<day>-t:<temp>-i:<0|1 interp>
+http://localhost:8080/hal9000/changeTemp?t=<Celsius*10>
 
 DELETE:
 http://localhost:8080/hal9000/alarm?c=key&p=<key>
