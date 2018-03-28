@@ -31,8 +31,7 @@ public final class App {
 	    if (!mode.equals("OFF")) {
 		if (mode.equals("MAN_OFF")) {
 		    return prog.executeSet("temp_off", value);
-		}
-		if (mode.equals("MAN_ON")) {
+		} else if (mode.equals("MAN_ON")) {
 		    return prog.executeSet("temp_on", value);
 		} else {
 		    return thermo.executeSet("required", value);

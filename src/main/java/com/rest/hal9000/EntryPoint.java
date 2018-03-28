@@ -199,7 +199,7 @@ public class EntryPoint {
     }
 
     @POST
-    @Path("changeTemp")
+    @Path("changetemp")
     @Produces(MediaType.TEXT_PLAIN)
     public Response changeTemp(@QueryParam("t") String value) {
 	if (!isAccessAllowed()) {
