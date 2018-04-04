@@ -104,6 +104,15 @@ public class ParserTest {
 	verify(objB, never()).parseEvent(anyChar(), anyString());
 	verify(objA, never()).parseEvent(anyChar(), anyString());
 
+	// Verify Acknowledges
+	parser.msgToBeParsed("A");
+	delay();
+
+	verify(objA, never()).parseGetAnswer(anyChar(), anyString());
+	verify(objB, never()).parseGetAnswer(anyChar(), anyString());
+	verify(objB, never()).parseEvent(anyChar(), anyString());
+	verify(objA, never()).parseEvent(anyChar(), anyString());
+
 	// Verify Correct messages
 	parser.msgToBeParsed("gA1parm");
 	parser.msgToBeParsed("gB2Z");

@@ -3,6 +3,7 @@ package com.rest.test;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyChar;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -240,6 +241,7 @@ public class EntryPointTest {
 	    server.changeTemp("100");
 	    verify(objP, never()).executeSet(anyString(), anyString());
 	    verify(objT, times(1)).executeSet("required", "100");
+	    verify(objP, never()).executeSet(eq("mode"), anyString()); // duplicate , usefull to learn eq
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("Exception:" + e.getMessage());
@@ -257,6 +259,7 @@ public class EntryPointTest {
 	    server.changeTemp("100");
 	    verify(objP, never()).executeSet(anyString(), anyString());
 	    verify(objT, times(1)).executeSet("required", "100");
+	    verify(objP, never()).executeSet(eq("mode"), anyString()); // duplicate , usefull to learn eq
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("Exception:" + e.getMessage());
@@ -274,6 +277,7 @@ public class EntryPointTest {
 	    server.changeTemp("100");
 	    verify(objT, never()).executeSet(anyString(), anyString());
 	    verify(objP, times(1)).executeSet("temp_off", "100");
+	    verify(objP, times(1)).executeSet("mode", "man_off");
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("Exception:" + e.getMessage());
@@ -291,6 +295,7 @@ public class EntryPointTest {
 	    server.changeTemp("100");
 	    verify(objT, never()).executeSet(anyString(), anyString());
 	    verify(objP, times(1)).executeSet("temp_on", "100");
+	    verify(objP, times(1)).executeSet("mode", "man_on");
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("Exception:" + e.getMessage());

@@ -27,12 +27,17 @@ public final class App {
 	ThermoObjAgent thermo = (ThermoObjAgent) registry.getRegisteredObj('T');
 
 	if ((prog != null) && (thermo != null)) {
-	    final String mode = prog.getMode();
-	    if (!mode.equals("OFF")) {
-		if (mode.equals("MAN_OFF")) {
-		    return prog.executeSet("temp_off", value);
-		} else if (mode.equals("MAN_ON")) {
-		    return prog.executeSet("temp_on", value);
+	    final String mode = prog.getMode().toLowerCase();
+	    if (!mode.equals("off")) {
+		final Response retResp;
+		if (mode.equals("man_off")) {
+		    retResp = prog.executeSet("temp_off", value);
+		    prog.executeSet("mode", mode);
+		    return retResp;
+		} else if (mode.equals("man_on")) {
+		    retResp = prog.executeSet("temp_on", value);
+		    prog.executeSet("mode", mode);
+		    return retResp;
 		} else {
 		    return thermo.executeSet("required", value);
 		}

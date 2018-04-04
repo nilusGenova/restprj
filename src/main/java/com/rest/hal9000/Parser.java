@@ -37,6 +37,9 @@ public class Parser implements Runnable {
 	    case ';': // comment
 		log.debug("Received comment");
 		break;
+	    case 'A': // comment
+		log.debug("Received Acknowledge");
+		break;
 	    case '!': // error
 		log.error("Received error:{}", msgToParse);
 		break;
