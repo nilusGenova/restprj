@@ -272,8 +272,8 @@ public class EntryPointTest {
 	when(objP.getMode()).thenReturn("MAN_OFF");
 	try {
 	    server.changeTemp("100");
-	    verify(objT, never()).executeSet(anyString(), anyString());
 	    verify(objP, times(1)).executeSet("temp_off", "100");
+	    verify(objT, times(1)).executeSet("required", "100");
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("Exception:" + e.getMessage());
@@ -289,8 +289,8 @@ public class EntryPointTest {
 	when(objP.getMode()).thenReturn("MAN_ON");
 	try {
 	    server.changeTemp("100");
-	    verify(objT, never()).executeSet(anyString(), anyString());
 	    verify(objP, times(1)).executeSet("temp_on", "100");
+	    verify(objT, times(1)).executeSet("required", "100");
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("Exception:" + e.getMessage());

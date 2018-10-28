@@ -29,10 +29,15 @@ public final class App {
 	if ((prog != null) && (thermo != null)) {
 	    final String mode = prog.getMode().toLowerCase();
 	    if (!mode.equals("off")) {
+		Response resp;
 		if (mode.equals("man_off")) {
-		    return prog.executeSet("temp_off", value);
+		    resp = prog.executeSet("temp_off", value);
+		    thermo.executeSet("required", value);
+		    return resp;
 		} else if (mode.equals("man_on")) {
-		    return prog.executeSet("temp_on", value);
+		    resp = prog.executeSet("temp_on", value);
+		    thermo.executeSet("required", value);
+		    return resp;
 		} else {
 		    return thermo.executeSet("required", value);
 		}
