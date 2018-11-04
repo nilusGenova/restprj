@@ -15,7 +15,7 @@ public class EpocTime {
     private final static int[][] DAYS = { DAY1, DAY2, DAY3, DAY4 }; // days[4][12]
 
     private static final Logger LOG = LoggerFactory.getLogger(EpocTime.class);
-    
+
     private final static int NTP_TOLLERANCE = 61; // in Sec
 
     private String date;
@@ -125,32 +125,33 @@ public class EpocTime {
 	LOG.debug("getEpocOfActualTime");
 	Calendar cal = Calendar.getInstance();
 	return calculateEpocTime(cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.YEAR),
-		cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
+		cal.get(Calendar.HOUR) + cal.get(Calendar.AM_PM) * 12, cal.get(Calendar.MINUTE),
+		cal.get(Calendar.SECOND));
     }
-    
+
     public boolean isEpocTimeNotAccurate() {
-    	LOG.debug("isEpocTimeNotAccurate");
-    	Calendar cal = Calendar.getInstance();
-    	long actualTime = calculateEpocTimeInSecs(cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.YEAR),
-    		cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
-        return Math.abs(actualTime - epochTime) > NTP_TOLLERANCE;
+	LOG.debug("isEpocTimeNotAccurate");
+	Calendar cal = Calendar.getInstance();
+	long actualTime = calculateEpocTimeInSecs(cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1,
+		cal.get(Calendar.YEAR), cal.get(Calendar.HOUR) + cal.get(Calendar.AM_PM) * 12, cal.get(Calendar.MINUTE),
+		cal.get(Calendar.SECOND));
+	return Math.abs(actualTime - epochTime) > NTP_TOLLERANCE;
     }
 
-    private Integer calculateEpocTimeInSecs(int day, int month, int year, final int hour, final int min, final int sec) {
-    	LOG.debug("Calculate EpocTime of {}-{}-{} {}:{}:{}", day, month, year, hour, min, sec);
-    	day -= 1;
-    	month -= 1;
-    	year -= 2000;
+    private Integer calculateEpocTimeInSecs(int day, int month, int year, final int hour, final int min,
+	    final int sec) {
+	LOG.debug("Calculate EpocTime of {}-{}-{} {}:{}:{}", day, month, year, hour, min, sec);
+	day -= 1;
+	month -= 1;
+	year -= 2000;
 
-    	return 
-    		((((year / 4 * (365 * 4 + 1) + DAYS[year % 4][month] + day) * 24 + hour) * 60 + min) * 60 + sec);
-        }
-    
+	return ((((year / 4 * (365 * 4 + 1) + DAYS[year % 4][month] + day) * 24 + hour) * 60 + min) * 60 + sec);
+    }
+
     private String calculateEpocTime(int day, int month, int year, final int hour, final int min, final int sec) {
 	LOG.debug("Calculate EpocTime of {}-{}-{} {}:{}:{}", day, month, year, hour, min, sec);
 
-	String retVal = Integer.toString(
-			calculateEpocTimeInSecs(day, month, year, hour, min, sec));
+	String retVal = Integer.toString(calculateEpocTimeInSecs(day, month, year, hour, min, sec));
 	LOG.debug("Epoc is:{}", retVal);
 	return retVal;
     }

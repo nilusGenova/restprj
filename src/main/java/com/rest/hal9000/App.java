@@ -32,11 +32,11 @@ public final class App {
 		Response resp;
 		if (mode.equals("man_off")) {
 		    resp = prog.executeSet("temp_off", value);
-		    thermo.executeSet("required", value);
+		    // TODO:nomorerequired thermo.executeSet("required", value);
 		    return resp;
 		} else if (mode.equals("man_on")) {
 		    resp = prog.executeSet("temp_on", value);
-		    thermo.executeSet("required", value);
+		    // TODO:nomorerequired thermo.executeSet("required", value);
 		    return resp;
 		} else {
 		    return thermo.executeSet("required", value);

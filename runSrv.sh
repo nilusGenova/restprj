@@ -10,5 +10,5 @@ do
 done
 
 #java -DLogPath=$pathlog -DDebugLogLevel=defined -jar target/restprj-1.1-SNAPSHOT.jar
-java -DLogPath=$pathlog -jar target/restprj-1.2-SNAPSHOT.jar
+java -DLogPath=$pathlog -jar target/restprj-1.3.jar
 

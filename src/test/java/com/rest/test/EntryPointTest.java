@@ -273,7 +273,7 @@ public class EntryPointTest {
 	try {
 	    server.changeTemp("100");
 	    verify(objP, times(1)).executeSet("temp_off", "100");
-	    verify(objT, times(1)).executeSet("required", "100");
+	    verify(objT, never()).executeSet(anyString(), anyString());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("Exception:" + e.getMessage());
@@ -290,7 +290,7 @@ public class EntryPointTest {
 	try {
 	    server.changeTemp("100");
 	    verify(objP, times(1)).executeSet("temp_on", "100");
-	    verify(objT, times(1)).executeSet("required", "100");
+	    verify(objT, never()).executeSet(anyString(), anyString());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("Exception:" + e.getMessage());

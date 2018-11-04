@@ -34,13 +34,13 @@ public class ThermoObjAgent extends HalObjAgent {
 
     @Override
     protected Object getExposedData() {
-	log.info("Thermo exposeData");
+	log.debug("Thermo exposeData");
 	return expAttr;
     }
 
     @Override
     protected String getExposedAttribute(final String attr) throws Exception {
-	log.info("Thermo exposeAttribute");
+	log.debug("Thermo exposeAttribute");
 	if ("warming".equals(attr)) {
 	    return Integer.toString(expAttr.warming);
 	}
@@ -104,7 +104,7 @@ public class ThermoObjAgent extends HalObjAgent {
 
     @Override
     public void alignAll() {
-	log.info("Thermo align all");
+	log.debug("Thermo align all");
 	sendMsgToHal("GTT");
 	sendMsgToHal("GTW");
 	sendMsgToHal("GTR");

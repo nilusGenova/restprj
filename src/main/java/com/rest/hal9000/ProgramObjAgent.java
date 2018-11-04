@@ -157,13 +157,13 @@ public class ProgramObjAgent extends HalObjAgent {
 
     @Override
     protected Object getExposedData() {
-	log.info("Program exposeData");
+	log.debug("Program exposeData");
 	return expAttr;
     }
 
     @Override
     public void alignAll() {
-	log.info("Program align all");
+	log.debug("Program align all");
 	sendMsgToHal("GPM");
 	sendMsgToHal("GPC");
 	sendMsgToHal("GPT");
@@ -228,7 +228,7 @@ public class ProgramObjAgent extends HalObjAgent {
 
     @Override
     protected String getExposedAttribute(final String attr) throws Exception {
-	log.info("Program exposeAttribute");
+	log.debug("Program exposeAttribute");
 	if ("countdown".equals(attr)) {
 	    return Integer.toString(expAttr.countdown);
 	}

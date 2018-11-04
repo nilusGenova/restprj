@@ -27,7 +27,7 @@ public class Registry {
 
     public void registerObj(final HalObjAgent obj) {
 	final char id = obj.getId();
-	log.info("Register obj {}", id);
+	log.debug("Register obj {}", id);
 	if (getRegisteredObj(id) != null) {
 	    log.error("Object {} already registered", id);
 	} else {

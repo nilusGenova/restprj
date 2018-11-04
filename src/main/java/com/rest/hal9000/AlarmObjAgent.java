@@ -21,13 +21,13 @@ public class AlarmObjAgent extends HalObjAgent {
 
     @Override
     protected Object getExposedData() {
-	log.info("Alarm exposeData");
+	log.debug("Alarm exposeData");
 	return expAttr;
     }
 
     @Override
     protected String getExposedAttribute(final String attr) throws Exception {
-	log.info("Alarm exposeAttribute");
+	log.debug("Alarm exposeAttribute");
 	if ("mode".equals(attr)) {
 	    return calcModeFormat(expAttr.getArmed(), expAttr.getAlarmed(), expAttr.getKeyProgramming());
 	}
@@ -112,7 +112,7 @@ public class AlarmObjAgent extends HalObjAgent {
 	// K Key changed
 	// N New Pin set (value 8 chars)
 	case 'N':
-	    log.info("New PIN: {}", msg);
+	    log.debug("New PIN: {}", msg);
 	    alarmLogger.logNewPin(msg);
 	case 'K':
 	    sendMsgToHal("GAK");
@@ -121,11 +121,11 @@ public class AlarmObjAgent extends HalObjAgent {
 	// R Key read (value 8 chars)
 	// P Pin read (value 8 chars)
 	case 'R':
-	    log.info("ALARM: read key {}", msg);
+	    log.debug("ALARM: read key {}", msg);
 	    alarmLogger.logKeyRead(msg);
 	    return false;
 	case 'P':
-	    log.info("ALARM: read pin {}", msg);
+	    log.debug("ALARM: read pin {}", msg);
 	    alarmLogger.logPinRead(msg);
 	    return false;
 	default:
@@ -137,7 +137,7 @@ public class AlarmObjAgent extends HalObjAgent {
 
     @Override
     public void alignAll() {
-	log.info("Alarm align all");
+	log.debug("Alarm align all");
 	sendMsgToHal("GAM");
 	sendMsgToHal("GAK");
 	sendMsgToHal("GAP");

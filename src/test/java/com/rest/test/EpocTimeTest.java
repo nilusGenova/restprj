@@ -62,13 +62,15 @@ public class EpocTimeTest {
 	Calendar cal = Calendar.getInstance();
 	String expDate = String.format("%02d-%02d-%4d", cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1,
 		cal.get(Calendar.YEAR));
-	String expTime = String.format("%02d:%02d", cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE));
+	String expTime = String.format("%02d:%02d", cal.get(Calendar.HOUR) + cal.get(Calendar.AM_PM) * 12,
+		cal.get(Calendar.MINUTE));
 
 	String date = epocTime.getEpocTime(31, 9, 2017, 8, 7, 5);
 	Assert.assertNull("wrong epocTime calculation", date);
 
 	date = epocTime.getEpocTime(cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.YEAR),
-		cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
+		cal.get(Calendar.HOUR) + cal.get(Calendar.AM_PM) * 12, cal.get(Calendar.MINUTE),
+		cal.get(Calendar.SECOND));
 	Assert.assertNotNull("wrong epocTime calculation", date);
 
 	epocTime.setEpocTime(Long.parseLong(date));
@@ -76,11 +78,20 @@ public class EpocTimeTest {
 	Assert.assertEquals("wrong time", expTime, epocTime.getTime());
 	Assert.assertEquals("wrong weekDay", (cal.get(Calendar.DAY_OF_WEEK) + 6) % 7, epocTime.getWeekDay());
 
-	date = epocTime.getEpocTime(1, 10, 2017, 22, 1, 0); // 1-oct-2017 is Sunday(0)
+	date = epocTime.getEpocTime(1, 10, 2017, 22, 1, 0); // 1-oct-2017 is Sunday(0) PM case
 	epocTime.setEpocTime(Long.parseLong(date));
 	Assert.assertEquals("wrong date", "01-10-2017", epocTime.getDate());
 	Assert.assertEquals("wrong time", "22:01", epocTime.getTime());
 	Assert.assertEquals("wrong weekDay", 0, epocTime.getWeekDay());
+
+	date = epocTime.getEpocTime(1, 11, 2017, 10, 1, 20); // 1-Nov-2017 AM case
+	epocTime.setEpocTime(Long.parseLong(date));
+	Assert.assertEquals("wrong date", "01-11-2017", epocTime.getDate());
+	Assert.assertEquals("wrong time", "10:01", epocTime.getTime());
+
+	// date:"03-11-2018" time:"15:59" weekDay:6 epochTime:594575948
+	date = epocTime.getEpocTime(3, 11, 2018, 15, 59, 8);
+	Assert.assertEquals("wrong date epoc time", "594575948", date);
 
 	Assert.assertEquals("wrong year calculation", epocTime.getEpocTime(1, 10, 2017, 22, 1, 0),
 		epocTime.getEpocTime(1, 10, 17, 22, 1, 0));
@@ -104,19 +115,19 @@ public class EpocTimeTest {
 	Assert.assertEquals("Wrong day", cal.get(Calendar.DAY_OF_MONTH), day);
 	Assert.assertEquals("Wrong month", cal.get(Calendar.MONTH) + 1, month);
 	Assert.assertEquals("Wrong year", cal.get(Calendar.YEAR), year);
-	Assert.assertEquals("Wrong hour", cal.get(Calendar.HOUR), hour);
+	Assert.assertEquals("Wrong hour", cal.get(Calendar.HOUR) + cal.get(Calendar.AM_PM) * 12, hour);
 	Assert.assertEquals("Wrong minute", cal.get(Calendar.MINUTE), min);
 	Assert.assertTrue("Error in date part of getEpochOfActualTime", epocTime.isDateValid(day, month, year));
 	Assert.assertTrue("Error in time part of getEpochOfActualTime", epocTime.isTimeValid(hour, min, 0));
     }
-    
+
     @Test
     public void testisEpocTimeNotAccurate() {
-    	String date = epocTime.getEpocTime(1, 4, 2010, 22, 1, 0); // 1-apr-2010
-    	epocTime.setEpocTime(Long.parseLong(date));
-    	Assert.assertTrue("Wrong accuration check",epocTime.isEpocTimeNotAccurate());
-    	epocTime.setEpocTime(Long.parseLong(epocTime.getEpocOfActualTime()));
-    	Assert.assertFalse("Wrong accuration check",epocTime.isEpocTimeNotAccurate());
+	String date = epocTime.getEpocTime(1, 4, 2010, 22, 1, 0); // 1-apr-2010
+	epocTime.setEpocTime(Long.parseLong(date));
+	Assert.assertTrue("Wrong accuration check", epocTime.isEpocTimeNotAccurate());
+	epocTime.setEpocTime(Long.parseLong(epocTime.getEpocOfActualTime()));
+	Assert.assertFalse("Wrong accuration check", epocTime.isEpocTimeNotAccurate());
     }
 
 }

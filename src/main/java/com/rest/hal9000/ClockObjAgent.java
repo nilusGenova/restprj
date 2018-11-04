@@ -16,13 +16,13 @@ public class ClockObjAgent extends HalObjAgent {
 
     @Override
     protected Object getExposedData() {
-	log.info("Clock exposeData");
+	log.debug("Clock exposeData");
 	return expAttr;
     }
 
     @Override
     protected String getExposedAttribute(final String attr) throws Exception {
-	log.info("Clock exposeAttribute");
+	log.debug("Clock exposeAttribute");
 	if ("epochtime".equals(attr)) {
 	    return expAttr.getEpochTime();
 	}
@@ -74,7 +74,7 @@ public class ClockObjAgent extends HalObjAgent {
 
     @Override
     public void alignAll() {
-	log.info("Clock align all");
+	log.debug("Clock align all");
 	sendMsgToHal("GCE");
     }
 
