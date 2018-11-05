@@ -119,20 +119,16 @@ public abstract class HalObjAgent {
 	throw new Exception();
     }
 
-    protected void wrongAttribute() {
-	log.error("Wrong attribute");
+    protected void wrongAttribute(final String attr) {
+	log.error("{} Wrong attribute:{}", pathName, attr);
     }
 
-    protected void wrongEvent() {
-	log.error("Wrong event");
-    }
-
-    protected void wrongValue(int i) {
-	log.error("Wrong value {}", i);
+    protected void wrongEvent(final String ev) {
+	log.error("{} Wrong event:{}", pathName, ev);
     }
 
     protected void wrongValue(final String s) {
-	log.error("Wrong value {}", s);
+	log.error("{} Wrong value:{}", pathName, s);
     }
 
     protected int getBooleanVal(final String val) throws Exception {

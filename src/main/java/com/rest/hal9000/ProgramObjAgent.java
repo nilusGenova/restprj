@@ -59,7 +59,7 @@ public class ProgramObjAgent extends HalObjAgent {
 		return;
 	    }
 	}
-	wrongValue(0);
+	wrongValue("mode=" + cm);
     }
 
     private void setHalMode(String mode) throws Exception {
@@ -70,7 +70,7 @@ public class ProgramObjAgent extends HalObjAgent {
 		return;
 	    }
 	}
-	wrongValue(0);
+	wrongValue("modeH=" + mode);
 	throw new Exception();
     }
 
@@ -187,7 +187,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	    askProgramItems();
 	    return false;
 	default:
-	    wrongEvent();
+	    wrongEvent(event + " " + msg);
 	    return false;
 	}
 	return true;
@@ -220,7 +220,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	    receivedProgramGetAnsw(msg);
 	    break;
 	default:
-	    wrongAttribute();
+	    wrongAttribute(attribute + " " + msg);
 	    return false;
 	}
 	return true;
@@ -238,7 +238,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	if ("size".equals(attr)) {
 	    return Integer.toString(expAttr.program.size());
 	}
-	wrongAttribute();
+	wrongAttribute(attr);
 	return null;
     }
 
@@ -278,7 +278,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	case "countdown":
 	    n = convertVal(val);
 	    if (n <= 0) {
-		wrongValue(n);
+		wrongValue("cnt:" + n);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
 		log.info("Setting countdown:{} hours", val);
@@ -293,7 +293,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	case "temp3":
 	    n = convertVal(val);
 	    if (n <= 0) {
-		wrongValue(n);
+		wrongValue("temp:" + n);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
 		log.info("Setting temp {} to {}", attr.charAt(4), val);
@@ -303,7 +303,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	case "temp_off":
 	    n = convertVal(val);
 	    if (n <= 0) {
-		wrongValue(n);
+		wrongValue("tempOff:" + n);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
 		log.info("Setting temp OFF to {}", val);
@@ -313,7 +313,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	case "temp_on":
 	    n = convertVal(val);
 	    if (n <= 0) {
-		wrongValue(n);
+		wrongValue("tempOn:" + n);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
 		log.info("Setting temp ON to {}", val);
@@ -323,7 +323,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	case "entry": {
 	    ProgramItem item = validateFormatItem(val);
 	    if (item == null) {
-		wrongValue(val);
+		wrongValue("Set entry:" + val);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
 		log.info("Adding program item:{}", val);
@@ -352,7 +352,7 @@ public class ProgramObjAgent extends HalObjAgent {
 	case "entry": {
 	    ProgramItem item = validateFormatItem(prm);
 	    if (item == null) {
-		wrongValue(prm);
+		wrongValue("Del entry:" + prm);
 	    } else {
 		log.info("Deleting program item:{}", prm);
 		if (!deleteProgramItem(item)) {

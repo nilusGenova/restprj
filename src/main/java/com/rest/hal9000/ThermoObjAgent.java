@@ -44,7 +44,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	if ("warming".equals(attr)) {
 	    return Integer.toString(expAttr.warming);
 	}
-	wrongAttribute();
+	wrongAttribute(attr);
 	return null;
     }
 
@@ -68,7 +68,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	    expAttr.hysteresis = roundTemp(msg);
 	    break;
 	default:
-	    wrongAttribute();
+	    wrongAttribute(attribute + " " + msg);
 	    return false;
 	}
 	return true;
@@ -96,7 +96,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	    log.error("Sensor [{}] reading error (at least 1 min)", msg);
 	    return false;
 	default:
-	    wrongEvent();
+	    wrongEvent(event + " " + msg);
 	    return false;
 	}
 	return true;

@@ -31,7 +31,7 @@ public class AlarmObjAgent extends HalObjAgent {
 	if ("mode".equals(attr)) {
 	    return calcModeFormat(expAttr.getArmed(), expAttr.getAlarmed(), expAttr.getKeyProgramming());
 	}
-	wrongAttribute();
+	wrongAttribute(attr);
 	return null;
     }
 
@@ -43,7 +43,7 @@ public class AlarmObjAgent extends HalObjAgent {
 	    int m;
 	    m = Integer.parseInt(msg);
 	    if ((m > 111) || (m < 0)) {
-		wrongValue(m);
+		wrongValue("get mode:" + m);
 	    } else {
 		expAttr.setKeyProgramming(m & 1);
 		m /= 10;
@@ -83,7 +83,7 @@ public class AlarmObjAgent extends HalObjAgent {
 	    expAttr.setValidSensValue(1);
 	    break;
 	default:
-	    wrongAttribute();
+	    wrongAttribute(attribute + " " + msg);
 	    return false;
 	}
 	return true;
@@ -96,7 +96,7 @@ public class AlarmObjAgent extends HalObjAgent {
 	case 'M':
 	    int m = Integer.parseInt(msg);
 	    if ((m > 111) || (m < 0)) {
-		wrongValue(m);
+		wrongValue("ev mode:" + m);
 		return false;
 	    } else {
 		boolean changed = expAttr.setKeyProgramming(m & 1);
@@ -129,7 +129,7 @@ public class AlarmObjAgent extends HalObjAgent {
 	    alarmLogger.logPinRead(msg);
 	    return false;
 	default:
-	    wrongEvent();
+	    wrongEvent(event + " " + msg);
 	    return false;
 	}
 	return true;
@@ -181,7 +181,7 @@ public class AlarmObjAgent extends HalObjAgent {
 		n = -1;
 	    }
 	    if (n <= 0) {
-		wrongValue(n);
+		wrongValue("masterkey:" + n);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
 		log.info("Setting master key :{}", val);
@@ -199,7 +199,7 @@ public class AlarmObjAgent extends HalObjAgent {
 		n = -1;
 	    }
 	    if ((n < 0) || (n >= 10)) {
-		wrongValue(n);
+		wrongValue("pin:" + n);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
 		log.info("Setting pin for key #{}", n);
@@ -218,7 +218,7 @@ public class AlarmObjAgent extends HalObjAgent {
 		n = -1;
 	    }
 	    if (n <= 0) {
-		wrongValue(n);
+		wrongValue("newkey:" + n);
 		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
 		log.info("Setting key :{}", val);
@@ -247,7 +247,7 @@ public class AlarmObjAgent extends HalObjAgent {
 		m = -1;
 	    }
 	    if (m <= 0) {
-		wrongValue(m);
+		wrongValue("key:" + m + " (" + prm + ")");
 		break;
 	    } else {
 		if (expAttr.keyExists(m)) {
@@ -256,7 +256,7 @@ public class AlarmObjAgent extends HalObjAgent {
 		    return Response.status(Response.Status.OK).header("Access-Control-Allow-Origin", "*").build();
 		} else {
 		    log.error("Key {} doesn't exists", prm);
-		    wrongValue(m);
+		    wrongValue("not existing key:" + m);
 		}
 	    }
 	    break;

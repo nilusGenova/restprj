@@ -29,7 +29,7 @@ public class ClockObjAgent extends HalObjAgent {
 	if ("ntp_priority".equals(attr)) {
 	    return ntpPriority ? "1" : "0";
 	}
-	wrongAttribute();
+	wrongAttribute(attr);
 	return null;
     }
 
@@ -54,7 +54,7 @@ public class ClockObjAgent extends HalObjAgent {
 	    }
 	    break;
 	default:
-	    wrongAttribute();
+	    wrongAttribute(attribute + " " + msg);
 	    return false;
 	}
 	return true;
@@ -67,7 +67,7 @@ public class ClockObjAgent extends HalObjAgent {
 	    alignAll();
 	    break;
 	default:
-	    wrongEvent();
+	    wrongEvent(event + " " + msg);
 	}
 	return false;
     }
