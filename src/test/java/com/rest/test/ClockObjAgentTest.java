@@ -69,6 +69,7 @@ public class ClockObjAgentTest {
     @Test
     public void testParseGetAnswer() {
 	emptySentMsg();
+	clock.setNtpPriority(false);
 	clock.parseGetAnswer('D', "14-02-1967");
 	clock.parseGetAnswer('T', "18:07");
 	clock.parseGetAnswer('W', "3");
@@ -83,6 +84,7 @@ public class ClockObjAgentTest {
     @Test
     public void testParseEvent() {
 	emptySentMsg();
+	clock.setNtpPriority(false);
 	// D forza il riallineamento
 	clock.parseEvent('D', "");
 	Assert.assertEquals("ERROR:", "GCE", getSentMsg());
@@ -92,6 +94,7 @@ public class ClockObjAgentTest {
     @Test
     public void testExposeJsonAttribute() {
 	emptySentMsg();
+	clock.setNtpPriority(false);
 	clock.parseGetAnswer('E', "38569341");
 	String et = null;
 	String err = null;
@@ -118,45 +121,48 @@ public class ClockObjAgentTest {
 
     @Test
     public void testSetGetNtpFlag() {
-    	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
-    	Response r = null;
-    	try {
-    		//0 (false) is the default value
-    		r = clock.exposeJsonAttribute("ntp_priority");
-        	Assert.assertEquals("ERROR in ntp_priority get", "0", (String) r.getEntity());
-    	    et = Response.Status.fromStatusCode(clock.executeSet("ntp_priority", "1").getStatus());
-    		r = clock.exposeJsonAttribute("ntp_priority");
-        	Assert.assertEquals("ERROR in ntp_priority get/set", "1", (String) r.getEntity());
-        	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
-    	} catch (Exception e) {
-    	    e.printStackTrace();
-    	    fail("exception");
-    	}
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response r = null;
+	clock.setNtpPriority(false);
+	try {
+	    // 0 (false) is the default value
+	    r = clock.exposeJsonAttribute("ntp_priority");
+	    Assert.assertEquals("ERROR in ntp_priority get", "0", (String) r.getEntity());
+	    et = Response.Status.fromStatusCode(clock.executeSet("ntp_priority", "1").getStatus());
+	    r = clock.exposeJsonAttribute("ntp_priority");
+	    Assert.assertEquals("ERROR in ntp_priority get/set", "1", (String) r.getEntity());
+	    Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
     }
-    
+
     @Test
     public void testNtpCorrection() {
 	emptySentMsg();
-    try {
-		Response.Status.fromStatusCode(clock.executeSet("ntp_priority", "1").getStatus());
+	clock.setNtpPriority(false);
+	try {
+	    Response.Status.fromStatusCode(clock.executeSet("ntp_priority", "1").getStatus());
 	} catch (Exception e1) {
-		e1.printStackTrace();
-		fail("exception");
+	    e1.printStackTrace();
+	    fail("exception");
 	}
 	clock.parseGetAnswer('E', "566353380");
 	Assert.assertEquals("ERROR:", "SCE", getSentMsg().substring(0, 3));
 	Assert.assertTrue("ERROR:", noMsgSent());
 	try {
-		Response.Status.fromStatusCode(clock.executeSet("ntp_priority", "0").getStatus());
+	    Response.Status.fromStatusCode(clock.executeSet("ntp_priority", "0").getStatus());
 	} catch (Exception e1) {
-		e1.printStackTrace();
-		fail("exception");
+	    e1.printStackTrace();
+	    fail("exception");
 	}
     }
-    
+
     @Test
     public void testExecuteSetActualtime() {
 	emptySentMsg();
+	clock.setNtpPriority(false);
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
 	try {
 	    et = Response.Status.fromStatusCode(clock.executeSet("actualtime", "").getStatus());
@@ -172,6 +178,7 @@ public class ClockObjAgentTest {
     @Test
     public void testExecuteSetKnewTime() {
 	emptySentMsg();
+	clock.setNtpPriority(false);
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
 	try {
 	    et = Response.Status.fromStatusCode(clock.executeSet("time", "0:23-12-12-17").getStatus());
@@ -189,6 +196,7 @@ public class ClockObjAgentTest {
 	// v=<hour>:<min>-<day>-<month>-<year>
 	final String[] DATES_OK = { "4:0-12-12-17", "4:23-12-12-17", "4:23-12-12-2017", "04:23-12-12-2017",
 		"14:2-12-12-2017", "14:21-1-12-2017", "14:21-1-2-2017", "4:9-1-2-17" };
+	clock.setNtpPriority(false);
 	for (int i = 0; i < DATES_OK.length; i++) {
 	    emptySentMsg();
 	    Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
@@ -209,6 +217,7 @@ public class ClockObjAgentTest {
 	// v=<hour>:<min>-<day>-<month>-<year>
 	final String[] DATES_WRONG = { "4:23-12-13-17", "40:23-12-12-2017", "04:23-31-11-2017", "14-12-12-2017",
 		"14:21-1-12", "14:21-1-0-2017", "4:9:32-1-2-17", "4:9:32-1-2-17", "" };
+	clock.setNtpPriority(false);
 	for (int i = 0; i < DATES_WRONG.length; i++) {
 	    emptySentMsg();
 	    Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
@@ -227,6 +236,7 @@ public class ClockObjAgentTest {
     public void testExecuteSetWrong() {
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
 	emptySentMsg();
+	clock.setNtpPriority(false);
 	int exc = 0;
 	try {
 	    et = Response.Status.fromStatusCode(clock.executeSet("citrullo", "").getStatus());

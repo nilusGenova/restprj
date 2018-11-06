@@ -21,7 +21,7 @@ public class TwoWaysSerialComms {
     private static final int RCV_BUFFER_SIZE = 250;
     private static final int CONN_RETRY_TIMEOUT = 5000; // in mSec
     private static final Logger log = LoggerFactory.getLogger(TwoWaysSerialComms.class);
-    private final static String usbDevicePrefix = "/dev/ttyUSB";
+    private final static String usbDevicePrefix1 = "/dev/ttyUSB";
 
     ConnectionManager connectionManager = null;
     private volatile boolean connectedStatus = false;
@@ -57,10 +57,12 @@ public class TwoWaysSerialComms {
 	private ArrayList<String> getUsbPorts() {
 	    ArrayList<String> portList = new ArrayList<>();
 	    Enumeration<CommPortIdentifier> portEnum = CommPortIdentifier.getPortIdentifiers();
+	    log.info("Listing USB ports:");
 	    while (portEnum.hasMoreElements()) {
 		CommPortIdentifier currPort = (CommPortIdentifier) portEnum.nextElement();
 		String portName = currPort.getName();
-		if (portName.startsWith(usbDevicePrefix)) {
+		log.info("Found: {}", portName);
+		if (portName.startsWith(usbDevicePrefix1)) {
 		    portList.add(portName);
 		}
 	    }
