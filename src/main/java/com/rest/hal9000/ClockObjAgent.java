@@ -9,6 +9,7 @@ public class ClockObjAgent extends HalObjAgent {
 
     private EpocTime expAttr = new EpocTime();
     private boolean ntpPriority = true; // works on EpocTimeOnly
+    private boolean rtcChecks = true;
 
     public ClockObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
@@ -32,6 +33,9 @@ public class ClockObjAgent extends HalObjAgent {
 	}
 	if ("ntp_priority".equals(attr)) {
 	    return ntpPriority ? "1" : "0";
+	}
+	if ("rtcchecks".equals(attr)) {
+	    return rtcChecks ? "1" : "0";
 	}
 	wrongAttribute(attr);
 	return null;
@@ -57,6 +61,9 @@ public class ClockObjAgent extends HalObjAgent {
 		}
 	    }
 	    break;
+	case 'R':
+	    expAttr.setRtcError(Integer.parseInt(msg));
+	    break;
 	default:
 	    wrongAttribute(attribute + " " + msg);
 	    return false;
@@ -80,6 +87,9 @@ public class ClockObjAgent extends HalObjAgent {
     public void alignAll() {
 	log.debug("Clock align all");
 	sendMsgToHal("GCE");
+	if (rtcChecks) {
+	    sendMsgToHal("GCR");
+	}
     }
 
     // Format of msg
@@ -133,6 +143,10 @@ public class ClockObjAgent extends HalObjAgent {
 	case "ntp_priority":
 	    log.debug("Setting ntpPriority to:{}", val);
 	    ntpPriority = getBooleanVal(val) == 1;
+	    break;
+	case "rtcchecks":
+	    log.debug("Setting rtcCheck to:{}", val);
+	    rtcChecks = getBooleanVal(val) == 1;
 	    break;
 	default:
 	    throw new NoSuchElementException();

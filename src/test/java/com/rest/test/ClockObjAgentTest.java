@@ -73,9 +73,11 @@ public class ClockObjAgentTest {
 	clock.parseGetAnswer('D', "14-02-1967");
 	clock.parseGetAnswer('T', "18:07");
 	clock.parseGetAnswer('W', "3");
+	clock.parseGetAnswer('R', "0");
 	Assert.assertEquals("ERROR:", "14-02-1967", extractAttributeValue().getDate());
 	Assert.assertEquals("ERROR:", "18:07", extractAttributeValue().getTime());
 	Assert.assertEquals("ERROR:", 3, extractAttributeValue().getWeekDay());
+	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getRtcError());
 	clock.parseGetAnswer('E', "7623412");
 	Assert.assertEquals("ERROR:", "7623412", extractAttributeValue().getEpochTime());
 	Assert.assertTrue("ERROR:", noMsgSent());
@@ -86,6 +88,16 @@ public class ClockObjAgentTest {
 	emptySentMsg();
 	clock.setNtpPriority(false);
 	// D forza il riallineamento
+	clock.parseEvent('D', "");
+	Assert.assertEquals("ERROR:", "GCE", getSentMsg());
+	Assert.assertEquals("ERROR:", "GCR", getSentMsg());
+	Assert.assertTrue("ERROR:", noMsgSent());
+	try {
+	    clock.executeSet("rtcchecks", "0");
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
 	clock.parseEvent('D', "");
 	Assert.assertEquals("ERROR:", "GCE", getSentMsg());
 	Assert.assertTrue("ERROR:", noMsgSent());
@@ -131,6 +143,24 @@ public class ClockObjAgentTest {
 	    et = Response.Status.fromStatusCode(clock.executeSet("ntp_priority", "1").getStatus());
 	    r = clock.exposeJsonAttribute("ntp_priority");
 	    Assert.assertEquals("ERROR in ntp_priority get/set", "1", (String) r.getEntity());
+	    Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+    }
+
+    @Test
+    public void testSetGetRtcCheckFlag() {
+	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
+	Response r = null;
+	try {
+	    // 0 (false) is the default value
+	    r = clock.exposeJsonAttribute("rtcchecks");
+	    Assert.assertEquals("ERROR in rtcCheck get", "1", (String) r.getEntity());
+	    et = Response.Status.fromStatusCode(clock.executeSet("rtcchecks", "0").getStatus());
+	    r = clock.exposeJsonAttribute("rtcchecks");
+	    Assert.assertEquals("ERROR in rtcCheck get/set", "0", (String) r.getEntity());
 	    Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
 	} catch (Exception e) {
 	    e.printStackTrace();

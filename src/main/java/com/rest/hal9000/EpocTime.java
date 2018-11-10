@@ -22,12 +22,14 @@ public class EpocTime {
     private String time;
     private int weekDay; // 0:Sun -- 6:Sat
     private long epochTime; // value in Sec from 1-1-2000
+    private int rtcError; // 0:noError 1:error
 
     public EpocTime() {
 	date = "01-01-2000";
 	time = "00:00";
 	weekDay = 0;
 	epochTime = 0;
+	rtcError = 0;
     }
 
     public void setEpocTime(final long et) {
@@ -88,6 +90,14 @@ public class EpocTime {
 
     public String getEpochTime() {
 	return Long.toString(epochTime);
+    }
+
+    public int getRtcError() {
+	return rtcError;
+    }
+
+    public void setRtcError(final int val) {
+	this.rtcError = val;
     }
 
     public void setWeekDay(final int weekDay) {
