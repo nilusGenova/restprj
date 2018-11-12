@@ -119,6 +119,10 @@ public abstract class HalObjAgent {
 	throw new Exception();
     }
 
+    public void timer() {
+	return;
+    }
+
     protected void wrongAttribute(final String attr) {
 	log.error("{} Wrong attribute:{}", pathName, attr);
     }

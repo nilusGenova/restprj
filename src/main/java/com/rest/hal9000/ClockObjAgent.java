@@ -9,14 +9,24 @@ public class ClockObjAgent extends HalObjAgent {
 
     private EpocTime expAttr = new EpocTime();
     private boolean ntpPriority = true; // works on EpocTimeOnly
-    private boolean rtcChecks = true;
+    private boolean rtcChecks = false;
+    private int timer_period_in_minutes;
 
-    public ClockObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
+    public ClockObjAgent(final String pathName, final Consumer<String> sendMsgCallBack, int default_timer_in_min) {
 	super(pathName, sendMsgCallBack);
+	timer_period_in_minutes = default_timer_in_min;
     }
 
     public void setNtpPriority(boolean prio) {
 	ntpPriority = prio;
+    }
+
+    public void setRtcCheck(boolean val) {
+	rtcChecks = val;
+    }
+
+    public int getTimerPeriodInMin() {
+	return timer_period_in_minutes;
     }
 
     @Override
@@ -36,6 +46,9 @@ public class ClockObjAgent extends HalObjAgent {
 	}
 	if ("rtcchecks".equals(attr)) {
 	    return rtcChecks ? "1" : "0";
+	}
+	if ("timer".equals(attr)) {
+	    return Integer.toString(timer_period_in_minutes);
 	}
 	wrongAttribute(attr);
 	return null;
@@ -90,6 +103,13 @@ public class ClockObjAgent extends HalObjAgent {
 	if (rtcChecks) {
 	    sendMsgToHal("GCR");
 	}
+    }
+
+    @Override
+    public void timer() {
+	log.debug("Clock timer");
+	sendMsgToHal("GCE");
+	return;
     }
 
     // Format of msg
@@ -147,6 +167,24 @@ public class ClockObjAgent extends HalObjAgent {
 	case "rtcchecks":
 	    log.debug("Setting rtcCheck to:{}", val);
 	    rtcChecks = getBooleanVal(val) == 1;
+	    break;
+	case "timer":
+	    int n;
+	    if ("".equals(val)) {
+		n = -1;
+	    }
+	    try {
+		n = Integer.parseInt(val);
+	    } catch (Exception e) {
+		n = -1;
+	    }
+	    if (n <= 0) {
+		wrongValue("timer:" + n);
+		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+	    } else {
+		log.debug("Setting timer to:{}", val);
+		timer_period_in_minutes = n;
+	    }
 	    break;
 	default:
 	    throw new NoSuchElementException();

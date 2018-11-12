@@ -16,6 +16,8 @@ public final class App {
     private final static TwoWaysSerialComms serial = new TwoWaysSerialComms();
     public final static Registry registry = new Registry();
     private final static Parser parser = new Parser((id) -> registry.getRegisteredObj(id));
+    private static ClockObjAgent clockAgent = null;
+    private final static int DEFAULT_TIMER_PERIOD_IN_MIN = 10;
 
     public static boolean isSerialConnected() {
 	return serial.isConnected();
@@ -47,11 +49,18 @@ public final class App {
 	}
     }
 
+    public static int getTimerPeriodInMin() {
+	if (clockAgent != null) {
+	    return clockAgent.getTimerPeriodInMin();
+	} else
+	    return DEFAULT_TIMER_PERIOD_IN_MIN;
+    }
+
     public static void main(String[] args) throws Exception {
 	CommonUtils.setLogPath(System.getProperty(LOG_PATH_SYS_PROP));
 	CommonUtils.initialDebugStatus(System.getProperty(DEBUG_LEVEL_SYS_PROP) != null);
 
-	final ClockObjAgent clockAgent = new ClockObjAgent("clock", (msg) -> serial.sendMsg(msg));
+	clockAgent = new ClockObjAgent("clock", (msg) -> serial.sendMsg(msg), DEFAULT_TIMER_PERIOD_IN_MIN);
 	final ThermoObjAgent thermoAgent = new ThermoObjAgent("thermo", (msg) -> serial.sendMsg(msg));
 	final AlarmObjAgent alarmObjAgent = new AlarmObjAgent("alarm", (msg) -> serial.sendMsg(msg));
 	final ProgramObjAgent programObjAgent = new ProgramObjAgent("program", (msg) -> serial.sendMsg(msg));

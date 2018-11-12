@@ -48,4 +48,15 @@ public class Registry {
 	    registeredMap.forEach((k, v) -> v.alignAll());
 	}
     }
+
+    public void callTimerForAllRegistered() {
+	log.debug("All objects timer");
+	synchronized (registeredMap) {
+	    // without lambda functions
+	    // for (Map.Entry<Character, HalObjAgent> entry : registeredMap.entrySet()) {
+	    // entry.getValue().timer();
+	    // }
+	    registeredMap.forEach((k, v) -> v.timer());
+	}
+    }
 }

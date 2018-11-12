@@ -21,7 +21,7 @@ public class TwoWaysSerialComms {
     private static final int RCV_BUFFER_SIZE = 250;
     private static final int CONN_RETRY_TIMEOUT = 5000; // in mSec
     private static final Logger log = LoggerFactory.getLogger(TwoWaysSerialComms.class);
-    private final static String usbDevicePrefix1 = "/dev/ttyUSB";
+    private final static String usbDevicePrefix = "/dev/ttyUSB";
 
     ConnectionManager connectionManager = null;
     private volatile boolean connectedStatus = false;
@@ -53,6 +53,7 @@ public class TwoWaysSerialComms {
 
 	SerialReader reader = null;
 	SerialWriter writer = null;
+	Timer timer = null;
 
 	private ArrayList<String> getUsbPorts() {
 	    ArrayList<String> portList = new ArrayList<>();
@@ -62,7 +63,7 @@ public class TwoWaysSerialComms {
 		CommPortIdentifier currPort = (CommPortIdentifier) portEnum.nextElement();
 		String portName = currPort.getName();
 		log.info("Found: {}", portName);
-		if (portName.startsWith(usbDevicePrefix1)) {
+		if (portName.startsWith(usbDevicePrefix)) {
 		    portList.add(portName);
 		}
 	    }
@@ -116,12 +117,15 @@ public class TwoWaysSerialComms {
 
 			reader = new SerialReader(in);
 			writer = new SerialWriter(out);
+			timer = new Timer();
 			connectedStatus = true;
 
 			Thread readThread = new Thread(reader);
 			Thread writeThread = new Thread(writer);
+			Thread timerThread = new Thread(timer);
 			readThread.start();
 			writeThread.start();
+			timerThread.start();
 
 			App.registry.callAlignAllForAllRegistered();
 
@@ -130,7 +134,9 @@ public class TwoWaysSerialComms {
 			// then proceed to stop writer too
 			writer.cancel();
 			writeThread.join();
-			log.error("Read/write threads closed");
+			timer.cancel();
+			timerThread.join();
+			log.error("Read/Write/Timer threads closed");
 		    } else {
 			log.error("Only serial ports are handled by this code.");
 		    }
@@ -229,6 +235,33 @@ public class TwoWaysSerialComms {
 		    this.out.write(msgToSend.getBytes());
 		    this.out.write('\n');
 		    this.out.flush();
+		}
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	}
+    }
+
+    private static class Timer implements Runnable {
+
+	// period in minutes
+	public Timer() {
+	}
+
+	public void cancel() throws Exception {
+	    Thread.currentThread().interrupt();
+	}
+
+	private void sleep() throws InterruptedException {
+	    Thread.sleep(App.getTimerPeriodInMin() * 60 * 1000); // in mSec
+	}
+
+	public void run() {
+	    log.info("Timer started, period:{} min ", App.getTimerPeriodInMin());
+	    try {
+		while (!Thread.currentThread().isInterrupted()) {
+		    sleep(); // loop sleep
+		    App.registry.callTimerForAllRegistered();
 		}
 	    } catch (Exception e) {
 		e.printStackTrace();
