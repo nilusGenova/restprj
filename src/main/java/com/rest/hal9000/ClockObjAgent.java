@@ -7,14 +7,15 @@ import javax.ws.rs.core.Response;
 
 public class ClockObjAgent extends HalObjAgent {
 
+    private final static int DEFAULT_TIMER_PERIOD_IN_MINS = 10;
     private EpocTime expAttr = new EpocTime();
     private boolean ntpPriority = true; // works on EpocTimeOnly
     private boolean rtcChecks = false;
-    private int timer_period_in_minutes;
+    private int timer_period_in_minutes = DEFAULT_TIMER_PERIOD_IN_MINS;
+    private int min_ticks_cnt = 0;
 
-    public ClockObjAgent(final String pathName, final Consumer<String> sendMsgCallBack, int default_timer_in_min) {
+    public ClockObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super(pathName, sendMsgCallBack);
-	timer_period_in_minutes = default_timer_in_min;
     }
 
     public void setNtpPriority(boolean prio) {
@@ -23,10 +24,6 @@ public class ClockObjAgent extends HalObjAgent {
 
     public void setRtcCheck(boolean val) {
 	rtcChecks = val;
-    }
-
-    public int getTimerPeriodInMin() {
-	return timer_period_in_minutes;
     }
 
     @Override
@@ -106,9 +103,12 @@ public class ClockObjAgent extends HalObjAgent {
     }
 
     @Override
-    public void timer() {
-	log.debug("Clock timer");
-	sendMsgToHal("GCE");
+    public void one_min_tick() {
+	if ((timer_period_in_minutes != 0) && (++min_ticks_cnt == timer_period_in_minutes)) {
+	    min_ticks_cnt = 0;
+	    log.debug("Clock timer");
+	    sendMsgToHal("GCE");
+	}
 	return;
     }
 
@@ -184,6 +184,7 @@ public class ClockObjAgent extends HalObjAgent {
 	    } else {
 		log.debug("Setting timer to:{}", val);
 		timer_period_in_minutes = n;
+		min_ticks_cnt = 0;
 	    }
 	    break;
 	default:

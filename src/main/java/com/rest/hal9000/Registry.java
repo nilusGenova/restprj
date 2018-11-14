@@ -49,14 +49,14 @@ public class Registry {
 	}
     }
 
-    public void callTimerForAllRegistered() {
-	log.debug("All objects timer");
+    public void callOneMinTickForAllRegistered() {
+	log.debug("All objects tick");
 	synchronized (registeredMap) {
 	    // without lambda functions
 	    // for (Map.Entry<Character, HalObjAgent> entry : registeredMap.entrySet()) {
 	    // entry.getValue().timer();
 	    // }
-	    registeredMap.forEach((k, v) -> v.timer());
+	    registeredMap.forEach((k, v) -> v.one_min_tick());
 	}
     }
 }

@@ -43,9 +43,9 @@ public class RegistryTest {
 	doNothing().when(objA).alignAll();
 	doNothing().when(objB).alignAll();
 	doNothing().when(objC).alignAll();
-	doNothing().when(objA).timer();
-	doNothing().when(objB).timer();
-	doNothing().when(objC).timer();
+	doNothing().when(objA).one_min_tick();
+	doNothing().when(objB).one_min_tick();
+	doNothing().when(objC).one_min_tick();
     }
 
     @Test
@@ -68,11 +68,11 @@ public class RegistryTest {
 	verify(objA, times(1)).alignAll();
 
 	// test call timer
-	registry.callTimerForAllRegistered();
+	registry.callOneMinTickForAllRegistered();
 
-	verify(objC, times(1)).timer();
-	verify(objB, times(1)).timer();
-	verify(objA, times(1)).timer();
+	verify(objC, times(1)).one_min_tick();
+	verify(objB, times(1)).one_min_tick();
+	verify(objA, times(1)).one_min_tick();
 
 	// correct association
 	Assert.assertEquals("wrong association for B", 'B', registry.getRegisteredObj('B').getId());

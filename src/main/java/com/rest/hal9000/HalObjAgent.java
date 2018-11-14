@@ -119,7 +119,7 @@ public abstract class HalObjAgent {
 	throw new Exception();
     }
 
-    public void timer() {
+    public void one_min_tick() {
 	return;
     }
 

@@ -253,15 +253,15 @@ public class TwoWaysSerialComms {
 	}
 
 	private void sleep() throws InterruptedException {
-	    Thread.sleep(App.getTimerPeriodInMin() * 60 * 1000); // in mSec
+	    Thread.sleep(60 * 1000); // 1 minute in mSec
 	}
 
 	public void run() {
-	    log.info("Timer started, period:{} min ", App.getTimerPeriodInMin());
+	    log.info("1 min tick started");
 	    try {
 		while (!Thread.currentThread().isInterrupted()) {
 		    sleep(); // loop sleep
-		    App.registry.callTimerForAllRegistered();
+		    App.registry.callOneMinTickForAllRegistered();
 		}
 	    } catch (Exception e) {
 		e.printStackTrace();

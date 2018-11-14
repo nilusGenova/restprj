@@ -23,7 +23,7 @@ import com.rest.hal9000.EpocTime;
 @PrepareForTest({ ClockObjAgent.class })
 public class ClockObjAgentTest {
 
-    private final static int TIMER_INIT_VAL = 15;
+    private final static int TIMER_INIT_VAL = 10;
 
     ArrayList<String> msgSent = new ArrayList<>();
 
@@ -51,7 +51,7 @@ public class ClockObjAgentTest {
     }
 
     @InjectMocks
-    private final ClockObjAgent clock = new ClockObjAgent("clock", (s) -> sendMsg(s), TIMER_INIT_VAL);
+    private final ClockObjAgent clock = new ClockObjAgent("clock", (s) -> sendMsg(s));
 
     @Before
     public void setUp() throws Exception {
@@ -87,20 +87,35 @@ public class ClockObjAgentTest {
     }
 
     @Test
-    public void testTimerValue() {
-	Assert.assertEquals("ERROR:", TIMER_INIT_VAL, clock.getTimerPeriodInMin());
-
+    public void testTimerValueandTicks() {
 	Response.Status et = Response.Status.HTTP_VERSION_NOT_SUPPORTED;
 	Response r = null;
 	clock.setNtpPriority(false);
 	try {
 	    r = clock.exposeJsonAttribute("timer");
 	    Assert.assertEquals("ERROR in timer get", Integer.toString(TIMER_INIT_VAL), (String) r.getEntity());
+	    emptySentMsg();
+	    for (int i = 0; i < TIMER_INIT_VAL - 1; i++) {
+		clock.one_min_tick();
+		Assert.assertTrue("ERROR on tick:" + i, noMsgSent());
+	    }
+	    clock.one_min_tick();
+	    Assert.assertEquals("ERROR on timer:", "GCE", getSentMsg());
+	    clock.one_min_tick();
+	    Assert.assertTrue("ERROR on last tick:", noMsgSent());
 	    et = Response.Status
 		    .fromStatusCode(clock.executeSet("timer", Integer.toString(TIMER_INIT_VAL * 3)).getStatus());
 	    r = clock.exposeJsonAttribute("timer");
 	    Assert.assertEquals("ERROR in timer get/set", Integer.toString(TIMER_INIT_VAL * 3), (String) r.getEntity());
 	    Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	    for (int i = 0; i < (TIMER_INIT_VAL * 3) - 1; i++) {
+		clock.one_min_tick();
+		Assert.assertTrue("ERROR on tick:" + i, noMsgSent());
+	    }
+	    clock.one_min_tick();
+	    Assert.assertEquals("ERROR on timer:", "GCE", getSentMsg());
+	    clock.one_min_tick();
+	    Assert.assertTrue("ERROR on last tick:", noMsgSent());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("exception");
