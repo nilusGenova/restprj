@@ -16,7 +16,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	private double hysteresis = 0;
     }
 
-    private final static TempLogger tempLogger = new TempLogger();
+    private TempLogger tempLogger = null;
 
     private double roundTemp(final String val) {
 	Integer intVal = Integer.parseInt(val);
@@ -28,8 +28,9 @@ public class ThermoObjAgent extends HalObjAgent {
 
     private ExposedAttributes expAttr = new ExposedAttributes();
 
-    public ThermoObjAgent(String pathName, Consumer<String> sendMsgCallBack) {
+    public ThermoObjAgent(String pathName, Consumer<String> sendMsgCallBack, final TempLogger tempLogger) {
 	super(pathName, sendMsgCallBack);
+	this.tempLogger = tempLogger;
     }
 
     @Override
