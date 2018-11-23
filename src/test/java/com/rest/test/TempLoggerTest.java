@@ -87,6 +87,130 @@ public class TempLoggerTest {
     }
 
     @Test
+    public void testFillingsamples() {
+	PowerMockito.mockStatic(Calendar.class);
+	PowerMockito.when(Calendar.getInstance()).thenReturn(calendar);
+	when(calendar.get(Calendar.MINUTE)).thenReturn(0);
+	when(calendar.get(Calendar.HOUR)).thenReturn(0);
+	when(calendar.get(Calendar.AM_PM)).thenReturn(0);
+	tempLogger.logTemp(12.1);
+
+	when(calendar.get(Calendar.MINUTE)).thenReturn(7);
+	when(calendar.get(Calendar.HOUR)).thenReturn(1);
+	when(calendar.get(Calendar.AM_PM)).thenReturn(0);
+	tempLogger.logTemp(15.7);
+
+	try {
+	    ObjectMapper mapper = new ObjectMapper();
+	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
+	    // System.out.println(rootNode);
+	    int cnt = 0;
+	    for (JsonNode val : rootNode) {
+		if (cnt < 13) { // 1houre+7min = 12+1 samples
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 12.1, val.asDouble(), 0);
+		}
+		if (cnt == 13) {
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 15.7, val.asDouble(), 0);
+		}
+		if (cnt > 13) {
+		    break;
+		}
+		cnt++;
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("ERROR");
+	}
+    }
+
+    @Test
+    public void testFillingsamplesOverDay() {
+	PowerMockito.mockStatic(Calendar.class);
+	PowerMockito.when(Calendar.getInstance()).thenReturn(calendar);
+	when(calendar.get(Calendar.MINUTE)).thenReturn(30);
+	when(calendar.get(Calendar.HOUR)).thenReturn(11);
+	when(calendar.get(Calendar.AM_PM)).thenReturn(1);
+	tempLogger.logTemp(18.2);
+
+	when(calendar.get(Calendar.MINUTE)).thenReturn(27);
+	when(calendar.get(Calendar.HOUR)).thenReturn(0);
+	when(calendar.get(Calendar.AM_PM)).thenReturn(0);
+	tempLogger.logTemp(21.3);
+
+	try {
+	    ObjectMapper mapper = new ObjectMapper();
+	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
+	    // System.out.println(rootNode);
+	    int cnt = 0;
+	    for (JsonNode val : rootNode) {
+		if ((cnt < 5) || (cnt >= 282)) { // ((11+12)*60 + 30)/5
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 18.2, val.asDouble(), 0);
+		}
+		if (cnt == 5) {
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 21.3, val.asDouble(), 0);
+		}
+		cnt++;
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("ERROR");
+	}
+    }
+
+    @Test
+    public void testNoFillWhenTimeGoesBack1Hour() {
+	PowerMockito.mockStatic(Calendar.class);
+	PowerMockito.when(Calendar.getInstance()).thenReturn(calendar);
+	when(calendar.get(Calendar.MINUTE)).thenReturn(0);
+	when(calendar.get(Calendar.HOUR)).thenReturn(0);
+	when(calendar.get(Calendar.AM_PM)).thenReturn(0);
+	tempLogger.logTemp(5.5);
+
+	when(calendar.get(Calendar.MINUTE)).thenReturn(0);
+	when(calendar.get(Calendar.HOUR)).thenReturn(1);
+	when(calendar.get(Calendar.AM_PM)).thenReturn(0);
+	tempLogger.logTemp(8.8);
+
+	when(calendar.get(Calendar.MINUTE)).thenReturn(10);
+	when(calendar.get(Calendar.HOUR)).thenReturn(1);
+	when(calendar.get(Calendar.AM_PM)).thenReturn(0);
+	tempLogger.logTemp(9.9);
+
+	when(calendar.get(Calendar.MINUTE)).thenReturn(5);
+	when(calendar.get(Calendar.HOUR)).thenReturn(0);
+	when(calendar.get(Calendar.AM_PM)).thenReturn(0);
+	tempLogger.logTemp(7.7);
+
+	try {
+	    ObjectMapper mapper = new ObjectMapper();
+	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
+	    // System.out.println(rootNode);
+	    int cnt = 0;
+	    for (JsonNode val : rootNode) {
+		if (cnt == 1) {
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 7.7, val.asDouble(), 0);
+		}
+		if ((cnt < 12) && (cnt != 1)) {
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 5.5, val.asDouble(), 0);
+		}
+		if ((cnt == 12) || (cnt == 13)) {
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 8.8, val.asDouble(), 0);
+		}
+		if (cnt == 14) {
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 9.9, val.asDouble(), 0);
+		}
+		if (cnt > 14) {
+		    break;
+		}
+		cnt++;
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("ERROR");
+	}
+    }
+
+    @Test
     public void testLogMethods() {
 	PowerMockito.mockStatic(TempLogger.class);
 	Field field = PowerMockito.field(TempLogger.class, "tempLog");
