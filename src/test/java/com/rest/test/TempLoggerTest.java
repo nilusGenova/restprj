@@ -44,6 +44,26 @@ public class TempLoggerTest {
 	MockitoAnnotations.initMocks(this);
     }
 
+    private int[] generateRetArray(JsonNode rootNode) {
+	int[] retArray = new int[NUM_OF_TEMP_SAMPLES];
+	int idx = 0;
+	int value = 0;
+	int count;
+	int nodeCnt = 0;
+	for (JsonNode val : rootNode) {
+	    if (nodeCnt % 2 == 0) {
+		value = val.asInt();
+	    } else {
+		count = val.asInt();
+		for (int j = 0; j < count; j++) {
+		    retArray[idx++] = value;
+		}
+	    }
+	    nodeCnt++;
+	}
+	return retArray;
+    }
+
     @Test
     public void testSampling() {
 	PowerMockito.mockStatic(Calendar.class);
@@ -74,12 +94,13 @@ public class TempLoggerTest {
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
 	    // System.out.println(rootNode);
+	    int[] retArray = generateRetArray(rootNode);
 	    int cnt = 0;
-	    for (JsonNode val : rootNode) {
-		Assert.assertEquals("ERROR in samples #" + cnt + " :", 2.5 + (cnt + 0.0) / 10, val.asDouble(), 0);
+	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
+		Assert.assertEquals("ERROR in samples #" + cnt + " :", Math.round(2.5 + (cnt + 0.0) / 10), retArray[i]);
 		cnt++;
 	    }
-	    Assert.assertEquals("wrong num of samples", NUM_OF_TEMP_SAMPLES, cnt);
+	    Assert.assertEquals("wrong num of samples", NUM_OF_TEMP_SAMPLES, cnt); // now impossible
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    fail("ERROR");
@@ -104,13 +125,14 @@ public class TempLoggerTest {
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
 	    // System.out.println(rootNode);
+	    int[] retArray = generateRetArray(rootNode);
 	    int cnt = 0;
-	    for (JsonNode val : rootNode) {
+	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 		if (cnt < 13) { // 1houre+7min = 12+1 samples
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 12.1, val.asDouble(), 0);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 12, retArray[i]);
 		}
 		if (cnt == 13) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 15.7, val.asDouble(), 0);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 16, retArray[i]);
 		}
 		if (cnt > 13) {
 		    break;
@@ -141,13 +163,14 @@ public class TempLoggerTest {
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
 	    // System.out.println(rootNode);
+	    int[] retArray = generateRetArray(rootNode);
 	    int cnt = 0;
-	    for (JsonNode val : rootNode) {
+	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 		if ((cnt < 5) || (cnt >= 282)) { // ((11+12)*60 + 30)/5
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 18.2, val.asDouble(), 0);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 18, retArray[i]);
 		}
 		if (cnt == 5) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 21.3, val.asDouble(), 0);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 21, retArray[i]);
 		}
 		cnt++;
 	    }
@@ -185,19 +208,20 @@ public class TempLoggerTest {
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
 	    // System.out.println(rootNode);
+	    int[] retArray = generateRetArray(rootNode);
 	    int cnt = 0;
-	    for (JsonNode val : rootNode) {
+	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 		if (cnt == 1) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 7.7, val.asDouble(), 0);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 8, retArray[i]);
 		}
 		if ((cnt < 12) && (cnt != 1)) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 5.5, val.asDouble(), 0);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 6, retArray[i]);
 		}
 		if ((cnt == 12) || (cnt == 13)) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 8.8, val.asDouble(), 0);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 9, retArray[i]);
 		}
 		if (cnt == 14) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 9.9, val.asDouble(), 0);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 10, retArray[i]);
 		}
 		if (cnt > 14) {
 		    break;

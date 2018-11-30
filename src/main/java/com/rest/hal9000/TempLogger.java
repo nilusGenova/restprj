@@ -16,7 +16,7 @@ public class TempLogger extends HalObjAgent {
     private final static int MAX_NUM_OF_HOURS_FOR_UPDATE = 5;
 
     private class ExposedData {
-	private Double[] tempDay = new Double[NUM_OF_TEMP_SAMPLES];
+	private int[] tempDay = new int[NUM_OF_TEMP_SAMPLES];
 	private int latestTempIdx = -1;
     }
 
@@ -38,7 +38,7 @@ public class TempLogger extends HalObjAgent {
 		expData.tempDay[i] = expData.tempDay[expData.latestTempIdx];
 	    }
 	}
-	expData.tempDay[nowIdx] = temp;
+	expData.tempDay[nowIdx] = (int) Math.round(temp);
 	expData.latestTempIdx = nowIdx;
     }
 
@@ -47,7 +47,7 @@ public class TempLogger extends HalObjAgent {
     public TempLogger(final String pathName) {
 	super(pathName, null);
 	for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
-	    expData.tempDay[i] = 0.0;
+	    expData.tempDay[i] = 0;
 	}
     }
 
@@ -68,9 +68,42 @@ public class TempLogger extends HalObjAgent {
 	}
     }
 
+    public int[] getTempDayCompressed() {
+	int val = expData.tempDay[0];
+	int idx = 0;
+	int c = 1;
+	for (int i = 1; i < NUM_OF_TEMP_SAMPLES; i++) {
+	    if (val != expData.tempDay[i]) {
+		val = expData.tempDay[i];
+		idx++;
+		c = 1;
+	    } else {
+		c++;
+	    }
+	}
+	int[] retArray = new int[2 * (idx + 1)];
+	val = expData.tempDay[0];
+	idx = 0;
+	c = 1;
+	for (int i = 1; i < NUM_OF_TEMP_SAMPLES; i++) {
+	    if (val != expData.tempDay[i]) {
+		retArray[idx] = val;
+		retArray[idx + 1] = c;
+		val = expData.tempDay[i];
+		idx += 2;
+		c = 1;
+	    } else {
+		c++;
+	    }
+	}
+	retArray[idx] = val;
+	retArray[idx + 1] = c;
+	return retArray;
+    }
+
     @Override
     protected Object getExposedData() {
-	return expData.tempDay;
+	return getTempDayCompressed();
     }
 
     @Override

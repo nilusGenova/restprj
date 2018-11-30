@@ -14,6 +14,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	private double required = 0;
 	private int manuallyForced = 0;
 	private double hysteresis = 0;
+	private int[] tempDayCompressed;
     }
 
     private TempLogger tempLogger = null;
@@ -36,6 +37,7 @@ public class ThermoObjAgent extends HalObjAgent {
     @Override
     protected Object getExposedData() {
 	log.debug("Thermo exposeData");
+	expAttr.tempDayCompressed = tempLogger.getTempDayCompressed();
 	return expAttr;
     }
 
