@@ -55,8 +55,6 @@ http://localhost:8080/hal9000/program?a=size
 http://localhost:8080/hal9000/templogger
 http://localhost:8080/hal9000/alarmlogger
 http://localhost:8080/hal9000/connected
-http://localhost:8080/hal9000/daytemp
-
 
 POST:
 http://localhost:8080/hal9000/debug?enable=true

@@ -5,7 +5,7 @@ import java.util.Calendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TempLogger extends HalObjAgent {
+public class TempLogger {
 
     private static final Logger tempLog = LoggerFactory.getLogger(TempLogger.class);
 
@@ -44,8 +44,7 @@ public class TempLogger extends HalObjAgent {
 
     private ExposedData expData = new ExposedData();
 
-    public TempLogger(final String pathName) {
-	super(pathName, null);
+    public TempLogger() {
 	for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 	    expData.tempDay[i] = 0;
 	}
@@ -101,28 +100,4 @@ public class TempLogger extends HalObjAgent {
 	return retArray;
     }
 
-    @Override
-    protected Object getExposedData() {
-	return getTempDayCompressed();
-    }
-
-    @Override
-    protected String getExposedAttribute(String attr) throws Exception {
-	wrongAttribute(attr);
-	return null;
-    }
-
-    @Override
-    protected boolean specializedParseGetAnswer(char attribute, String msg) {
-	return false;
-    }
-
-    @Override
-    protected boolean specializedParseEvent(char event, String msg) {
-	return false;
-    }
-
-    @Override
-    public void alignAll() {
-    }
 }

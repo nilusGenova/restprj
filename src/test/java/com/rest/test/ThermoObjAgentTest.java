@@ -3,6 +3,7 @@ package com.rest.test;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -57,7 +59,7 @@ public class ThermoObjAgentTest {
     private TempLogger tempLog;
 
     @InjectMocks
-    private final ThermoObjAgent thermo = new ThermoObjAgent("thermo", (s) -> sendMsg(s), tempLog);
+    private final ThermoObjAgent thermo = new ThermoObjAgent("thermo", (s) -> sendMsg(s));
 
     @Before
     public void setUp() throws Exception {
@@ -122,6 +124,15 @@ public class ThermoObjAgentTest {
 
     @Test
     public void testParseEvent() {
+	PowerMockito.mockStatic(ThermoObjAgent.class);
+	Field field = PowerMockito.field(ThermoObjAgent.class, "tempLogger");
+	try {
+	    field.set(ThermoObjAgent.class, tempLog);
+	} catch (IllegalArgumentException e1) {
+	    e1.printStackTrace();
+	} catch (IllegalAccessException e1) {
+	    e1.printStackTrace();
+	}
 	// W T R (E)
 	emptySentMsg();
 	thermo.parseEvent('W', "0");

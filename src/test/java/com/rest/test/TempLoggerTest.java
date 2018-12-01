@@ -19,8 +19,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rest.hal9000.TempLogger;
 
 @RunWith(PowerMockRunner.class)
@@ -37,29 +35,24 @@ public class TempLoggerTest {
     private Calendar calendar;
 
     @InjectMocks
-    private final TempLogger tempLogger = new TempLogger("logger");
+    private final TempLogger tempLogger = new TempLogger();
 
     @Before
     public void setUp() throws Exception {
 	MockitoAnnotations.initMocks(this);
     }
 
-    private int[] generateRetArray(JsonNode rootNode) {
+    private int[] generateRetArray(int[] zippedArray) {
 	int[] retArray = new int[NUM_OF_TEMP_SAMPLES];
 	int idx = 0;
 	int value = 0;
 	int count;
-	int nodeCnt = 0;
-	for (JsonNode val : rootNode) {
-	    if (nodeCnt % 2 == 0) {
-		value = val.asInt();
-	    } else {
-		count = val.asInt();
-		for (int j = 0; j < count; j++) {
-		    retArray[idx++] = value;
-		}
+	for (int i = 0; i < zippedArray.length; i += 2) {
+	    value = zippedArray[i];
+	    count = zippedArray[i + 1];
+	    for (int j = 0; j < count; j++) {
+		retArray[idx++] = value;
 	    }
-	    nodeCnt++;
 	}
 	return retArray;
     }
@@ -91,10 +84,7 @@ public class TempLoggerTest {
 	}
 
 	try {
-	    ObjectMapper mapper = new ObjectMapper();
-	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
-	    // System.out.println(rootNode);
-	    int[] retArray = generateRetArray(rootNode);
+	    int[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
 	    int cnt = 0;
 	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 		Assert.assertEquals("ERROR in samples #" + cnt + " :", Math.round(2.5 + (cnt + 0.0) / 10), retArray[i]);
@@ -122,10 +112,7 @@ public class TempLoggerTest {
 	tempLogger.logTemp(15.7);
 
 	try {
-	    ObjectMapper mapper = new ObjectMapper();
-	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
-	    // System.out.println(rootNode);
-	    int[] retArray = generateRetArray(rootNode);
+	    int[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
 	    int cnt = 0;
 	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 		if (cnt < 13) { // 1houre+7min = 12+1 samples
@@ -160,10 +147,7 @@ public class TempLoggerTest {
 	tempLogger.logTemp(21.3);
 
 	try {
-	    ObjectMapper mapper = new ObjectMapper();
-	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
-	    // System.out.println(rootNode);
-	    int[] retArray = generateRetArray(rootNode);
+	    int[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
 	    int cnt = 0;
 	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 		if ((cnt < 5) || (cnt >= 282)) { // ((11+12)*60 + 30)/5
@@ -205,10 +189,7 @@ public class TempLoggerTest {
 	tempLogger.logTemp(7.7);
 
 	try {
-	    ObjectMapper mapper = new ObjectMapper();
-	    JsonNode rootNode = mapper.readTree((String) tempLogger.exposeJsonData().getEntity());
-	    // System.out.println(rootNode);
-	    int[] retArray = generateRetArray(rootNode);
+	    int[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
 	    int cnt = 0;
 	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 		if (cnt == 1) {
