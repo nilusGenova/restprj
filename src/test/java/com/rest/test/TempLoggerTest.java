@@ -42,11 +42,12 @@ public class TempLoggerTest {
 	MockitoAnnotations.initMocks(this);
     }
 
-    private int[] generateRetArray(int[] zippedArray) {
-	int[] retArray = new int[NUM_OF_TEMP_SAMPLES];
+    private double[] generateRetArray(double[] zippedArray) {
+	double[] retArray = new double[NUM_OF_TEMP_SAMPLES];
+	// printZippedArray(zippedArray);
 	int idx = 0;
-	int value = 0;
-	int count;
+	double value = 0;
+	double count;
 	for (int i = 0; i < zippedArray.length; i += 2) {
 	    value = zippedArray[i];
 	    count = zippedArray[i + 1];
@@ -57,6 +58,26 @@ public class TempLoggerTest {
 	return retArray;
     }
 
+    private void printZippedArray(double zar[]) {
+	System.out.print("{" + zar[0] + ":" + zar[1]);
+	for (int i = 1; i < zar.length; i += 2) {
+	    System.out.print("," + zar[i] + ":" + zar[i + 1]);
+	}
+	System.out.println("}");
+    }
+
+    private void printArray(double ar[]) {
+	System.out.print("{" + ar[0]);
+	for (int i = 1; i < NUM_OF_TEMP_SAMPLES; i++) {
+	    System.out.print("," + ar[i]);
+	}
+	System.out.println("}");
+    }
+
+    private double roundTemp(final double t) {
+	return (double) (Math.round(t * 10) / 2) / 5; // to have only pair numbers
+    }
+
     @Test
     public void testSampling() {
 	PowerMockito.mockStatic(Calendar.class);
@@ -65,29 +86,27 @@ public class TempLoggerTest {
 	when(calendar.get(Calendar.HOUR)).thenReturn(2);
 	when(calendar.get(Calendar.AM_PM)).thenReturn(0);
 
-	tempLogger.logTemp(10.1);
-	tempLogger.logTemp(12.1);
-
 	for (int idx = 0; idx < NUM_OF_TEMP_SAMPLES; idx++) {
 	    when(calendar.get(Calendar.HOUR)).thenReturn((idx * NUM_OF_MINS_FOR_SAMPLE / 60) % 12);
 	    when(calendar.get(Calendar.AM_PM)).thenReturn((idx * NUM_OF_MINS_FOR_SAMPLE / 60) < 12 ? 0 : 1);
 	    int min = (idx * NUM_OF_MINS_FOR_SAMPLE) % 60;
 	    when(calendar.get(Calendar.MINUTE)).thenReturn(min); // unuseful here
 
-	    for (int m = 0; m < NUM_OF_MINS_FOR_SAMPLE - 1; m++) {
+	    for (int m = 0; m < NUM_OF_MINS_FOR_SAMPLE; m++) {
 		when(calendar.get(Calendar.MINUTE)).thenReturn(min + m);
-		tempLogger.logTemp(2.4 + (idx + 0.0) / 10);
+		tempLogger.logTemp(2.5 + (m - NUM_OF_MINS_FOR_SAMPLE / 2) + (idx + 0.0) / 10);
 	    }
-	    // good run;
-	    tempLogger.logTemp(2.2 + (idx + 0.0) / 10);
-	    tempLogger.logTemp(2.5 + (idx + 0.0) / 10); // this is the good one
+	    tempLogger.logTemp(2.5 + (idx + 0.0) / 10);
 	}
 
 	try {
-	    int[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
+	    double[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
+	    // printArray(retArray);
+
 	    int cnt = 0;
 	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
-		Assert.assertEquals("ERROR in samples #" + cnt + " :", Math.round(2.5 + (cnt + 0.0) / 10), retArray[i]);
+		Assert.assertEquals("ERROR in samples #" + cnt + " :", roundTemp(2.5 + (cnt + 0.0) / 10), retArray[i],
+			0);
 		cnt++;
 	    }
 	    Assert.assertEquals("wrong num of samples", NUM_OF_TEMP_SAMPLES, cnt); // now impossible
@@ -112,14 +131,15 @@ public class TempLoggerTest {
 	tempLogger.logTemp(15.7);
 
 	try {
-	    int[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
+	    double[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
+	    // printArray(retArray);
 	    int cnt = 0;
 	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 		if (cnt < 13) { // 1houre+7min = 12+1 samples
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 12, retArray[i]);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 12.0, retArray[i], 0);
 		}
 		if (cnt == 13) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 16, retArray[i]);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 15.6, retArray[i], 0);
 		}
 		if (cnt > 13) {
 		    break;
@@ -147,14 +167,14 @@ public class TempLoggerTest {
 	tempLogger.logTemp(21.3);
 
 	try {
-	    int[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
+	    double[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
 	    int cnt = 0;
 	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 		if ((cnt < 5) || (cnt >= 282)) { // ((11+12)*60 + 30)/5
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 18, retArray[i]);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 18.2, retArray[i], 0);
 		}
 		if (cnt == 5) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 21, retArray[i]);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 21.2, retArray[i], 0);
 		}
 		cnt++;
 	    }
@@ -189,20 +209,21 @@ public class TempLoggerTest {
 	tempLogger.logTemp(7.7);
 
 	try {
-	    int[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
+	    double[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
+	    // printArray(retArray);
 	    int cnt = 0;
 	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
 		if (cnt == 1) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 8, retArray[i]);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 7.6, retArray[i], 0);
 		}
 		if ((cnt < 12) && (cnt != 1)) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 6, retArray[i]);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 5.4, retArray[i], 0);
 		}
 		if ((cnt == 12) || (cnt == 13)) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 9, retArray[i]);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 8.8, retArray[i], 0);
 		}
 		if (cnt == 14) {
-		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 10, retArray[i]);
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 9.8, retArray[i], 0);
 		}
 		if (cnt > 14) {
 		    break;
@@ -230,8 +251,8 @@ public class TempLoggerTest {
 	verify(logger).info("W,{}", 0);
 	tempLogger.logWarming(1);
 	verify(logger).info("W,{}", 1);
-	tempLogger.logTemp(3.5);
-	verify(logger).info("T,{}", 3.5);
+	tempLogger.logTemp(2.5);
+	verify(logger).info("T,{}", 2.5);
 	tempLogger.logReqTemp(0, 25.3);
 	verify(logger).info("P,{}", 25.3);
 	tempLogger.logReqTemp(1, 19.9);

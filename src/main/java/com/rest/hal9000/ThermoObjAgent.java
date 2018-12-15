@@ -14,7 +14,7 @@ public class ThermoObjAgent extends HalObjAgent {
 	private double required = 0;
 	private int manuallyForced = 0;
 	private double hysteresis = 0;
-	private int[] tempDayCompressed;
+	private double[] tempDayCompressed;
     }
 
     private final static TempLogger tempLogger = new TempLogger();

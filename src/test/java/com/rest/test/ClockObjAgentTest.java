@@ -108,6 +108,7 @@ public class ClockObjAgentTest {
 	    r = clock.exposeJsonAttribute("timer");
 	    Assert.assertEquals("ERROR in timer get/set", Integer.toString(TIMER_INIT_VAL * 3), (String) r.getEntity());
 	    Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	    emptySentMsg();
 	    for (int i = 0; i < (TIMER_INIT_VAL * 3) - 1; i++) {
 		clock.one_min_tick();
 		Assert.assertTrue("ERROR on tick:" + i, noMsgSent());

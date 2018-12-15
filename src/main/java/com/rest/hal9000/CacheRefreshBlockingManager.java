@@ -44,10 +44,12 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
 	    try {
 		updateWithCallBack();
 		if (!isUpdated.await(wait_timeout, TimeUnit.MILLISECONDS)) {
-		    log.error("requestForUpdate: timeout caused update failure");
+		    log.error("refreshIfRequired: timeout caused update failure");
+		    isUpdated.signalAll(); // sblocco la faccenda
+		    lastUpdateTime = 0; // forzo un realign
 		}
 	    } catch (InterruptedException e) {
-		log.error("requestForUpdate: interrupted!");
+		log.error("refreshIfRequired: interrupted!");
 		e.printStackTrace();
 	    }
 	}
