@@ -1,6 +1,8 @@
 package com.rest.test;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
@@ -19,69 +21,72 @@ public class CacheRefBlk_MngTest {
     private int cnt2 = 0;
 
     @InjectMocks
-    private final CacheRefreshBlockingManager objUTQuick = new CacheRefreshBlockingManager(() -> quickUpdater(), REFRESH_TIME, TIMEOUT);
+    private final CacheRefreshBlockingManager objUTQuick = new CacheRefreshBlockingManager(() -> quickUpdater(),
+	    REFRESH_TIME, TIMEOUT, "testQuick");
 
     @InjectMocks
-    private final CacheRefreshBlockingManager objUT = new CacheRefreshBlockingManager(() -> updater(), REFRESH_TIME, TIMEOUT);
+    private final CacheRefreshBlockingManager objUT = new CacheRefreshBlockingManager(() -> updater(), REFRESH_TIME,
+	    TIMEOUT, "testUt");
 
     @InjectMocks
-    private final CacheRefreshBlockingManager objUTTooSlow = new CacheRefreshBlockingManager(() -> slowUpdater(), REFRESH_TIME, TIMEOUT);
+    private final CacheRefreshBlockingManager objUTTooSlow = new CacheRefreshBlockingManager(() -> slowUpdater(),
+	    REFRESH_TIME, TIMEOUT, "testSlow");
 
     private void quickUpdater() {
-        cnt++;
+	cnt++;
     }
 
     private void updater() {
-        final Thread testThread = new Thread(() -> {
-            try {
-                Thread.sleep(REFRESH_TIME / 2);
-            } catch (final InterruptedException e) {
-            }
-            cnt++;
-        });
-        testThread.start();
+	final Thread testThread = new Thread(() -> {
+	    try {
+		Thread.sleep(REFRESH_TIME / 2);
+	    } catch (final InterruptedException e) {
+	    }
+	    cnt++;
+	});
+	testThread.start();
     }
 
     private void slowUpdater() {
-        final Thread testThread = new Thread(() -> {
-            try {
-                Thread.sleep(REFRESH_TIME * 3);
-            } catch (final InterruptedException e) {
-            }
-            cnt2++;
-        });
-        testThread.start();
+	final Thread testThread = new Thread(() -> {
+	    try {
+		Thread.sleep(REFRESH_TIME * 3);
+	    } catch (final InterruptedException e) {
+	    }
+	    cnt2++;
+	});
+	testThread.start();
     }
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+	MockitoAnnotations.initMocks(this);
     }
 
     @Test
     public void testUpdateCompleted() {
-        // Quick case
-        cnt = 0;
-        Assert.assertEquals("ERROR:", 0, cnt);
-        objUTQuick.refreshIfRequired();
-        Assert.assertEquals("ERROR:", 1, cnt);
-        objUTQuick.doRefresh();
-        Assert.assertEquals("ERROR:", 2, cnt);
-        // Normal case
-        cnt = 0;
-        Assert.assertEquals("ERROR:", 0, cnt);
-        objUT.refreshIfRequired();
-        Assert.assertEquals("ERROR:", 1, cnt);
-        try {
-            Thread.sleep(REFRESH_TIME * 2);
-        } catch (final InterruptedException e) {
-        }
-        objUT.refreshCompleted();
-        Assert.assertEquals("ERROR:", 1, cnt);
-        // Too Slow case
-        cnt2 = 0;
-        Assert.assertEquals("ERROR:", 0, cnt2);
-        objUTTooSlow.refreshIfRequired();
-        Assert.assertEquals("ERROR:", 0, cnt2);
+	// Quick case
+	cnt = 0;
+	Assert.assertEquals("ERROR:", 0, cnt);
+	objUTQuick.refreshIfRequired();
+	Assert.assertEquals("ERROR:", 1, cnt);
+	objUTQuick.doRefresh();
+	Assert.assertEquals("ERROR:", 2, cnt);
+	// Normal case
+	cnt = 0;
+	Assert.assertEquals("ERROR:", 0, cnt);
+	objUT.refreshIfRequired();
+	Assert.assertEquals("ERROR:", 1, cnt);
+	try {
+	    Thread.sleep(REFRESH_TIME * 2);
+	} catch (final InterruptedException e) {
+	}
+	objUT.refreshCompleted();
+	Assert.assertEquals("ERROR:", 1, cnt);
+	// Too Slow case
+	cnt2 = 0;
+	Assert.assertEquals("ERROR:", 0, cnt2);
+	objUTTooSlow.refreshIfRequired();
+	Assert.assertEquals("ERROR:", 0, cnt2);
     }
 }

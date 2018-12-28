@@ -18,10 +18,11 @@ public class CachedInfoTest {
     private static final long REFRESH_TIME = 3000;
 
     @InjectMocks
-    private final CachedInfo<Integer> infQuick1 = new CachedInfo<>(() -> mysupplier1(), 1);
+    private final CachedInfo<Integer> infQuick1 = new CachedInfo<>(() -> mysupplier1(), 1, "testQuick1");
 
     @InjectMocks
-    private final CachedInfo<Integer> infSlow2 = new CachedInfo<>(0, () -> mysupplier2(), REFRESH_TIME/2);
+    private final CachedInfo<Integer> infSlow2 = new CachedInfo<>(0, () -> mysupplier2(), REFRESH_TIME / 2,
+	    "testSlow2");
 
     private Integer mysupplier1() {
 	return 1;

@@ -21,10 +21,12 @@ public class CacheRef_MngTest {
     private int cntShort = 0;
 
     @InjectMocks
-    private final CacheRefreshManager objUTLong = new CacheRefreshManager(() -> updateLong(), REFRESH_TIME_LONG);
+    private final CacheRefreshManager objUTLong = new CacheRefreshManager(() -> updateLong(), REFRESH_TIME_LONG,
+	    "testLong");
 
     @InjectMocks
-    private final CacheRefreshManager objUTShort = new CacheRefreshManager(() -> updateShort(), REFRESH_TIME_SHORT);
+    private final CacheRefreshManager objUTShort = new CacheRefreshManager(() -> updateShort(), REFRESH_TIME_SHORT,
+	    "testShort");
 
     private void updateLong() {
 	cntLong++;

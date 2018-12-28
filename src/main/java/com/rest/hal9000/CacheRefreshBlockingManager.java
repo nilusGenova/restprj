@@ -10,13 +10,14 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
 
     protected final Condition isUpdated = updateLock.newCondition();
 
-    public CacheRefreshBlockingManager(Runnable updateCallBack, long refresh_period_ms, long wait_timeout) {
-	super(updateCallBack, refresh_period_ms);
+    public CacheRefreshBlockingManager(Runnable updateCallBack, long refresh_period_ms, long wait_timeout,
+	    final String debug_name) {
+	super(updateCallBack, refresh_period_ms, debug_name);
 	this.wait_timeout = wait_timeout;
     }
 
-    protected CacheRefreshBlockingManager(long refresh_period_ms, long wait_timeout) {
-	super(refresh_period_ms);
+    protected CacheRefreshBlockingManager(long refresh_period_ms, long wait_timeout, final String debug_name) {
+	super(refresh_period_ms, debug_name);
 	this.wait_timeout = wait_timeout;
     }
 
@@ -44,12 +45,12 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
 	    try {
 		updateWithCallBack();
 		if (!isUpdated.await(wait_timeout, TimeUnit.MILLISECONDS)) {
-		    log.error("refreshIfRequired: timeout caused update failure");
+		    log.error("refreshIfRequired {}: timeout caused update failure", debug_name);
 		    isUpdated.signalAll(); // sblocco la faccenda
 		    lastUpdateTime = 0; // forzo un realign
 		}
 	    } catch (InterruptedException e) {
-		log.error("refreshIfRequired: interrupted!");
+		log.error("refreshIfRequired {}: interrupted!", debug_name);
 		e.printStackTrace();
 	    }
 	}

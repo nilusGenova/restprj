@@ -29,14 +29,15 @@ public abstract class HalObjAgent {
 
     private final Consumer<String> sendMsgCallBack;
 
-    private CacheRefreshBlockingManager cacheRefreshManager = new CacheRefreshBlockingManager(() -> alignAll(),
-	    REFRESH_TIME, WAIT_REFRESH_TIMEOUT);
+    private CacheRefreshBlockingManager cacheRefreshManager;
 
     public HalObjAgent(final String pathName, final Consumer<String> sendMsgCallBack) {
 	super();
 	this.id = Character.toUpperCase(pathName.charAt(0));
 	this.pathName = pathName;
 	this.sendMsgCallBack = sendMsgCallBack;
+	cacheRefreshManager = new CacheRefreshBlockingManager(() -> alignAll(), REFRESH_TIME, WAIT_REFRESH_TIMEOUT,
+		pathName);
     }
 
     public char getId() {

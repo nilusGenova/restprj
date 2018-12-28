@@ -16,15 +16,19 @@ public class CacheRefreshManager {
 
     protected volatile long lastUpdateTime = 0;
 
+    protected String debug_name;
+
     protected Lock updateLock = new ReentrantLock();
 
-    public CacheRefreshManager(Runnable updateCallBack, long refresh_period_ms) {
+    public CacheRefreshManager(Runnable updateCallBack, long refresh_period_ms, final String debug_name) {
 	this.updateCallBack = updateCallBack;
 	this.refresh_period_ms = refresh_period_ms;
+	this.debug_name = debug_name;
     }
 
-    protected CacheRefreshManager(long refresh_period_ms) {
+    protected CacheRefreshManager(long refresh_period_ms, final String debug_name) {
 	this.refresh_period_ms = refresh_period_ms;
+	this.debug_name = debug_name;
     }
 
     protected void setCallBack(Runnable updateCallBack) {
@@ -49,11 +53,11 @@ public class CacheRefreshManager {
 	final long actualTime = Calendar.getInstance().getTimeInMillis();
 	updateLock.lock();
 	if ((actualTime - lastUpdateTime) > refresh_period_ms) {
-	    log.debug("Force realignment");
+	    log.debug("Force realignment of {}", debug_name);
 	    try {
 		updateWithCallBack();
 	    } catch (Exception e) {
-		log.error("requestForUpdate: interrupted!");
+		log.error("requestForUpdate {}: interrupted!", debug_name);
 		e.printStackTrace();
 	    }
 	}
