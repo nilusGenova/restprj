@@ -25,6 +25,7 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
     public void doRefresh() {
 	updateLock.lock();
 	updateWithCallBack();
+	log.debug("refreshDone for {}", debug_name);
 	isUpdated.signalAll();
 	updateLock.unlock();
     }
@@ -32,6 +33,7 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
     public void refreshCompleted() {
 	updateLock.lock();
 	update();
+	log.debug("refreshCompleted for {}", debug_name);
 	isUpdated.signalAll();
 	updateLock.unlock();
     }
@@ -46,8 +48,6 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
 		updateWithCallBack();
 		if (!isUpdated.await(wait_timeout, TimeUnit.MILLISECONDS)) {
 		    log.error("refreshIfRequired {}: timeout caused update failure", debug_name);
-		    isUpdated.signalAll(); // sblocco la faccenda
-		    lastUpdateTime = 0; // forzo un realign
 		}
 	    } catch (InterruptedException e) {
 		log.error("refreshIfRequired {}: interrupted!", debug_name);
