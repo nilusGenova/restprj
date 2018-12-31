@@ -50,7 +50,7 @@ public class Registry {
     }
 
     public void callOneMinTickForAllRegistered() {
-	log.debug("All objects tick");
+	// log.debug("All objects tick");
 	synchronized (registeredMap) {
 	    // without lambda functions
 	    // for (Map.Entry<Character, HalObjAgent> entry : registeredMap.entrySet()) {
