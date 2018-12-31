@@ -235,6 +235,10 @@ public class TwoWaysSerialComms {
 		    this.out.write(msgToSend.getBytes());
 		    this.out.write('\n');
 		    this.out.flush();
+		    if (!outMsgQueue.isEmpty()) {
+			log.debug("Writer: not empty queue... sleep");
+			Thread.sleep(500); // mSec
+		    }
 		}
 	    } catch (Exception e) {
 		e.printStackTrace();
