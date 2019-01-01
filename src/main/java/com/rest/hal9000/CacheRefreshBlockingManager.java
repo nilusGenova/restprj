@@ -41,6 +41,7 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
     @Override
     public void refreshIfRequired() {
 	final long actualTime = Calendar.getInstance().getTimeInMillis();
+	log.debug("refreshIfRequired lock");
 	updateLock.lock();
 	if ((actualTime - lastUpdateTime) > refresh_period_ms) {
 	    log.debug("Force realignment");
@@ -54,6 +55,7 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
 		e.printStackTrace();
 	    }
 	}
+	log.debug("refreshIfRequired unlock");
 	updateLock.unlock();
     }
 }
