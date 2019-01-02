@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public class Parser implements Runnable {
 
-    private final static BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>(5);
+    private final static BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>(10);
     private final Function<Character, HalObjAgent> getRegisteredObj;
 
     private static final Logger log = LoggerFactory.getLogger(Parser.class);
@@ -20,6 +20,7 @@ public class Parser implements Runnable {
 
     public void msgToBeParsed(final String msg) {
 	try {
+	    log.debug("Parse: queued <{}>", msg);
 	    msgQueue.put(msg);
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
@@ -51,10 +52,10 @@ public class Parser implements Runnable {
 		HalObjAgent obj = getRegisteredObj.apply(objId);
 		if (obj != null) {
 		    if (invocation == 'g') {
-			log.debug("Invoking obj get parser");
+			log.debug("Invoking obj {} get parser", obj.getPathName());
 			obj.parseGetAnswer(msgToParse.charAt(2), msgToParse.substring(3));
 		    } else {
-			log.debug("Invoking obj event parser");
+			log.debug("Invoking obj {} event parser", obj.getPathName());
 			obj.parseEvent(msgToParse.charAt(2), msgToParse.substring(3));
 		    }
 		} else {
