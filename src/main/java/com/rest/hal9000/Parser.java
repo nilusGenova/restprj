@@ -58,6 +58,7 @@ public class Parser implements Runnable {
 			log.debug("Invoking obj {} event parser", obj.getPathName());
 			obj.parseEvent(msgToParse.charAt(2), msgToParse.substring(3));
 		    }
+		    log.debug("Parsing by {} completed", obj.getPathName());
 		} else {
 		    log.error("Invalid object:{}", objId);
 		}
