@@ -20,7 +20,6 @@ public class Parser implements Runnable {
 
     public void msgToBeParsed(final String msg) {
 	try {
-	    log.debug("Parse: queued <{}>", msg);
 	    msgQueue.put(msg);
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
@@ -47,18 +46,14 @@ public class Parser implements Runnable {
 	    case 'g': // answer to get
 	    case 'E': // Event
 		// search for registered obj
-		log.debug("Correct msg, search registered obj to dispatch");
 		final char objId = msgToParse.charAt(1);
 		HalObjAgent obj = getRegisteredObj.apply(objId);
 		if (obj != null) {
 		    if (invocation == 'g') {
-			log.debug("Parser invokation of {} get", obj.getPathName());
 			obj.parseGetAnswer(msgToParse.charAt(2), msgToParse.substring(3));
 		    } else {
-			log.debug("Parser invokation of {} event", obj.getPathName());
 			obj.parseEvent(msgToParse.charAt(2), msgToParse.substring(3));
 		    }
-		    log.debug("Parsing by {} completed", obj.getPathName());
 		} else {
 		    log.error("Invalid object:{}", objId);
 		}

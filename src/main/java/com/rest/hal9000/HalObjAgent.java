@@ -62,7 +62,6 @@ public abstract class HalObjAgent {
 	synchWrite(new Callable<Boolean>() {
 	    public Boolean call() throws Exception {
 		if (specializedParseGetAnswer(attribute, msg)) {
-		    log.debug("specializedParseGetAnswer of {} done", pathName);
 		    cacheRefreshManager.refreshCompleted();
 		}
 		return true;
@@ -74,7 +73,6 @@ public abstract class HalObjAgent {
 	synchWrite(new Callable<Boolean>() {
 	    public Boolean call() throws Exception {
 		if (specializedParseEvent(event, msg)) {
-		    log.debug("specializedParseEvent of {} done", pathName);
 		    cacheRefreshManager.refreshCompleted();
 		}
 		return true;

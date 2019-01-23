@@ -80,7 +80,6 @@ public class ThermoObjAgent extends HalObjAgent {
     protected boolean specializedParseEvent(final char event, final String msg) {
 	// Format of message:
 	// type(temp,warm,required,error),value
-	log.debug("Thermo ParseEvent {}", msg);
 	switch (event) {
 	case 'W':
 	    expAttr.warming = "0".equals(msg) ? 0 : 1;
