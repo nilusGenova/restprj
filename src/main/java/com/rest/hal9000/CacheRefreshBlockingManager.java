@@ -25,17 +25,17 @@ public class CacheRefreshBlockingManager extends CacheRefreshManager {
     public void doRefresh() {
 	updateLock.lock();
 	updateWithCallBack();
-	log.debug("refreshDone for {}", debug_name);
 	isUpdated.signalAll();
 	updateLock.unlock();
+	log.debug("refreshDone for {}", debug_name);
     }
 
     public void refreshCompleted() {
 	updateLock.lock();
 	update();
-	log.debug("refreshCompleted for {}", debug_name);
 	isUpdated.signalAll();
 	updateLock.unlock();
+	log.debug("refreshCompleted for {}", debug_name);
     }
 
     @Override

@@ -185,6 +185,41 @@ public class TempLoggerTest {
     }
 
     @Test
+    public void testFillingsamplesOverDay4Bug() {
+	// 2019-01-18,23:46:13,1,T,20.3
+	// 2019-01-19,00:02:25,1,T,20.2
+	PowerMockito.mockStatic(Calendar.class);
+	PowerMockito.when(Calendar.getInstance()).thenReturn(calendar);
+	when(calendar.get(Calendar.MINUTE)).thenReturn(46);
+	when(calendar.get(Calendar.HOUR)).thenReturn(11);
+	when(calendar.get(Calendar.AM_PM)).thenReturn(1);
+	tempLogger.logTemp(20.3);
+
+	when(calendar.get(Calendar.MINUTE)).thenReturn(2);
+	when(calendar.get(Calendar.HOUR)).thenReturn(0);
+	when(calendar.get(Calendar.AM_PM)).thenReturn(0);
+	tempLogger.logTemp(20.1);
+
+	try {
+	    double[] retArray = generateRetArray(tempLogger.getTempDayCompressed());
+	    // printArray(retArray);
+	    int cnt = 0;
+	    for (int i = 0; i < NUM_OF_TEMP_SAMPLES; i++) {
+		if ((cnt >= 285)) { // ((11+12)*60 + 46)/5
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 20.2, retArray[i], 0);
+		}
+		if (cnt == 0) {
+		    Assert.assertEquals("ERROR in filling #" + cnt + " :", 20.0, retArray[i], 0);
+		}
+		cnt++;
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("ERROR");
+	}
+    }
+
+    @Test
     public void testNoFillWhenTimeGoesBack1Hour() {
 	PowerMockito.mockStatic(Calendar.class);
 	PowerMockito.when(Calendar.getInstance()).thenReturn(calendar);

@@ -40,6 +40,10 @@ public class TempLogger {
 		for (int i = expData.latestTempIdx; i != nowIdx; i++) {
 		    if (i == NUM_OF_TEMP_SAMPLES) {
 			i = 0;
+			if (nowIdx == 0) {
+			    expData.tempDay[0] = expData.tempDay[expData.latestTempIdx];
+			    break;
+			}
 		    }
 		    expData.tempDay[i] = expData.tempDay[expData.latestTempIdx];
 		}

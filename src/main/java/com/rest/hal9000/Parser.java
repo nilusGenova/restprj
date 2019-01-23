@@ -52,10 +52,10 @@ public class Parser implements Runnable {
 		HalObjAgent obj = getRegisteredObj.apply(objId);
 		if (obj != null) {
 		    if (invocation == 'g') {
-			log.debug("Invoking obj {} get parser", obj.getPathName());
+			log.debug("Parser invokation of {} get", obj.getPathName());
 			obj.parseGetAnswer(msgToParse.charAt(2), msgToParse.substring(3));
 		    } else {
-			log.debug("Invoking obj {} event parser", obj.getPathName());
+			log.debug("Parser invokation of {} event", obj.getPathName());
 			obj.parseEvent(msgToParse.charAt(2), msgToParse.substring(3));
 		    }
 		    log.debug("Parsing by {} completed", obj.getPathName());
