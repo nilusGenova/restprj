@@ -74,14 +74,6 @@ public class AlarmObjAgent extends HalObjAgent {
 		expAttr.storePin(Integer.parseInt(rec[0]) - 1, Integer.parseInt(rec[1]));
 	    }
 	    break;
-	// S sensor values: (green);(red);(alm)
-	case 'S':
-	    String[] val = msg.split(";");
-	    expAttr.setSensGreen(Integer.parseInt(val[0]));
-	    expAttr.setSensRed(Integer.parseInt(val[1]));
-	    expAttr.setSensAlm(Integer.parseInt(val[2]));
-	    expAttr.setValidSensValue(1);
-	    break;
 	default:
 	    wrongAttribute(attribute + " " + msg);
 	    return false;
@@ -147,11 +139,6 @@ public class AlarmObjAgent extends HalObjAgent {
     public Response executeSet(final String attr, String val) throws Exception {
 	int n;
 	switch (attr) {
-	// need to force sensor read to have valid values
-	case "readsensors":
-	    expAttr.setValidSensValue(0);
-	    sendMsgToHal("GAS");
-	    break;
 	// R Remote ctrl [0:verde 1:rosso]
 	case "remote":
 	    log.info("Forcing remote controller (0:green 1:red) :{}", val);

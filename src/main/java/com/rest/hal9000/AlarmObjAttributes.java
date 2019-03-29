@@ -37,10 +37,6 @@ public class AlarmObjAttributes {
     private int keyProgramming = 0;
     private int masterKey = 0;
     private Map<Integer, KeyPinRecord> keys = new HashMap();
-    private int sensGreen = 0;
-    private int sensRed = 0;
-    private int sensAlm = 0;
-    private int validSensValue = 0;
 
     public void storeKey(final int idx, final int keyval) {
 	KeyPinRecord k = keys.get(idx);
@@ -133,38 +129,6 @@ public class AlarmObjAttributes {
 
     public void setMasterKey(final int masterKey) {
 	this.masterKey = masterKey;
-    }
-
-    public int getSensGreen() {
-	return sensGreen;
-    }
-
-    public void setSensGreen(final int sensGreen) {
-	this.sensGreen = sensGreen;
-    }
-
-    public int getSensRed() {
-	return sensRed;
-    }
-
-    public void setSensRed(final int sensRed) {
-	this.sensRed = sensRed;
-    }
-
-    public int getSensAlm() {
-	return sensAlm;
-    }
-
-    public void setSensAlm(final int sensAlm) {
-	this.sensAlm = sensAlm;
-    }
-
-    public int getValidSensValue() {
-	return validSensValue;
-    }
-
-    public void setValidSensValue(final int validSensValue) {
-	this.validSensValue = validSensValue;
     }
 
 }

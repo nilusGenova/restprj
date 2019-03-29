@@ -94,20 +94,6 @@ public class AlarmObjAgentTest {
     }
 
     @Test
-    public void testParseGetAnswerSensors() {
-	// S sensor values: (green);(red);(alm)
-	emptySentMsg();
-	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getValidSensValue());
-	alarm.parseGetAnswer('S', "15;0;2");
-	Assert.assertEquals("ERROR:", 1, extractAttributeValue().getValidSensValue());
-	Assert.assertEquals("ERROR:", 15, extractAttributeValue().getSensGreen());
-	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getSensRed());
-	Assert.assertEquals("ERROR:", 2, extractAttributeValue().getSensAlm());
-	// Assert.assertTrue("ERROR:", noMsgSent()); refresh mechanism force further
-	// messages
-    }
-
-    @Test
     public void testParseGetAnswerKeysPinsDelete() {
 	emptySentMsg();
 	// K key = (idxKey 0:master)(value 8 chars).(......).
@@ -326,23 +312,6 @@ public class AlarmObjAgentTest {
 	Assert.assertEquals("ERROR:", "RAP", getSentMsg());
 	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
 	Assert.assertTrue("ERROR:", noMsgSent());
-    }
-
-    @Test
-    public void testExecuteSetReadSensors() {
-	Response.Status et = Response.Status.BAD_REQUEST;
-	emptySentMsg();
-	try {
-	    et = Response.Status.fromStatusCode(alarm.executeSet("readsensors", "").getStatus());
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    fail("exception");
-	}
-	Assert.assertEquals("ERROR:", "GAS", getSentMsg());
-	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getValidSensValue());
-	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
-	// Assert.assertTrue("ERROR:", noMsgSent()); refresh mechanism force further
-	// messages
     }
 
     @Test
