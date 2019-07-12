@@ -367,6 +367,7 @@ public class AlarmObjAgentTest {
 	}
 	Assert.assertEquals("ERROR:", "SAM100", getSentMsg());
 	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertEquals("ERROR:", "SAR1", getSentMsg());
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 

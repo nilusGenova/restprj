@@ -148,6 +148,8 @@ public class AlarmObjAgent extends HalObjAgent {
 	case "armed":
 	    log.info("Forcing mode armed:{}", val);
 	    sendMsgToHal("SAM" + calcModeFormat(getBooleanVal(val), expAttr.getAlarmed(), expAttr.getKeyProgramming()));
+	    log.info("Forcing remote controller (0:green 1:red) :{}", val);
+	    sendMsgToHal("SAR" + getBooleanVal(val));
 	    break;
 	case "alarm":
 	    log.info("Forcing mode alarmed:{}", val);

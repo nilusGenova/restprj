@@ -37,7 +37,7 @@ P,temp temperature required by program
 Example:
 2018-01-07,11:56:00,1,W,1
 
-to browse:
+to browse (0:sunday):
 GET:
 http://localhost:8080/hal9000/clock
 http://localhost:8080/hal9000/clock?a=epochtime
