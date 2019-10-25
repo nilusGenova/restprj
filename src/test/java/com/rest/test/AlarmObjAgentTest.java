@@ -346,9 +346,6 @@ public class AlarmObjAgentTest {
 
     @Test
     public void testExecuteSetSimples() {
-	testExecuteSetAttr("remote", "0", "SAR0", Response.Status.OK);
-	testExecuteSetAttr("remote", "1", "SAR1", Response.Status.OK);
-	testExecuteSetAttr("remote", "3", "", Response.Status.BAD_REQUEST);
 	testExecuteSetAttr("armed", "3", "", Response.Status.BAD_REQUEST);
 	testExecuteSetAttr("alarm", "3", "", Response.Status.BAD_REQUEST);
 	testExecuteSetAttr("program", "3", "", Response.Status.BAD_REQUEST);
@@ -367,7 +364,6 @@ public class AlarmObjAgentTest {
 	}
 	Assert.assertEquals("ERROR:", "SAM100", getSentMsg());
 	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
-	Assert.assertEquals("ERROR:", "SAR1", getSentMsg());
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 

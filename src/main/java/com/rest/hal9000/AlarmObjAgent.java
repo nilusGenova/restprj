@@ -139,17 +139,10 @@ public class AlarmObjAgent extends HalObjAgent {
     public Response executeSet(final String attr, String val) throws Exception {
 	int n;
 	switch (attr) {
-	// R Remote ctrl [0:verde 1:rosso]
-	case "remote":
-	    log.info("Forcing remote controller (0:green 1:red) :{}", val);
-	    sendMsgToHal("SAR" + getBooleanVal(val));
-	    break;
 	// M Mode (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
 	case "armed":
 	    log.info("Forcing mode armed:{}", val);
 	    sendMsgToHal("SAM" + calcModeFormat(getBooleanVal(val), expAttr.getAlarmed(), expAttr.getKeyProgramming()));
-	    log.info("Forcing remote controller (0:green 1:red) :{}", val);
-	    sendMsgToHal("SAR" + getBooleanVal(val));
 	    break;
 	case "alarm":
 	    log.info("Forcing mode alarmed:{}", val);
