@@ -90,6 +90,7 @@ http://localhost:8080/hal9000/program?c=allprograms
 http://localhost:8080/hal9000/program?c=entry&p=h:<hour>-m:<min>-d:<day>-t:<temp>-i:<0|1 interp>
 http://localhost:8080/hal9000/shutdown
 
+curl -X DELETE -i 'http://localhost:8080/hal9000/shutdown'
 
 curl -X POST http://localhost:8080/hal9000/debug?enable=true
 curl -X PUT -HContent-type:text/plain --data 
