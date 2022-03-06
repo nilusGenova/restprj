@@ -7,11 +7,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
-
 import com.rest.hal9000.CacheRefreshBlockingManager;
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 @PrepareForTest({ CacheRefreshBlockingManager.class })
 public class CacheRefBlk_MngTest {
     private static final long REFRESH_TIME = 3000;

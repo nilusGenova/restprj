@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -34,6 +35,7 @@ import com.rest.hal9000.ThermoObjAgent;
 
 //@RunWith(MockitoJUnitRunner.class)
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 @PrepareForTest({ EntryPoint.class, App.class, Registry.class, HttpServletRequest.class })
 public class EntryPointTest {
 
