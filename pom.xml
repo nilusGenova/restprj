@@ -10,7 +10,7 @@
   
   <properties>
      <jersey.version>2.26-b03</jersey.version>
-     <jetty.version>9.4.35.v20201120</jetty.version>
+     <jetty.version>10.0.10</jetty.version>
      <powermock.version>1.6.1</powermock.version>
      <mockito.version>1.9.5</mockito.version>
      <log4j.version>2.17.1</log4j.version>
