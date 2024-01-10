@@ -69,5 +69,13 @@ public class AlarmObjAttributesTest {
     	Assert.assertTrue("ERROR:",attr.setAlarmed(1));
     	Assert.assertFalse("ERROR:",attr.setAlarmed(1));
     	Assert.assertTrue("ERROR:",attr.setAlarmed(0));
+    	Assert.assertFalse("ERROR:",attr.setCamPower(0));
+    	Assert.assertTrue("ERROR:",attr.setCamPower(1));
+    	Assert.assertFalse("ERROR:",attr.setCamPower(1));
+    	Assert.assertTrue("ERROR:",attr.setCamPower(0));
+    	Assert.assertFalse("ERROR:",attr.setAutoCamPower(0));
+    	Assert.assertTrue("ERROR:",attr.setAutoCamPower(1));
+    	Assert.assertFalse("ERROR:",attr.setAutoCamPower(1));
+    	Assert.assertTrue("ERROR:",attr.setAutoCamPower(0));
     }
 }

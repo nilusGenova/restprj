@@ -31,12 +31,19 @@ public class AlarmObjAgent extends HalObjAgent {
 	if ("mode".equals(attr)) {
 	    return calcModeFormat(expAttr.getArmed(), expAttr.getAlarmed(), expAttr.getKeyProgramming());
 	}
+	if ("campower".equals(attr)) {
+		return Integer.toString(expAttr.getCamPower());
+	}
+	if ("autocampower".equals(attr)) {
+		return Integer.toString(expAttr.getAutoCamPower());
+	}
 	wrongAttribute(attr);
 	return null;
     }
 
     @Override
     protected boolean specializedParseGetAnswer(final char attribute, final String msg) {
+    	int v;
 	switch (attribute) {
 	// M mode = (Armed:[0-1])(Alarm:[0-1])(Prg:[0-1])
 	case 'M':
@@ -74,6 +81,22 @@ public class AlarmObjAgent extends HalObjAgent {
 		expAttr.storePin(Integer.parseInt(rec[0]) - 1, Integer.parseInt(rec[1]));
 	    }
 	    break;
+	case 'C':
+	    v = Integer.parseInt(msg);
+	    if ((v > 1) || (v < 0)) {
+		wrongValue("get val:" + v);
+	    } else {
+		expAttr.setCamPower(v);
+	    }
+	    break;
+	case 'A':
+	    v = Integer.parseInt(msg);
+	    if ((v > 1) || (v < 0)) {
+		wrongValue("get val:" + v);
+	    } else {
+		expAttr.setAutoCamPower(v);
+	    }
+	    break;	    
 	default:
 	    wrongAttribute(attribute + " " + msg);
 	    return false;
@@ -133,6 +156,8 @@ public class AlarmObjAgent extends HalObjAgent {
 	sendMsgToHal("GAM");
 	sendMsgToHal("GAK");
 	sendMsgToHal("GAP");
+	sendMsgToHal("GAC");
+	sendMsgToHal("GAA");
     }
 
     @Override
@@ -155,58 +180,66 @@ public class AlarmObjAgent extends HalObjAgent {
 	// X Master Key value
 	case "masterkey":
 	    if ("".equals(val)) {
-		val = "-1";
+		  val = "-1";
 	    }
 	    try {
-		n = Integer.parseInt(val);
+		  n = Integer.parseInt(val);
 	    } catch (Exception e) {
-		n = -1;
+		  n = -1;
 	    }
 	    if (n <= 0) {
-		wrongValue("masterkey:" + n);
-		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+		  wrongValue("masterkey:" + n);
+		  return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
-		log.info("Setting master key :{}", val);
-		sendMsgToHal("SAX" + val);
+		  log.info("Setting master key :{}", val);
+		  sendMsgToHal("SAX" + val);
 	    }
 	    break;
 	// P Pin of key idxKey:value to add(to be entered on keyboard)
 	case "enterpin":
 	    if ("".equals(val)) {
-		val = "-1";
+		  val = "-1";
 	    }
 	    try {
-		n = Integer.parseInt(val);
+		  n = Integer.parseInt(val);
 	    } catch (Exception e) {
-		n = -1;
+		  n = -1;
 	    }
 	    if ((n < 0) || (n >= 10)) {
-		wrongValue("pin:" + n);
-		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+		  wrongValue("pin:" + n);
+		  return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
-		log.info("Setting pin for key #{}", n);
-		sendMsgToHal("SAP" + val);
-		return Response.ok("Enter PIN from Keyboard", MediaType.TEXT_PLAIN)
+		  log.info("Setting pin for key #{}", n);
+		  sendMsgToHal("SAP" + val);
+		  return Response.ok("Enter PIN from Keyboard", MediaType.TEXT_PLAIN)
 			.header("Access-Control-Allow-Origin", "*").build();
 	    }
 	    // K Key value to add
 	case "newkey":
 	    if ("".equals(val)) {
-		val = "-1";
+		  val = "-1";
 	    }
 	    try {
-		n = Integer.parseInt(val);
+		  n = Integer.parseInt(val);
 	    } catch (Exception e) {
-		n = -1;
+		  n = -1;
 	    }
 	    if (n <= 0) {
-		wrongValue("newkey:" + n);
-		return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+		  wrongValue("newkey:" + n);
+		  return Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 	    } else {
-		log.info("Setting key :{}", val);
-		sendMsgToHal("SAK" + val);
+		  log.info("Setting key :{}", val);
+		  sendMsgToHal("SAK" + val);
 	    }
 	    break;
+	case "campower":
+		log.info("Cam power:{}", val);
+	    sendMsgToHal("SAC" +  getBooleanVal(val));
+	    break;
+	case "autocampower":		
+	    log.info("Auto cam power:{}", val);
+	    sendMsgToHal("SAA" +  getBooleanVal(val));
+	    break;	    
 	default:
 	    throw new Exception();
 	}

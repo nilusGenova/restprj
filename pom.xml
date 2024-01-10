@@ -4,7 +4,7 @@
   <groupId>com.rest.test</groupId>
   <artifactId>restprj</artifactId>
   <packaging>jar</packaging>
-  <version>2.39</version>
+  <version>2.41</version>
   <name>restprj</name>
   <url>http://maven.apache.org</url>
   

@@ -36,6 +36,8 @@ public class AlarmObjAttributes {
     private int alarmed = 0;
     private int keyProgramming = 0;
     private int masterKey = 0;
+    private int camPower = 0;
+    private int autoCamPower = 0;
     private Map<Integer, KeyPinRecord> keys = new HashMap();
 
     public void storeKey(final int idx, final int keyval) {
@@ -131,4 +133,25 @@ public class AlarmObjAttributes {
 	this.masterKey = masterKey;
     }
 
+    // return true if changed
+    public boolean setCamPower(final int val) {
+    	final boolean retVal = (this.camPower != val);
+    	this.camPower = val;
+    	return retVal;
+    }
+
+    public int getCamPower() {
+	    return camPower;
+    }
+    
+    // return true if changed
+    public boolean setAutoCamPower(final int val) {
+    	final boolean retVal = (this.autoCamPower != val);
+    	this.autoCamPower = val;
+    	return retVal;
+    }
+
+    public int getAutoCamPower() {
+	    return autoCamPower;
+    }
 }

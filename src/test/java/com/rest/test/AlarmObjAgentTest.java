@@ -349,6 +349,8 @@ public class AlarmObjAgentTest {
 	testExecuteSetAttr("armed", "3", "", Response.Status.BAD_REQUEST);
 	testExecuteSetAttr("alarm", "3", "", Response.Status.BAD_REQUEST);
 	testExecuteSetAttr("program", "3", "", Response.Status.BAD_REQUEST);
+	testExecuteSetAttr("campower", "3", "", Response.Status.BAD_REQUEST);
+	testExecuteSetAttr("autocampower", "3", "", Response.Status.BAD_REQUEST);
     }
 
     @Test
@@ -468,6 +470,70 @@ public class AlarmObjAgentTest {
 	    fail("exception");
 	}
 	Assert.assertEquals("ERROR in return value", Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+    
+    @Test
+    public void testExecuteSetCamPowerOn() {
+	Response.Status et = Response.Status.BAD_REQUEST;
+	emptySentMsg();
+	alarm.parseGetAnswer('C', "0");
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("campower", "1").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAC1", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+    
+    @Test
+    public void testExecuteSetCamPowerOff() {
+	Response.Status et = Response.Status.BAD_REQUEST;
+	emptySentMsg();
+	alarm.parseGetAnswer('C', "1");
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("campower", "0").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAC0", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+    
+    @Test
+    public void testExecuteSetAutoCamPowerOn() {
+	Response.Status et = Response.Status.BAD_REQUEST;
+	emptySentMsg();
+	alarm.parseGetAnswer('A', "0");
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("autocampower", "1").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAA1", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
+	Assert.assertTrue("ERROR:", noMsgSent());
+    }
+    
+    @Test
+    public void testExecuteSetAutoCamPowerOff() {
+	Response.Status et = Response.Status.BAD_REQUEST;
+	emptySentMsg();
+	alarm.parseGetAnswer('A', "1");
+	try {
+	    et = Response.Status.fromStatusCode(alarm.executeSet("autocampower", "0").getStatus());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    fail("exception");
+	}
+	Assert.assertEquals("ERROR:", "SAA0", getSentMsg());
+	Assert.assertEquals("ERROR in return value", Response.Status.OK, et);
 	Assert.assertTrue("ERROR:", noMsgSent());
     }
 
