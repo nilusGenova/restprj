@@ -17,10 +17,10 @@ public class AlarmObjAttributes {
 
     private static class KeyPinRecord {
 	private int keyCode;
-	private int pinCode;
+	private long pinCode;
 
 	@JsonCreator
-	public KeyPinRecord(@JsonProperty("keyCode") int keyCode, @JsonProperty("pinCode") int pincode) {
+	public KeyPinRecord(@JsonProperty("keyCode") int keyCode, @JsonProperty("pinCode") long pincode) {
 	    this.keyCode = keyCode;
 	    this.pinCode = pincode;
 	}
@@ -59,7 +59,7 @@ public class AlarmObjAttributes {
 	return false;
     }
 
-    public void storePin(final int idx, final int pin) {
+   	public void storePin(final int idx, final long pin) {
 	KeyPinRecord k = keys.get(idx);
 	if (k == null) {
 	    k = new KeyPinRecord(0);
@@ -72,7 +72,7 @@ public class AlarmObjAttributes {
 	keys.clear();
     }
 
-    public int getPin(final int idx) {
+    public long getPin(final int idx) {
 	KeyPinRecord k = keys.get(idx);
 	if (k != null) {
 	    return k.pinCode;

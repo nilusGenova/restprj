@@ -78,7 +78,7 @@ public class AlarmObjAgent extends HalObjAgent {
 	    String[] pin = msg.split("\\.");
 	    for (String p : pin) {
 		String[] rec = p.split(":");
-		expAttr.storePin(Integer.parseInt(rec[0]) - 1, Integer.parseInt(rec[1]));
+		expAttr.storePin(Integer.parseInt(rec[0]) - 1, Long.parseLong(rec[1]));
 	    }
 	    break;
 	case 'C':

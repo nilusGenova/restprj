@@ -108,10 +108,11 @@ public class AlarmObjAgentTest {
 	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getPin(7 - 1));
 	Assert.assertEquals("ERROR:", -1, extractAttributeValue().getPin(2 - 1));
 	// P pin = (idxKey 1:)(value 8 chars);(......)
-	alarm.parseGetAnswer('P', "1:00087892.3:8475.7:99811022.");
+	alarm.parseGetAnswer('P', "1:00087892.3:8475.7:4026597376.");  
 	Assert.assertEquals("ERROR:", 87892, extractAttributeValue().getPin(1 - 1));
 	Assert.assertEquals("ERROR:", 8475, extractAttributeValue().getPin(3 - 1));
-	Assert.assertEquals("ERROR:", 99811022, extractAttributeValue().getPin(7 - 1));
+	Assert.assertEquals("ERROR:", 0xf0010000L, extractAttributeValue().getPin(7 - 1));  
+
 	Assert.assertEquals("ERROR:", 0, extractAttributeValue().getPin(5 - 1));
 	Assert.assertEquals("ERROR:", -1, extractAttributeValue().getPin(2 - 1));
 	Assert.assertTrue("ERROR:", noMsgSent());
